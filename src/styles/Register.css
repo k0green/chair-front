@@ -1,0 +1,86 @@
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.register-form {
+    border: 2px solid #ccc;
+    padding: 20px;
+    width: 350px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.register-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-left: 38%;
+}
+
+.register-label {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 2px;
+}
+
+.register-input {
+    display: block;
+    font-size: 18px;
+    padding: 10px;
+    width: 100%;
+    margin: 0 10px 0 -10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.register-input:focus {
+    outline: none;
+    border-color: #0077ff;
+}
+
+.register-select {
+    display: block;
+    font-size: 18px;
+    padding: 10px;
+    width: 100%;
+    margin: 0 10px 0 -10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.register-error {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.register-button {
+    display: block;
+    background-color: #636363;
+    color: white;
+    font-size: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0 auto;
+}
+
+.register-button:hover {
+    background-color: #0066cc;
+}
+
+.register-button.active {
+    background-color: #007bff;
+    cursor: pointer;
+}
+
+.register-button.active:hover {
+    background-color: #0069d9;
+}

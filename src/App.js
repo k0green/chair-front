@@ -1,24 +1,40 @@
-import logo from './logo.svg';
 import './App.css';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import Main from "./pages/Main";
+import Calendar from "./pages/Calendar";
+import CalendarEdit from "./pages/CalendarEdit";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Chat from "./pages/ChatPage";
+import Messages from "./pages/MessagesPage";
+import Profile from "./pages/ProfilePage";
+import EditServiceCard from "./pages/EditServiceCardPage";
+import AddServiceCard from "./pages/AddServiceCardPage";
+import CategoryPage from "./pages/CategoryPage";
+import OrdersPage from "./pages/OrdersPage";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div className="App">
+        <Router>
+          <Routes>
+            <Route path="/" element={<Main/>}/>
+            <Route path="/calendar/:id" element={<Calendar full={false}/>}/>
+            <Route path="/calendar/full" element={<Calendar full={true}/>}/>
+            <Route path="/calendar/edit/:id" element={<CalendarEdit full={false}/>}/>
+            <Route path="/calendar/full/edit" element={<CalendarEdit full={true}/>}/>
+            <Route path="/login" element={<Login/>}/>
+            <Route path="/register" element={<Register/>}/>
+            <Route path="/chats" element={<Chat/>}/>
+            <Route path="/profile/:id" element={<Profile/>}/>
+            <Route path="/messages/:id" element={<Messages />} />
+            <Route path="/service-card/edit/:id" element={<EditServiceCard />} />
+            <Route path="/service-card/add" element={<AddServiceCard />} />
+            <Route path="/collection/category/:id" element={<CategoryPage />} />
+            <Route path="/orders" element={<OrdersPage />} />
+          </Routes>
+        </Router>
+      </div>
   );
 }
 

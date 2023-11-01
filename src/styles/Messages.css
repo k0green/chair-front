@@ -1,0 +1,190 @@
+/* MessageComponent.css */
+.chat-container {
+    width: 40%;
+    height: 90vh;
+    margin: 10px auto;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #3498db; /* Цвет фона круга (можете заменить) */
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.name {
+    font-weight: bold;
+}
+
+.message-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column; /* Добавляем столбцовый макет для сообщений */
+}
+
+.message {
+    max-width: 70%;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 5px;
+    word-wrap: break-word;
+}
+
+.mine {
+    align-self: flex-end;
+    background-color: #3498db; /* Ваш цвет сообщений */
+    color: #fff;
+}
+
+.theirs {
+    align-self: flex-start;
+    background-color: #f0f0f0; /* Цвет сообщений собеседника */
+}
+
+/* Добавляем отступы к сообщениям, чтобы они не прилипали друг к другу */
+.mine + .mine,
+.theirs + .theirs {
+    margin-top: 5px;
+}
+
+.message-input-div {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-top: 1px solid #ccc;
+    border-radius: 0 0 10px 10px;
+}
+
+.message-input {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+}
+
+.send-button {
+    background-color: #3498db; /* Ваш цвет кнопки отправить */
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.send-button:hover {
+    background-color: #2980b9; /* Цвет кнопки при наведении */
+}
+
+/* Messages.css */
+
+.name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.message-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.message-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.date {
+    align-self: center;
+    background-color: #eee;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 14px;
+}
+
+.message {
+    max-width: 70%;
+    padding: 8px 16px;
+    border-radius: 16px;
+    word-wrap: break-word;
+}
+
+.mine {
+    align-self: flex-end;
+    background-color: #007bff;
+    color: white;
+}
+
+.theirs {
+    align-self: flex-start;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.timestamp {
+    display: flex; /* Добавляем flex-контейнер для времени и кружочка */
+
+    font-size: 12px;
+    color: white;
+    margin-top: 4px;
+    text-align: right;
+    justify-content: space-between; /* Добавил выравнивание по горизонтали */
+}
+
+.circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-left: 5px; /* Помещаем кружочек после времени */
+    margin-top: 3px;
+    scale: 0.8;
+}
+
+.not-viewed {
+    background-color: gray; /* Серый цвет - не просмотрено */
+}
+
+.viewed {
+    background-color: darkblue; /* Темно-синий цвет - просмотрено */
+}
+
+.mark-as-read {
+    text-align: center;
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.mark-as-read:hover {
+    background-color: #2980b9;
+}
+
+.mark-as-read {
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    padding: 8px;
+    margin-top: 10px;
+    border-radius: 4px;
+}

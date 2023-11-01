@@ -1,0 +1,71 @@
+.chat {
+    display: flex;
+    align-items: center;
+    width: 100%; /* Изменено на 100% */
+    margin-bottom: 16px;
+    background-color: #f5f5f5; /* Изменен цвет фона */
+    border-radius: 20px; /* Увеличен радиус скругления */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 12px;
+}
+
+.chat-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Изменено на flex-start */
+    background-color: #ffffff;
+    height: 100vh;
+    padding-top: 20px; /* Добавлен отступ сверху */
+    width: 40%; /* Добавлено */
+    margin: 0 auto; /* Добавлено для центрирования */
+}
+
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-left: 12px; /* Изменено на margin-left */
+}
+
+.chat-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin-left: 12px; /* Изменено на margin-left */
+}
+
+.name {
+    font-weight: bold;
+    margin-bottom: 4px; /* Добавлено расстояние между именем и сообщением */
+}
+
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.last-message {
+    color: #888888;
+    font-size: 14px;
+}
+
+.unread-count {
+    background-color: #ff0000; /* Красный цвет для непрочитанных сообщений */
+    color: #ffffff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 12px;
+}

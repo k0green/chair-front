@@ -1,0 +1,10 @@
+.custom-icon-class-light-theme {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.custom-icon-class-dark-theme {
+    font-size: 24px;
+    margin-bottom: 5px;
+    color: white;
+}

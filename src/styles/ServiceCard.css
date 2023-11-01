@@ -1,0 +1,191 @@
+/* styles.css */
+
+/* Общий стиль карточки услуги */
+.service-card {
+    width: 20%;
+    background-color: white;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin-top: 20px; /* Add top margin */
+    margin-left: 5%; /* Add right margin */
+    /*transition: transform 0.3s ease;*/ /* Add transition for pressed effect */
+}
+
+/* Apply the pressed effect on hover */
+/*.service-card:hover {
+    transform: scale(1.02);
+}*/
+
+/* Стили для мастер-карточки */
+.master-card {
+    margin-bottom: 20px;
+}
+
+/* Стили для картинок */
+.photos {
+    position: relative;
+    margin-top: -20px;
+    margin-bottom: -20px;
+}
+
+.photos img {
+    border-radius: 10px;
+    max-width: 100%;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.photos img:hover {
+    transform: scale(1.1);
+}
+
+/* Стили для переключателей между картинками */
+.arrow-buttons {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.arrow-buttons button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+}
+
+/* Отображение имени мастера и рейтинга */
+.master-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5px;
+    margin-bottom: -20px;
+}
+
+.master-info h4 {
+    margin-right: 10px;
+}
+
+/* Стили для описания услуги, количества свободных записей и продолжительности */
+.service-description {
+    margin-top: -10px;
+    margin-bottom: -30px;
+}
+
+.service-description p {
+    display: flex;
+    align-items: center;
+    margin-top: -5px;
+}
+
+.service-description p:not(:last-child) {
+    margin-bottom: 5px;
+}
+
+/* Стили для стоимости */
+.price {
+    text-align: right;
+}
+
+.service-name-left{
+    position: relative;
+    justify-content: left;
+    margin-right: 80%;
+}
+
+.order-button{
+    width: 100%;
+    border-radius: 10px;
+    border-color: #3333ff;
+    background-color: white;
+    margin-bottom: -40px;
+    margin-top: 10px;
+    padding: -8px -12px;
+}
+
+.order-text{
+    color: #3333ff;
+    font-weight: bold;
+    text-decoration: none;
+    line-height: 1;
+    font-size: 14px;
+}
+
+.service-card-edit {
+    width: 20%;
+    background-color: white;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin-top: 20px; /* Add top margin */
+    margin-left: 5%; /* Add right margin */
+    /*transition: transform 0.3s ease;*/ /* Add transition for pressed effect */
+}
+
+.centrize{
+    display: flex;
+    justify-content: center; /* Центрирование по горизонтали */
+    align-items: center;
+}
+
+input[type="text"] {
+    width: 94%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px; /* Расстояние между полями ввода */
+    margin-top: 5px; /* Расстояние между полями ввода */
+}
+
+/* Для ввода чисел с немного скругленными краями */
+input[type="number"] {
+    width: 25%;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+/* Для ввода чисел с немного скругленными краями */
+input[type="time"] {
+    width: 25%;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+
+.add-photo-button {
+    background-color: #ccc;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.add-photo-icon {
+    color: #fff;
+}
+
+.go-left{
+    margin-left: -20px;
+}
+
+.space{
+    display: flex;
+    /*align-items: center;*/
+    justify-content: space-between;
+}
+

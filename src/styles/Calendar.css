@@ -1,0 +1,254 @@
+.calendarContainer {
+    width: 96%;
+    margin-left: 2%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2%;
+}
+
+.calendar {
+    width: 100%;
+    border-radius: 10px;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.monthNavigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.currentMonth {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.daysOfWeek {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-weight: bold;
+}
+
+.dayOfWeek {
+    padding: 10px;
+    text-align: center;
+}
+
+.daysContainer {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.emptyDay {
+    width: 100%;
+    height: 50px;
+}
+
+.appointmentContainer {
+    width: 97%;
+    margin-left: 1%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0.2%;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Добавил выравнивание по горизонтали */
+}
+
+.appointment {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.appointment-details {
+    display: flex;
+    align-items: center;
+}
+
+.appointment-details > div {
+    margin-right: 10px; /* Отступ между элементами внутри записи */
+}
+
+.appointment button {
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-weight: bold;
+    color: #007bff;
+    background-color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.appointment button:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.monthButton{
+    background-color: white;
+    border: none;
+}
+
+
+/**/
+/* ... (ваш существующий CSS код) */
+
+.appointment button {
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-weight: bold;
+    color: #007bff;
+    background-color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.appointment button.edit {
+    border: 2px solid #17a2b8;
+    color: #17a2b8;
+    background-color: white;
+}
+
+.appointment button.save {
+    border: 2px solid #28a745;
+    color: #28a745;
+    background-color: white;
+}
+
+/* ... (ваш существующий CSS код) */
+
+.newAppointmentContainer {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.newAppointmentButton {
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-weight: bold;
+    color: #007bff;
+    background-color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    margin-right: 10px;
+}
+
+.newAppointmentButton:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.newAppointmentForm {
+    display: flex;
+    flex-direction: column;
+}
+
+.newAppointmentForm input {
+    margin-bottom: 10px;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.newAppointmentForm button {
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-weight: bold;
+    color: #007bff;
+    background-color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.newAppointmentForm button:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.selectedDay {
+    background-color: #28a745; /* Зеленый цвет для выбранных дней */
+    color: white;
+}
+
+.appointmentAddContainer {
+    width: 97%;
+    margin-left: 1%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0.2%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.appointmentAdd {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    width: 100%;
+    margin-left: -3%;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.appointmentAdd-details {
+    display: flex;
+    align-items: center;
+}
+
+.appointmentAdd button.save {
+    border: 2px solid #28a745;
+    color: #28a745;
+    background-color: white;
+}
+
+.small-input {
+    width: 60px; /* You can adjust the width as needed */
+    padding: 4px;
+}
+
+.add-element{
+    margin-left: 15px;
+}
+
+.tab {
+    font-weight: bold;
+    border-bottom: 2px solid #000;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+/* Add styles for the up and down arrows indicating tab state */
+.tab-up {
+    transform: rotate(180deg);
+}
+
+.tab-down {
+    transform: rotate(0deg);
+}

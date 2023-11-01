@@ -1,0 +1,146 @@
+.header {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px 40px 0px 10px;
+    height: 65px;
+    border-bottom: 1px solid #ccc;
+}
+
+.search-input-container {
+    position: relative;
+}
+
+.search-input {
+    margin-top: 10px;
+    margin-right: 20px;
+    border-radius: 20px;
+    padding: 11px 24px;
+    border: 1px solid #ccc;
+}
+
+.search-button {
+    margin-top: 5px;
+    position: absolute;
+    top: 50%;
+    right: 25px;
+    transform: translateY(-50%);
+    background-color: white;
+    color: white;
+    border-radius: 50%;
+    padding: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.search-icon {
+    color: black;
+}
+
+.header a {
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -5px;
+}
+
+.logo {
+    margin: 0 0 0 3%;
+    color: black;
+    cursor: pointer;
+    scale: 1.2;
+}
+
+.navigate {
+    /*margin: 0 0 0 3%;*/
+    color: #666666;
+    cursor: pointer;
+    margin-left: 100px;
+    /*scale: 1.2;*/
+}
+
+.navigate:hover{
+    color: black;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.profile-header-button {
+    /*margin-top: 10px;*/
+    margin-right: 0;
+    margin-left: 10px;
+    background-color: white;
+    border: 2px solid black;
+    color: white;
+    border-radius: 20px;
+    padding: 6px 10px;
+    font-size: 18px;
+    text-decoration: none;
+    scale: 1.05;
+}
+
+.settings-button {
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: -20px;
+    background-color: white;
+    color: black;
+    font-size: 24px;
+    border-radius: 20px;
+    border: black;
+    text-decoration: none;
+    scale: 1.6;
+}
+
+.profile-header-button:hover {
+    /*background-color: black;*/
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.theme-switch {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.theme-toggle {
+    margin-right: 10px;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.5);
+    color: black;
+    background-color: black;
+}
+
+.theme-toggle .react-switch-handle {
+   /* display: flex;*/
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle-switch {
+    background-color: white;
+}
+
+.dark-theme .theme-toggle-switch {
+    background-color: black;
+}
+
+.moon-icon {
+    color: white;
+}
+
+.sun-icon {
+    color: black;
+}
+
+.message-icon {
+    color: black;
+}
