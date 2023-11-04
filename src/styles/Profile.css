@@ -56,3 +56,8 @@
     margin: 0 auto;
 }
 
+.contact-item {
+    display: inline-block; /* Вывод в одну строку */
+    margin-right: 10px;    /* Добавляем немного отступа между иконками и текстом */
+}
+

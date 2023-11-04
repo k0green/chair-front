@@ -21,19 +21,18 @@ const EditServiceCardPage = () => {
                 const formattedData = {
                     id: response.data.id,
                     name: response.data.executorName || 'Unknown Master',
-                    masters: [
-                        {
-                            id: response.data.executorId,
-                            name: response.data.executorName || 'Unknown Master',
-                            description: response.data.description,
-                            price: response.data.price,
-                            availableSlots: response.data.availableSlots,
-                            duration: formatTime(response.data.duration),
-                            rating: response.data.rating,
-                            //photos: response.data.imageURLs.map((url, index) => ({ id: index + 1, url })),
-                            photos: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' }],
-                        },
-                    ],
+                    serviceTypeId: response.data.serviceTypeId,
+                    serviceTypeName: response.data.serviceTypeName,
+                    executorId: response.data.executorId,
+                    executorName: response.data.executorName,
+                    description: response.data.description,
+                    rating: response.data.rating,
+                    price: response.data.price,
+                    availableSlots: response.data.availableSlots,
+                    duration: response.data.duration,
+                    address: response.data.address,
+                    //imageURLs: response.data.imageURLs.map((url, index) => ({ id: index + 1, url })),
+                    imageURLs: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' }],
                 };
                 setService(formattedData);
             } catch (error) {
@@ -44,17 +43,10 @@ const EditServiceCardPage = () => {
         fetchData();
     }, [id, navigate]);
 
-    const formatTime = (rawTime) => {
-        const date = new Date(rawTime);
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
-    };
-
     return (
         <div>
             <Header />
-            {service && <EditServiceCard service={service} isNew={isNew} />}
+            {service && <EditServiceCard service={service} isNew={isNew} id={id}/>}
             <Footer />
         </div>
     );

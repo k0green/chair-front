@@ -1,5 +1,5 @@
 import React, {useState, Fragment, useEffect} from "react";
-//import axios from "axios";
+import Cookies from 'js-cookie';
 import "../styles/Login.css";
 import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
@@ -46,10 +46,11 @@ function Login() {
             RememberMe: true,
         };
         const url = "http://localhost:5155/account/login"; // some url
+
         axios
             .post(url, data)
             .then((result) => {
-                localStorage.setItem('token', result.data);
+                Cookies.set('token', result.data, { expires: 1 });
                     axios.get(`http://localhost:5155/account/user-info?email=`+data.Email)
                         .then(response => {
                             const serverData = {

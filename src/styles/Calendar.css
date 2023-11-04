@@ -12,7 +12,7 @@
     border-radius: 10px;
     background-color: white;
     padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
     margin-bottom: 20px;
 }
 
@@ -67,7 +67,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 0.2%;
+    margin-top: 0.6%;
     flex-wrap: wrap;
     justify-content: space-between; /* Добавил выравнивание по горизонтали */
 }
@@ -78,7 +78,8 @@
     padding: 10px;
     width: 100%;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    background-color: #f6fff6;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
 }
 
 .appointment-details {
@@ -191,11 +192,6 @@
     color: white;
 }
 
-.selectedDay {
-    background-color: #28a745; /* Зеленый цвет для выбранных дней */
-    color: white;
-}
-
 .appointmentAddContainer {
     width: 97%;
     margin-left: 1%;
@@ -214,7 +210,7 @@
     width: 100%;
     margin-left: -3%;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
 }
 
 .appointmentAdd-details {
@@ -251,4 +247,18 @@
 
 .tab-down {
     transform: rotate(0deg);
+}
+
+.selectedDay {
+    background-color: #28a745; /* Зеленый цвет для выбранных дней */
+    color: white;
+}
+
+.day.selectedDay {
+    background-color: #269d41; /* Зеленый цвет для выбранных дней */
+    color: white;
+}
+
+.day.hasAppointments {
+    background-color: rgb(12, 255, 0);
 }

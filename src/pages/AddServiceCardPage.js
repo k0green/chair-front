@@ -11,30 +11,22 @@ import Footer from "../components/Footer";
 const AddServiceCardPage = () => {
     //const [service, setService] = useState(null);
     const navigate = useNavigate();
+    let { id } = useParams();
 
     const service =
         {
             id: 1,
             name: 'Service 1',
-            masters: [
-                {
-                    //id: 1,
-                    name: 'Name',
-                    description: 'Description',
-                    price: 50,
-                    //availableSlots: 3,
-                    duration: '01:00',
-                    //rating: 4.5,
-                    photos: [{ id: 1, url: 'path/to/photo1.jpg' }],
-                },
-                // Добавьте других мастеров, если нужно
-            ],
+            //availableSlots: 3,
+            duration: '0001-01-01T01:00:00',
+            serviceTypeId: "36dc8d14-c955-4d33-9b2b-cf2ea432da3c",
+            imageURLs: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' }],
         };
 
     return (
         <div>
             <Header />
-            <EditServiceCard service={service} isNew={true} />
+            <EditServiceCard service={service} isNew={true} id={id}/>
             <Footer />
         </div>
     );

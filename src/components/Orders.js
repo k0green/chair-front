@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {useNavigate} from "react-router-dom";
+import Cookies from "js-cookie";
 
 const AppointmentsComponent = () => {
     const [appointmentsData, setAppointmentsData] = useState([]);
@@ -8,7 +9,7 @@ const AppointmentsComponent = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = Cookies.get('token');
         if (!token) {
             // Редирект на страницу входа
             navigate('/login');
@@ -18,7 +19,7 @@ const AppointmentsComponent = () => {
 
     const fetchData = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = Cookies.get('token');
             const userRole = localStorage.getItem('userRole');
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 

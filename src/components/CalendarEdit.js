@@ -6,6 +6,7 @@ import { ThemeContext } from "../context/ThemeContext";
 import { v4 as uuidv4 } from 'uuid';
 import {useParams} from "react-router-dom";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const Calendar = ({full}) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -22,6 +23,7 @@ const Calendar = ({full}) => {
         cost: "",
     });
     const [appointmentsData, setAppointmentsData] = useState([]);
+    const [servicesLookupData, setServicesLookupData] = useState([]);
     const { theme } = useContext(ThemeContext);
     let { id } = useParams();
 
@@ -30,10 +32,33 @@ const Calendar = ({full}) => {
         fetchData();
     }, [currentMonth]);
 
+    useEffect(() => {
+        // Fetch data from the backend when the component mounts or currentMonth changes
+
+        fetchLookupData();
+    }, []);
+
+    const fetchLookupData = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                const response = await axios.get('http://localhost:5155/executor-service/executor-services/lookup', { withCredentials: true });
+                const serverData = response.data.map(item => ({
+                    id: item.id,
+                    name: item.name
+                }));
+                setServicesLookupData(serverData);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+
     const fetchData = async () => {
         try {
             if(full)
             {
+                const token = Cookies.get('token');
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 const response = await axios.get('http://localhost:5155/order/executor?month=' + (currentMonth.getMonth() + 1) +'&year=' + currentMonth.getFullYear(), { withCredentials: true });
                 const serverData = response.data.map(item => ({
                     executorServiceId: item.executorServiceId,
@@ -56,6 +81,8 @@ const Calendar = ({full}) => {
                 setAppointmentsData(serverData);
             }
             else{
+                const token = Cookies.get('token');
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 const response = await axios.get(`http://localhost:5155/order/`+id + '?month=' + (currentMonth.getMonth() + 1) +'&year=' + currentMonth.getFullYear(), { withCredentials: true });
                 const serverData = response.data.map(item => ({
                     executorServiceId: item.executorServiceId,
@@ -75,7 +102,7 @@ const Calendar = ({full}) => {
                     serviceTypeName: item.serviceTypeName,
                     id: item.id
                 }));
-            setAppointmentsData(serverData);
+                setAppointmentsData(serverData);
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -88,40 +115,6 @@ const Calendar = ({full}) => {
         const minutes = date.getMinutes().toString().padStart(2, '0');
         return `${hours}:${minutes}`;
     };
-
-    /*const [appointmentsData, setAppointmentsData] = useState([
-        {
-            id: 1,
-            day: 3,
-            procedure: 'Процедура 1',
-            start: '18:00',
-            duration: '1 час',
-            cost: '100',
-        },
-        {
-            id: 2,
-            day: 3,
-            procedure: 'Процедура 3',
-            start: '18:00',
-            duration: '1 час',
-            cost: '200',
-        },
-        {
-            id: 3,
-            day: 10,
-            procedure: 'Процедура 2',
-            start: '18:00',
-            duration: '2 часа',
-            cost: '150',
-        },
-        // ...другие записи
-    ]);*/
-
-    // Здесь нужно будет добавить логику запроса для получения данных о записях на сервере
-
-    // Вместо Date.now() используйте библиотеку uuid для генерации уникальных id
-
-// ...
 
     const handleNewAppointmentSave = async () => {
         const newAppointments = [];
@@ -138,16 +131,13 @@ const Calendar = ({full}) => {
 
                 const durationInMinutes = parseInt(newAppointmentData.duration);
                 const endDate = new Date(startDate.getTime() + durationInMinutes * 60000);
-
                 const appointmentData = {
-                    executorServiceId: id,
+                    executorServiceId: newAppointmentData.procedure,
                     starDate: startDate.toISOString(),
                     duration: endDate.toISOString(),
                     executorComment: "string",
                     price: parseFloat(newAppointmentData.cost), // convert cost to float
                 };
-                console.log(startDate);
-                console.log(endDate);
                 newAppointments.push(appointmentData);
             }
         }
@@ -158,6 +148,7 @@ const Calendar = ({full}) => {
 
             // Handle the response, e.g., show a success message
             console.log('Data saved successfully', response.data);
+            await fetchData();
         } catch (error) {
             // Handle errors, e.g., show an error message
             console.error('Error saving data', error);
@@ -277,14 +268,23 @@ const Calendar = ({full}) => {
                         />
                     </button>
                 </div>
-                <div className="daysOfWeek">{renderDaysOfWeek()}</div>
+
+
                 <div className="daysContainer">
                     {emptyDays}
-                    {daysInMonth.map((day, index) => (
-                        <div key={index} className={`day ${selectedDays.includes(day) ? "selectedDay" : ""}`} onClick={() => handleDayClick(day)}>
-                            {day}
-                        </div>
-                    ))}
+                    {daysInMonth.map((day, index) => {
+                        const hasAppointments = appointmentsData.some(appointment => appointment.day === day);
+                        return (
+                            <div
+                                key={index}
+                                //className={`day ${selectedDays.includes(day) ? "selectedDay" : ""} ${hasAppointments ? "hasAppointments" : ""}`}
+                                className={`day ${selectedDays.includes(day) ? "selectedDay" : `${hasAppointments ? "hasAppointments" : ""}`}`}
+                                onClick={() => handleDayClick(day)}
+                            >
+                                {day}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         );
@@ -310,7 +310,7 @@ const Calendar = ({full}) => {
             sessionCount: 1,
             breakTime: "15",
             duration: "60",
-            price: "",
+            cost: "",
         });
     };
 
@@ -330,15 +330,20 @@ const Calendar = ({full}) => {
                 <div className="appointmentAdd">
                     <div className="appointmentAdd-details">
                         <div>
-                            Название:{" "}
+                            Н:{" "}
                             {
-                                <input
-                                    type="text"
+                                <select
                                     name="procedure"
-                                    placeholder="Название"
                                     value={newAppointmentData.procedure}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, procedure: e.target.value })}
-                                />
+                                >
+                                    <option value="">Выберите услугу</option>
+                                    {servicesLookupData.map((service) => (
+                                        <option key={service.id} value={service.id}>
+                                            {service.name}
+                                        </option>
+                                    ))}
+                                </select>
                             }
                         </div>
                         <div className="add-element">
@@ -349,7 +354,7 @@ const Calendar = ({full}) => {
                                     name="starDate"
                                     placeholder="Время начала (HH:mm)"
                                     value={newAppointmentData.starDate}
-                                    onChange={(e) => setNewAppointmentData({ ...newAppointmentData, starDate: e.target.value })}
+                                    onChange={(e) => setNewAppointmentData({ ...newAppointmentData, startTime: e.target.value })}
                                 />
                             }
                         </div>
@@ -399,11 +404,11 @@ const Calendar = ({full}) => {
                             {
                                 <input
                                     type="number"
-                                    name="price"
+                                    name="cost"
                                     placeholder="Стоимость"
                                     className="small-input" // Add this class
-                                    value={newAppointmentData.price}
-                                    onChange={(e) => setNewAppointmentData({ ...newAppointmentData, price: e.target.value })}
+                                    value={newAppointmentData.cost}
+                                    onChange={(e) => setNewAppointmentData({ ...newAppointmentData, cost: e.target.value })}
                                 />
                             }
                             {" "}б.р.
@@ -436,12 +441,24 @@ const Calendar = ({full}) => {
                                         <div>
                                             Название:{" "}
                                             {editingAppointmentId === appointment.id ? (
-                                                <input
+ /*                                               <input
                                                     type="text"
                                                     name="procedure"
                                                     value={editedAppointments[appointment.id]?.serviceTypeName || ""}
                                                     onChange={(e) => handleInputChange(e, appointment.id)}
-                                                />
+                                                />*/
+                                                <select
+                                                    name="procedure"
+                                                    value={appointment.executorServiceId}
+                                                    onChange={(e) => setNewAppointmentData({ ...newAppointmentData, procedure: e.target.value })}
+                                                >
+                                                    <option value="">Выберите услугу</option>
+                                                    {servicesLookupData.map((service) => (
+                                                        <option key={service.id} value={service.id}>
+                                                            {service.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             ) : (
                                                 <strong>{appointment.serviceTypeName}</strong>
                                             )}

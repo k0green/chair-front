@@ -9,7 +9,8 @@ import {
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ThemeContext} from "../context/ThemeContext";
 import {useNavigate, useParams} from "react-router-dom";
-import axios from "axios"; // Подключаем файл стилей
+import axios from "axios";
+import Cookies from "js-cookie"; // Подключаем файл стилей
 
 const Calendar = ({full}) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -23,7 +24,7 @@ const Calendar = ({full}) => {
 
     useEffect(() => {
         // Fetch data from the backend when the component mounts or currentMonth changes
-        const token = localStorage.getItem('token');
+        const token = Cookies.get('token');
         if (!token) {
             // Редирект на страницу входа
             navigate('/login');
@@ -33,7 +34,7 @@ const Calendar = ({full}) => {
 
     const fetchData = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = Cookies.get('token');
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             if (full){
                 const response = await axios.get('http://localhost:5155/order/client?month=' + (currentMonth.getMonth() + 1) + '&year=' + currentMonth.getFullYear(), { withCredentials: true });

@@ -4,10 +4,10 @@ import {
     faBoltLightning,
     faClock,
     faHouse,
-    faLightbulb,
+    faLightbulb, faPencil,
     faStar,
     faTimes,
-    faTimesCircle
+    faTimesCircle, faTrash
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"; // Подключаем файл стилей
 import PhotoList from "../components/PhotoList";
@@ -27,6 +27,10 @@ const ServiceCard = ({ service, isProfile }) => {
 
     const handleIsProfileClick = (executorServiceId) => {
         navigate("/service-card/edit/" + executorServiceId);
+    };
+
+    const handleRemoveClick = (id) => {
+        navigate("/service-card/remove/" + id);
     };
 
     return (
@@ -65,9 +69,16 @@ const ServiceCard = ({ service, isProfile }) => {
                     </div>
                     <div>
                         {isProfile ?
-                            <button className="order-button" onClick={()=>handleIsProfileClick(service.id)}>
-                                <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} />    Редактировать</p>
-                            </button>
+                            <div>
+                                <button className="order-button" onClick={()=>handleIsProfileClick(service.id)}>
+                                    <p className="order-text"><FontAwesomeIcon icon={faPencil} />    Редактировать</p>
+                                </button>
+                                <br/>
+                                <br/>
+                                <button className="order-button" onClick={()=>handleRemoveClick(service.id)}>
+                                    <p className="order-text"><FontAwesomeIcon icon={faTrash} />    Удалить</p>
+                                </button>
+                            </div>
                             :
                             <button className="order-button" onClick={()=>handleOrderClick(master.id)}>
                                 <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} />    Записаться</p>

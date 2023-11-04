@@ -27,9 +27,10 @@ function App() {
             <Route path="/register" element={<Register/>}/>
             <Route path="/chats" element={<Chat/>}/>
             <Route path="/profile/:id" element={<Profile/>}/>
+            <Route path="/profile" element={<Profile/>}/>
             <Route path="/messages/:id" element={<Messages />} />
             <Route path="/service-card/edit/:id" element={<EditServiceCard />} />
-            <Route path="/service-card/add" element={<AddServiceCard />} />
+            <Route path="/service-card/add/:id" element={<AddServiceCard />} />
             <Route path="/collection/category/:id" element={<CategoryPage />} />
             <Route path="/orders" element={<OrdersPage />} />
           </Routes>

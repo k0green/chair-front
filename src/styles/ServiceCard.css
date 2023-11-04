@@ -157,7 +157,7 @@ input[type="number"] {
 
 /* Для ввода чисел с немного скругленными краями */
 input[type="time"] {
-    width: 25%;
+    width: 40%;
     padding: 4px;
     border: 1px solid #ccc;
     border-radius: 5px;

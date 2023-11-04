@@ -5,13 +5,17 @@ import {faSearch, faMessage, faPerson, faUser} from "@fortawesome/free-solid-svg
 import React, { useState } from "react";
 import "../styles/Header.css";
 import ThemeSwitcher from "./ThemeSwitcher";
+import Cookies from "js-cookie";
 
 const Header = ({ user, onLogout }) => {
     const navigate = useNavigate();
     const [darkTheme, setDarkTheme] = useState(false);
 
     const handleLoginClick = () => {
-        navigate("/login");
+        const token = Cookies.get('token');
+        if(!token)
+            navigate("/login");
+        navigate("/profile")
     };
 
     const handleMessageClick = () => {
@@ -27,7 +31,7 @@ const Header = ({ user, onLogout }) => {
     };
 
     const handleCalendarClick = () => {
-        const token = localStorage.getItem('token');
+        const token = Cookies.get('token');
         const role = localStorage.getItem('userRole');
         if(token === null || token === "")
             navigate("/login");
