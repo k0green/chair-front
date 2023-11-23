@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import '../styles/Register.css';
 import {Link, useNavigate} from "react-router-dom";
+import Cookies from "js-cookie";
 
 function Register() {
     const options = [
@@ -112,8 +113,26 @@ function Register() {
         axios
             .post(url, data)
             .then((result) => {
-                localStorage.setItem('token', result.data);
-                navigate("/");
+                Cookies.set('token', result.data, { expires: 1 });
+                axios.get(`http://localhost:5155/account/user-info?email=`+data.Email)
+                    .then(response => {
+                        const serverData = {
+                            id: response.data.id,
+                            name: response.data.name,
+                            email: response.data.email,
+                            role: response.data.role
+                        }
+                        console.log(serverData)
+                        localStorage.setItem('userName', serverData.name);
+                        localStorage.setItem('userId', serverData.id);
+                        localStorage.setItem('userEmail', serverData.email);
+                        localStorage.setItem('userRole', serverData.role);
+                    })
+                    .catch(error => {
+                        // Handle error
+                        console.error('Error fetching data:', error);
+                    });
+                navigate("/")
             })
             .catch((error) => {
                 alert(error);

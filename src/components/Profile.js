@@ -27,6 +27,9 @@ const Profile = ({user, services, contacts, current}) => {
         return <div>Loading...</div>; // You can customize the loading state as needed
     }
 
+    const userRole = localStorage.getItem('userRole');
+    const userId = localStorage.getItem('userId');
+
     const contactsIcons = [
         {
             id: 1,
@@ -64,6 +67,10 @@ const Profile = ({user, services, contacts, current}) => {
 
     const handleNewServiceClick = () => {
             navigate("/service-card/add/"+user.id);
+    };
+
+    const handleMessageClick = () => {
+            navigate("/messages/"+user.id);
     };
 
     const handleEditSaveClick = () => {
@@ -187,7 +194,7 @@ const Profile = ({user, services, contacts, current}) => {
                     </div>
 
                     {!current ? (
-                        <button className="message-button">
+                        <button className="message-button" onClick={handleMessageClick}>
                             <FontAwesomeIcon icon={faComment} /> Написать сообщение
                         </button>
                     ) : (
@@ -209,13 +216,16 @@ const Profile = ({user, services, contacts, current}) => {
                             )
                     )}
                 </div>
-                <button className="newAppointmentButton" onClick={handleNewServiceClick}>
-                    Добавить
-                </button>
+                {
+                    userRole === 'executor' ?
+                        <button className="newAppointmentButton" onClick={handleNewServiceClick}>
+                            Добавить
+                        </button> : <p></p>
+                }
             </div>
             <div className="services-list">
                 {services.map((service) => (
-                    <ServiceCard key={service.id} service={service} isProfile = {true}/>
+                    <ServiceCard key={service.id} service={service} isProfile = {user.userId.toString() === userId.toString()}/>
                 ))}
             </div>
         </div>

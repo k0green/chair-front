@@ -7,6 +7,7 @@ const AppointmentsComponent = () => {
     const [appointmentsData, setAppointmentsData] = useState([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const navigate = useNavigate();
+    const isExecutor = localStorage.getItem("userRole") === "executor";
 
     useEffect(() => {
         const token = Cookies.get('token');
@@ -105,6 +106,12 @@ const AppointmentsComponent = () => {
         return `${hours}:${minutes}`;
     };
 
+    const handleApproveClick = (id) => {
+        const token = Cookies.get('token');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        axios.get(`http://localhost:5155/order/approve/${id}?isExecutor=${isExecutor}`);
+    };
+
     const renderAppointments = (filteredAppointments) => {
         if (filteredAppointments.length > 0) {
             return (
@@ -118,7 +125,7 @@ const AppointmentsComponent = () => {
                                     <div>Продолжительность: <strong>{formatTime(appointment.duration)}</strong></div>
                                     <div>Стоимость: <strong>{appointment.price} byn</strong></div>
                                 </div>
-                                <button>Записаться</button>
+                                <button onClick={() => handleApproveClick(appointment.id)} disabled={isExecutor ? !appointment.clientId : !appointment.executorApprove}>Подтвердить запись</button>
                             </div>
                         </div>
                     ))}

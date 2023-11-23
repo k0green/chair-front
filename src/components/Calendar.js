@@ -121,6 +121,17 @@ const Calendar = ({full}) => {
         setSelectedDay(day);
     };
 
+    const enrollButtonClick = (id) => {
+        try {
+            // Send a DELETE request to the backend endpoint
+            axios.post(`http://localhost:5155/order/enroll/${id}`);
+
+        } catch (error) {
+            // Handle errors, e.g., show an error message
+            console.error('Error deleting data', error);
+        }
+    };
+
     const getDaysInMonth = (date) => {
         const year = date.getFullYear();
         const month = date.getMonth();
@@ -162,11 +173,19 @@ const Calendar = ({full}) => {
                 <div className="daysOfWeek">{renderDaysOfWeek()}</div>
                 <div className="daysContainer">
                     {emptyDays}
-                    {daysInMonth.map((day, index) => (
-                        <div key={index} className={`day ${selectedDay === day ? "selectedDay" : ""}`} onClick={()=> handleDayClick(day)}>
-                            {day}
-                        </div>
-                    ))}
+                    {daysInMonth.map((day, index) => {
+                        const hasAppointments = appointmentsData.some(appointment => appointment.day === day);
+                        return (
+                            <div
+                                key={index}
+                                //className={`day ${selectedDays.includes(day) ? "selectedDay" : ""} ${hasAppointments ? "hasAppointments" : ""}`}
+                                className={`day ${selectedDay === day ? "selectedDay" : `${hasAppointments ? "hasAppointments" : ""}`}`}
+                                onClick={() => handleDayClick(day)}
+                            >
+                                {day}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         );
@@ -187,7 +206,7 @@ const Calendar = ({full}) => {
                                         <div>Продолжительность: <strong>{formatTime(appointment.duration)}</strong></div>
                                         <div>Стоимость: <strong>{appointment.price} byn</strong></div>
                                     </div>
-                                    <button>Записаться</button>
+                                    <button onClick={()=>enrollButtonClick(appointment.id)}>Записаться</button>
                                 </div>
                             </div>
                         ))}
