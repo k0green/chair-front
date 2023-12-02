@@ -6,14 +6,25 @@ import "../styles/Main.css";
 import Icon from '../components/Categories';
 import ServiceList from '../components/ServiceList';
 import axios from "axios";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import {isSameDay} from "date-fns";
+import ServiceCard from "../components/ServiceCard";
+import PhotoList from "../components/PhotoList";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faBoltLightning, faClock, faHouse, faPencil, faStar, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {useNavigate} from "react-router-dom";
 
 const HomePage = ({ user, onLogout }) => {
     const { theme } = useContext(ThemeContext);
+    const navigate = useNavigate();
     //const { theme } = true;
 
     const [categories, setCategories] = useState([]);  // Используем состояние для хранения данных категорий
     const [servicesData, setServicesData] = useState([]);
     const [showFilterModal, setShowFilterModal] = useState(false);
+    const [showPeriodModal, setShowPeriodModal] = useState(false);
+    const [showOprResModal, setShowOprResModal] = useState(false);
     const [sortOptions, setSortOptions] = useState({
         executorName: null,
         price: null,
@@ -27,6 +38,80 @@ const HomePage = ({ user, onLogout }) => {
     const [priceSwitch, setPriceSwitch] = useState(true);
     const [ratingSwitch, setRatingSwitch] = useState(true);
     const [durationSwitch, setDurationSwitch] = useState(true);
+    const [selectedDates, setSelectedDates] = useState([]);
+    const [timeRanges, setTimeRanges] = useState([]);
+    const [masterNameValue, setMasterNameValue] = useState('');
+    const [priceFromValue, setPriceFromValue] = useState('');
+    const [priceToValue, setPriceToValue] = useState('');
+    const [ratingFromValue, setRatingFromValue] = useState('');
+    const [ratingToValue, setRatingToValue] = useState('');
+    const [durationFromValue, setDurationFromValue] = useState('');
+    const [durationToValue, setDurationToValue] = useState('');
+// Add state variables for sort arrows
+    const [executorNameSort, setExecutorNameSort] = useState(null);
+    const [priceSort, setPriceSort] = useState(null);
+    const [availableSlotsSort, setAvailableSlotsSort] = useState(null);
+    const [ratingSort, setRatingSort] = useState(null);
+    const [durationSort, setDurationSort] = useState(null);
+    const [oprData, setOprData] = useState(null);
+
+
+    const isDateSelected = (date) => {
+        // Проверяем, выбран ли день
+        return selectedDates.some((selectedDate) =>
+            isSameDay(selectedDate, date)
+        );
+    };
+
+    const handleDateChange = (date) => {
+        // Convert the selected date to UTC to avoid time zone issues
+        const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+
+        // If the day is already selected, remove it; otherwise, add it to the list
+        if (isDateSelected(utcDate)) {
+            const updatedDates = selectedDates.filter(
+                (selectedDate) => !isSameDay(selectedDate, utcDate)
+            );
+            setSelectedDates(updatedDates);
+        } else {
+            setSelectedDates([...selectedDates, utcDate]);
+        }
+    };
+
+    const handleTimeChange = (index, field, value) => {
+        setTimeRanges((prevRanges) => {
+            const newRanges = [...prevRanges];
+            newRanges[index][field] = value;
+            return newRanges;
+        });
+    };
+
+
+    const handleAddTimeRange = () => {
+        setTimeRanges((prevRanges) => [...prevRanges, { startTime: null, endTime: null }]);
+    };
+
+
+    const handleRemoveTimeRange = (index) => {
+        setTimeRanges((prevRanges) => {
+            const newRanges = [...prevRanges];
+            newRanges.splice(index, 1);
+            return newRanges;
+        });
+    };
+
+    const handlePeriodClick = () => {
+        setShowPeriodModal(true);
+    };
+
+    const handlePeriodClose = () => {
+        setShowPeriodModal(false);
+    };
+
+    const handleResetFilters = () => {
+        setSelectedDates([]);
+        setTimeRanges([{ startTime: null, endTime: null }]);
+    };
 
     const handleOPRClick = () => {
         setOptimizeServiceModal(true);
@@ -62,8 +147,8 @@ const HomePage = ({ user, onLogout }) => {
             },
             serviceTypeId: selectedServiceType,
             conditions: [
-                { column: 1, value: freeSlots, lambda: 0.2 },
-                { column: 2, value: priceSwitch, lambda: 0.4 },
+                { column: 1, value: freeSlots, lambda: 0.4 },
+                { column: 2, value: priceSwitch, lambda: 0.2 },
                 { column: 3, value: ratingSwitch, lambda: 0.3 },
                 { column: 4, value: durationSwitch, lambda: 0.1 },
             ],
@@ -72,15 +157,36 @@ const HomePage = ({ user, onLogout }) => {
         // Make the request
         axios.post('http://localhost:5155/executor-service/optimize-service', requestBody)
             .then(response => {
-                // Handle the response as needed
-                console.log(response);
+                const newServicesData = {
+                        id: response.data.id,
+                        name: response.data.executorName,
+                        description: response.data.description,
+                        price: response.data.price,
+                        availableSlots: response.data.availableSlots,
+                        duration: formatTime(response.data.duration),
+                        rating: response.data.rating,
+                        address: response.data.address,
+                        executorId: response.data.executorId,
+                        //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
+                    photos: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' },
+                        { id: 3, url: 'path/to/photo3.jpg' }, { id: 4, url: 'path/to/photo4.jpg' },
+                        { id: 5, url: 'path/to/photo5.jpg' }, { id: 6, url: 'path/to/photo6.jpg' }],
+                };
+
+                setOprData(newServicesData);
             })
             .catch(error => {
                 console.error('Error optimizing service:', error);
             });
 
-        // Close the modal after submitting
+
+/*        setTimeout(() => {
+            setOptimizeServiceModal(true);
+            setShowOprResModal(true);
+        }, 300000);*/
         setOptimizeServiceModal(true);
+        if(oprData)
+            setShowOprResModal(true);
     };
 
     const handleSortClick = (field, direction) => {
@@ -149,8 +255,10 @@ const HomePage = ({ user, onLogout }) => {
 
     useEffect(() => {
         axios.post('http://localhost:5155/executor-service/all', {
-            skip: 0,
-            take: 10,
+            filter: {
+                skip: 0,
+                take: 10,
+            }
         })
             .then(response => {
                 // Преобразование данных с сервера в необходимый формат
@@ -168,7 +276,9 @@ const HomePage = ({ user, onLogout }) => {
                         address: service.address,
                         executorId: service.executorId,
                         //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
-                        photos: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' }],
+                        photos: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' },
+                            { id: 3, url: 'path/to/photo3.jpg' }, { id: 4, url: 'path/to/photo4.jpg' },
+                            { id: 5, url: 'path/to/photo5.jpg' }, { id: 6, url: 'path/to/photo6.jpg' }],
                     })),
                 }));
 
@@ -196,15 +306,36 @@ const HomePage = ({ user, onLogout }) => {
         setShowFilterModal(false);
     };
 
-
-
     const handleFilterApply = () => {
-            const masterNameValue = document.getElementById("masterName").value;
-            const priceFromValue = document.getElementById("priceFrom").value;
-            const priceToValue = document.getElementById("priceTo").value;
-            const ratingFromValue = document.getElementById("ratingFrom").value;
-            const ratingToValue = document.getElementById("ratingTo").value;
-            const durationValue = document.getElementById("duration").value;
+        const masterNameElement = document.getElementById("masterName");
+        const priceFromElement = document.getElementById("priceFrom");
+        const priceToElement = document.getElementById("priceTo");
+        const ratingFromElement = document.getElementById("ratingFrom");
+        const ratingToElement = document.getElementById("ratingTo");
+        const durationFromElement = document.getElementById("durationFrom");
+        const durationToElement = document.getElementById("durationTo");
+
+        const masterNameValue = masterNameElement ? masterNameElement.value : null;
+        const priceFromValue = priceFromElement ? priceFromElement.value : null;
+        const priceToValue = priceToElement ? priceToElement.value : null;
+        const ratingFromValue = ratingFromElement ? ratingFromElement.value : null;
+        const ratingToValue = ratingToElement ? ratingToElement.value : null;
+        const durationFromValue = durationFromElement ? durationFromElement.value : null;
+        const durationToValue = durationToElement ? durationToElement.value : null;
+
+        setMasterNameValue(masterNameElement ? masterNameElement.value : null);
+        setPriceFromValue(priceFromElement ? priceFromElement.value : null);
+        setPriceToValue(priceToElement ? priceToElement.value : null);
+        setRatingFromValue(ratingFromElement ? ratingFromElement.value : null);
+        setRatingToValue(ratingToElement ? ratingToElement.value : null);
+        setDurationFromValue(durationFromElement ? durationFromElement.value : null);
+        setDurationToValue(durationToElement ? durationToElement.value : null);
+
+        setExecutorNameSort(sortOptions.executorName);
+        setPriceSort(sortOptions.price);
+        setAvailableSlotsSort(sortOptions.availableSlots);
+        setRatingSort(sortOptions.rating);
+        setDurationSort(sortOptions.duration);
 
             const filters = [];
 
@@ -216,7 +347,7 @@ const HomePage = ({ user, onLogout }) => {
 
                     nameFilter.filters.push({
                         field: "executorName",
-                        value: masterNameValue,
+                        value: '"'+masterNameValue+'"',
                         operator: "contains",
                     });
 
@@ -273,13 +404,38 @@ const HomePage = ({ user, onLogout }) => {
                 filters.push(ratingFilter);
             }
 
-            if (durationValue) {
+/*            if (durationFromValue) {
                 filters.push({
                     field: "duration",
                     value: durationValue,
                     operator: "contains",
                 });
+            }*/
+
+        if (durationFromValue || durationToValue) {
+            const durationFilter = {
+                logic: "and",
+                filters: [],
+            };
+
+            if (durationFromValue) {
+                durationFilter.filters.push({
+                    field: "duration",
+                    value: new Date(`2023-11-02T${durationFromValue}:00.000Z`).toISOString(),
+                    operator: ">=",
+                });
             }
+
+            if (durationToValue) {
+                durationFilter.filters.push({
+                    field: "duration",
+                    value: new Date(`2023-11-02T${durationToValue}:00.000Z`).toISOString(),
+                    operator: "<=",
+                });
+            }
+
+            filters.push(durationFilter);
+        }
 
             const filter = filters.length > 1 ? { logic: "and", filters } : filters[0];
 
@@ -293,10 +449,17 @@ const HomePage = ({ user, onLogout }) => {
                 }));
 
             const requestBody = {
-                skip: 0,
-                take: 10,
-                sort,
-                filter,
+                filter: {
+                    skip: 0,
+                    take: 10,
+                    sort,
+                    filter,
+                },
+                dates: selectedDates,
+                times: timeRanges.map((timeRange) => ({
+                    startTime: timeRange.startTime ? new Date(`2023-11-02T${timeRange.startTime}:00.000Z`).toISOString() : null,
+                    endTime: timeRange.endTime ? new Date(`2023-11-02T${timeRange.endTime}:00.000Z`).toISOString() : null,
+                })),
             };
 
             axios.post('http://localhost:5155/executor-service/all', requestBody)
@@ -316,7 +479,9 @@ const HomePage = ({ user, onLogout }) => {
                             address: service.address,
                             executorId: service.executorId,
                             //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
-                            photos: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' }],
+                            photos: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' },
+                                { id: 3, url: 'path/to/photo3.jpg' }, { id: 4, url: 'path/to/photo4.jpg' },
+                                { id: 5, url: 'path/to/photo5.jpg' }, { id: 6, url: 'path/to/photo6.jpg' }],
                         })),
                     }));
 
@@ -329,6 +494,24 @@ const HomePage = ({ user, onLogout }) => {
 
         // Close the filter modal after applying filters
         setShowFilterModal(false);
+        setShowPeriodModal(false);
+    };
+
+    const handleFilterClear = () => {
+
+        setMasterNameValue(null);
+        setPriceFromValue(null);
+        setPriceToValue(null);
+        setRatingFromValue(null);
+        setRatingToValue(null);
+        setDurationFromValue(null);
+        setDurationToValue( null);
+
+        setExecutorNameSort(null);
+        setPriceSort(null);
+        setAvailableSlotsSort(null);
+        setRatingSort(null);
+        setDurationSort(null);
     };
 
     const renderToggle = (field, checked, onChange) => (
@@ -343,6 +526,14 @@ const HomePage = ({ user, onLogout }) => {
         </div>
     );
 
+    const handleOrderClick = (executorServiceId) => {
+        navigate("/calendar/"+ executorServiceId);
+    };
+
+    let handleMasterNameClickClick = (masterId) => {
+        navigate("/profile/" + masterId);
+    };
+
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
             <Header user={user} onLogout={onLogout} />
@@ -350,12 +541,17 @@ const HomePage = ({ user, onLogout }) => {
                 <Icon categories={categories}/>
             </div>
             <div>
-                <button className="filter-button" onClick={handleOPRClick}>
-                    Найти наилучший вариант
-                </button>
-                <button className="filter-button" onClick={handleFilterClick}>
-                    Filter
-                </button>
+                <div className="parent-container">
+                    <button className="filter-button" onClick={handleOPRClick}>
+                        Найти наилучший вариант
+                    </button>
+                    <button className="filter-button" onClick={handlePeriodClick}>
+                        Подбор по датам
+                    </button>
+                    <button className="filter-button" onClick={handleFilterClick}>
+                        Filter
+                    </button>
+                </div>
                 <ServiceList services={servicesData} />
             </div>
             {showFilterModal && (
@@ -367,17 +563,18 @@ const HomePage = ({ user, onLogout }) => {
                         <h2>Filter</h2>
                         <div>
                             <label htmlFor="masterName">Master Name:</label>
-                            <input style={{width: '45%'}} type="text" className="custom-input" id="masterName" placeholder="Enter master name" />
+                            <input defaultValue={masterNameValue} style={{width: '45%'}} type="text" className="custom-input" id="masterName" placeholder="Enter master name" />
                         </div>
                         <div>
                             <label htmlFor="priceFrom">Price Range:</label>
-                            <input style={{width: '15%'}} type="number" id="priceFrom" placeholder="From" />
+                            <input defaultValue={priceFromValue} style={{width: '15%'}} type="number" id="priceFrom" placeholder="From" />
                             <label> - </label>
-                            <input style={{width: '15%'}} type="number" id="priceTo" placeholder="To" />
+                            <input defaultValue={priceToValue} style={{width: '15%'}} type="number" id="priceTo" placeholder="To" />
                         </div>
                         <div>
                             <label htmlFor="rating">Rating:</label>
                             <input
+                                defaultValue={ratingFromValue}
                                 type="number"
                                 id="ratingFrom"
                                 min="0"
@@ -386,6 +583,7 @@ const HomePage = ({ user, onLogout }) => {
                             />
                             <label> - </label>
                             <input
+                                defaultValue={ratingToValue}
                                 type="number"
                                 id="ratingTo"
                                 min="0"
@@ -395,8 +593,10 @@ const HomePage = ({ user, onLogout }) => {
                             />
                         </div>
                             <div>
-                                <label htmlFor="duration">Duration:</label>
-                                <input style={{width: '15%'}}type="time" id="duration" placeholder="Enter duration" />
+                                <label htmlFor="durationFrom">Duration:</label>
+                                <input defaultValue={durationFromValue} style={{width: '15%'}} type="time" id="durationFrom" placeholder="Enter duration" />
+                        <label>-</label>
+                                <input defaultValue={durationToValue} style={{width: '15%'}} type="time" id="durationTo" placeholder="Enter duration" />
                             </div>
                         <h3>Sort By:</h3>
                         <div>
@@ -511,6 +711,7 @@ const HomePage = ({ user, onLogout }) => {
                         </span>
                             </div>
                         </div>
+                            <button onClick={handleFilterClear}>Clear</button>
                             <button onClick={handleFilterApply}>Apply Filters</button>
                         </div>
                 </div>
@@ -543,6 +744,85 @@ const HomePage = ({ user, onLogout }) => {
                             {renderToggle('Duration', durationSwitch, () => handleSwitchChange('duration'))}
                         </div>
                         <button onClick={handleOptimizeServiceClick}>Optimize Service</button>
+                    </div>
+                </div>
+            )}
+            {showOprResModal && (
+                <div className="filter-modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={() => setShowOprResModal(false)}>
+                            &times;
+                        </span>
+                        <div style={{display: "flex", justifyContent: "center"}}>
+                        <div className="service-card">
+                            <div key={oprData.id} className="master-card">
+                                <div className="photos">
+                                    <PhotoList photos={oprData.photos}/>
+                                </div>
+                                <div className="master-info">
+                                    <h4 onClick={() => handleMasterNameClickClick(oprData.executorId)}>{oprData.name}</h4>
+                                    <h4>{oprData.rating} <FontAwesomeIcon icon={faStar} className = 'item-icon'/></h4>
+                                </div>
+                                <div className="service-description">
+                                    <p>{oprData.description}</p>
+                                    <p><FontAwesomeIcon icon={faHouse} className = 'item-icon'/>{oprData.address}</p>
+                                    <p>Available Slots: {oprData.availableSlots}</p>
+                                </div>
+                                <div className="master-info">
+                                    <h4><FontAwesomeIcon icon={faClock} className = 'item-icon'/> {oprData.duration}</h4>
+                                    <h4>{oprData.price} Byn</h4>
+                                </div>
+                                <div>
+                                        <button className="order-button" onClick={()=>handleOrderClick(oprData.id)}>
+                                            <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} />    Записаться</p>
+                                        </button>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showPeriodModal && (
+                <div className="filter-modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={() => setShowPeriodModal(false)}>
+                            &times;
+                        </span>
+                        <div>
+                            <DatePicker
+                                selected={null} // Установите выбранную дату в null, чтобы позволить выбирать дни
+                                onChange={handleDateChange}
+                                inline // Рендер календаря всегда видимым
+                                dayClassName={(date) => (isDateSelected(date) ? 'selected' : '')} // Добавляем класс к выделенным дням
+                            />
+                        </div>
+                        {timeRanges.map((timeRange, index) => (
+                            <div key={index}>
+                                <label>Time Range {index + 1}:</label>
+                                <input
+                                    type="time"
+                                    style={{width: '15%'}}
+                                    value={timeRange.startTime || ''}
+                                    onChange={(e) => handleTimeChange(index, 'startTime', e.target.value)}
+                                />
+                                <span> - </span>
+                                <input
+                                    type="time"
+                                    style={{width: '15%'}}
+                                    value={timeRange.endTime || ''}
+                                    onChange={(e) => handleTimeChange(index, 'endTime', e.target.value)}
+                                />
+                                {index > -1 && (
+                                    <button onClick={() => handleRemoveTimeRange(index)}>
+                                        Remove Time Range
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        <button onClick={handleAddTimeRange}>Add Time Range</button>
+                        <button onClick={handleResetFilters}>Reset Filters</button>
+                        <button onClick={handleFilterApply}>Apply Filters</button>
                     </div>
                 </div>
             )}

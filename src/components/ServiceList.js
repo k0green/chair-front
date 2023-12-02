@@ -1,17 +1,19 @@
 import React from 'react';
 import ServiceCard from './ServiceCard';
+import "../styles/ServiceCard.css";
 
 const ServiceList = ({ services, isProfile }) => {
     return (
-        <div className="service-list">
+        <div>
             {services.map((service) => (
-                <div>
+                <div className='card-list'>
                     <h1 className="service-name-left">{service.name}</h1>
-                    <ServiceCard key={service.id} service={service} isProfile={isProfile}/>
+                    <ServiceCard service={service} isProfile={isProfile} />
                 </div>
             ))}
         </div>
     );
 };
+
 
 export default ServiceList;

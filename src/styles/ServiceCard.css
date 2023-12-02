@@ -3,12 +3,13 @@
 /* Общий стиль карточки услуги */
 .service-card {
     width: 20%;
+    min-width: 300px; /* Set a minimum width */
     background-color: white;
     border-radius: 15px;
     padding: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     margin-top: 20px; /* Add top margin */
-    margin-left: 5%; /* Add right margin */
+    margin-left: 2%; /* Add right margin */
     /*transition: transform 0.3s ease;*/ /* Add transition for pressed effect */
 }
 
@@ -31,7 +32,7 @@
 
 .photos img {
     border-radius: 10px;
-    max-width: 100%;
+    width: 100%;
     height: auto;
     cursor: pointer;
     transition: transform 0.3s ease;
@@ -187,5 +188,14 @@ input[type="time"] {
     display: flex;
     /*align-items: center;*/
     justify-content: space-between;
+}
+
+.card-list{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        margin-left: 20px;
+    width: 95%;
 }
 

@@ -6,16 +6,20 @@
     background-color: white;
 }
 
-/* Add these styles to your existing Main.css or create a new CSS file */
-
-.filter-button {
+.parent-container {
     position: absolute;
     right: 10px;
+}
+
+.filter-button {
+    /* Другие стили */
+    margin-right: 10px;
     background-color: white;
     border: 1px solid blue;
     color: blue;
     padding: 5px 10px;
     cursor: pointer;
+    border-radius: 5px;
 }
 
 .filter-modal {
@@ -105,4 +109,9 @@
     transform: translate(0%, -50%);
 }
 
+.selected {
+    background-color: #66b2ff;
+    color: #fff;
+    border-radius: 50%;
+}
 /* Примените стили в вашем компоненте */

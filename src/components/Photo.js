@@ -6,6 +6,10 @@ import IconComponent from "./IconComponent";
 import { ThemeContext } from "../context/ThemeContext";
 import ph1 from '../testPhotos/ph1.png';
 import ph2 from '../testPhotos/ph2.png';
+import ph3 from '../testPhotos/ph3.jpg';
+import ph4 from '../testPhotos/ph4.jpg';
+import ph5 from '../testPhotos/ph5.jpg';
+import ph6 from '../testPhotos/ph6.jpeg';
 
 
 const Photo = ({ id, url }) => {
@@ -25,7 +29,7 @@ const Photo = ({ id, url }) => {
         </button>*/
     <img
         key={id}
-        src={id === 1 ? ph1 : ph2}
+        src={id === 1 ? ph1 : id === 2 ? ph2 : id === 3 ? ph3 : id === 4 ? ph4 : id === 5 ? ph5 : ph6}
         alt={id}/>
     );
 };
