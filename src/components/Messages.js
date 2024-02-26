@@ -4,6 +4,7 @@ import {isVisible} from "@testing-library/user-event/dist/utils";
 import {useNavigate, useParams} from "react-router-dom";
 import Cookies from "js-cookie";
 import axios from "axios";
+import * as signalR from "@microsoft/signalr";
 
 const MessageComponent = ({ id, isMessageViewed }) => {
 
@@ -27,6 +28,8 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                     setMessages(updatedMessages);
                     setIsEditing(false);
                     setSelectedMessageId(null);
+                    // Очищаем поле ввода после отправки
+                    setNewMessage('');
                 })
                 .catch(error => {
                     console.error('Error editing message:', error);
@@ -35,6 +38,14 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                 });
         }
     };
+
+    const accessToken = Cookies.get('token');
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("http://localhost:5155/messageHub",{
+                accessTokenFactory: () => accessToken
+            })
+        .build();
 
     const handleButtonClick = () => {
         if (isEditing) {
@@ -84,14 +95,6 @@ const MessageComponent = ({ id, isMessageViewed }) => {
             setSelectedMessageId(messageId);
         }
     };
-
-
-
-    /*    const [messages, setMessages] = useState([
-            { text: 'Привет!', isMine: false, isViewed: true, timestamp: new Date('2023-09-10T10:30:00') },
-            { text: 'Привет! Как дела?', isMine: true, isViewed: true, timestamp: new Date('2023-09-10T10:30:10') },
-            { text: 'Отлично, спасибо!', isMine: false, isViewed: false, timestamp: new Date('2023-09-11T00:30:00') },
-        ]);*/
 
     const navigate = useNavigate();
 
@@ -148,6 +151,38 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                     }
                 });
         }
+
+        connection.on("ReceiveMessage", (message) => {
+            console.log("Message received: ", message);
+            if (message.senderId !== localStorage.getItem('userId')) {
+                setMessages(messages => {
+                    const index = messages.findIndex(m => m.id === message.id);
+                    if (index !== -1) {
+                        // Если сообщение помечено как удаленное, удаляем его из списка
+                        if (message.isDeleted === true) {
+                            return [...messages.slice(0, index), ...messages.slice(index + 1)];
+                        } else {
+                            // Иначе заменяем существующее сообщение
+                            return [...messages.slice(0, index), message, ...messages.slice(index + 1)];
+                        }
+                    } else {
+                        // Если сообщение не существует в списке, добавляем его
+                        return [...messages, message];
+                    }
+                });
+            }
+        });
+
+
+
+        // Запуск соединения при загрузке страницы или компонента
+        connection.start()
+            .then(() => console.log('Connection started'))
+            .catch(err => console.log('Error while starting connection: ' + err))
+
+        return () => {
+            connection.off("ReceiveMessage");
+        };
     }, [id]);
 
     const [newMessage, setNewMessage] = useState('');
@@ -322,6 +357,7 @@ const MessageComponent = ({ id, isMessageViewed }) => {
 
             <div className="message-input-div">
                 <textarea
+                    id="textarea-message"
                     className="message-input"
                     type="text"
                     placeholder="Введите сообщение..."
