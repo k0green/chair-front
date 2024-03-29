@@ -167,10 +167,13 @@ const HomePage = ({ user, onLogout }) => {
                         rating: response.data.rating,
                         address: response.data.address,
                         executorId: response.data.executorId,
-                        //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
-                    photos: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' },
-                        { id: 3, url: 'path/to/photo3.jpg' }, { id: 4, url: 'path/to/photo4.jpg' },
-                        { id: 5, url: 'path/to/photo5.jpg' }, { id: 6, url: 'path/to/photo6.jpg' }],
+                    photos: response.data.photos.length > 0 ? response.data.photos.map(photo => ({
+                        id: photo.id,
+                        url: photo.url,
+                    })) : [{
+                        id: 'default',
+                        url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+                    }],
                 };
 
                 setOprData(newServicesData);
@@ -276,9 +279,13 @@ const HomePage = ({ user, onLogout }) => {
                         address: service.address,
                         executorId: service.executorId,
                         //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
-                        photos: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' },
-                            { id: 3, url: 'path/to/photo3.jpg' }, { id: 4, url: 'path/to/photo4.jpg' },
-                            { id: 5, url: 'path/to/photo5.jpg' }, { id: 6, url: 'path/to/photo6.jpg' }],
+                        photos: service.photos.length > 0 ? service.photos.map(photo => ({
+                            id: photo.id,
+                            url: photo.url,
+                        })) : [{
+                            id: 'default',
+                            url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+                        }],
                     })),
                 }));
 
@@ -479,9 +486,16 @@ const HomePage = ({ user, onLogout }) => {
                             address: service.address,
                             executorId: service.executorId,
                             //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
-                            photos: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' },
-                                { id: 3, url: 'path/to/photo3.jpg' }, { id: 4, url: 'path/to/photo4.jpg' },
-                                { id: 5, url: 'path/to/photo5.jpg' }, { id: 6, url: 'path/to/photo6.jpg' }],
+                            photos: service.photos.length > 0 ? service.photos.map(photo => ({
+                                id: photo.id,
+                                url: photo.url,
+                            })) : [{
+                                id: 'default',
+                                url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+                            }],
+                            /*photos: [{ id: service.photos.id, url: 'https://www.desktopbackground.org/download/o/2014/07/09/790888_chrome-set-as-wallpapers-wallpapers-zone_7539x5031_h.jpg' }, { id: 2, url: 'path/to/photo2.jpg' },
+                                { id: 3, url: 'http://priroda.club/uploads/posts/2022-07/1658478016_13-priroda-club-p-krasivie-prirodnie-peizazhi-priroda-krasiv-13.jpg' }, { id: 4, url: 'path/to/photo4.jpg' },
+                                { id: 5, url: 'https://gas-kvas.com/uploads/posts/2023-02/1675444651_gas-kvas-com-p-fonovii-risunok-rabochego-priroda-10.jpg' }, { id: 6, url: 'path/to/photo6.jpg' }],*/
                         })),
                     }));
 

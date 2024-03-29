@@ -306,7 +306,7 @@ const MessageComponent = ({ id, isMessageViewed }) => {
     return (
         <div className="chat-container">
             <div className="message-header">
-                <div className="avatar"><img src={chatData.recipientProfileImg} alt="User Avatar" className="avatar-image"/></div>
+                <div className="avatar"><img src={chatData.recipientProfileImg} className="avatar-image"/></div>
                 <div className="name">{chatData.recipientName}</div>
                 {isChoosing ? (
                     <div className="choose-buttons">

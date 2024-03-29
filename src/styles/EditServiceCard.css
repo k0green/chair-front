@@ -1,0 +1,84 @@
+.centr-esc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.service-card-edit-photo {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px;
+}
+
+.photos-esc {
+    position: relative;
+    margin-top: -20px;
+    margin-bottom: -20px;
+}
+
+.photos-esc img {
+    border-radius: 10px;
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.photos-esc img:hover {
+    transform: scale(1.1);
+}
+
+.order-text-esc{
+    color: #3333ff;
+    font-weight: bold;
+    text-decoration: none;
+    line-height: 1;
+    font-size: 14px;
+}
+
+.add-photo-button-new {
+    width: 100%;
+    border-radius: 10px;
+    border-color: #3333ff;
+    background-color: white;
+    margin-top: 30px;
+    padding: -8px -12px;
+    cursor: pointer;
+}
+
+.service-card-edit-master {
+    width: 80%;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px;
+}
+
+input[type="time"] {
+    width: auto; /* Автоматически подстраивает ширину под содержимое */
+}
+
+input[type="number"] {
+    width: 10ch; /* Ограничивает ширину, чтобы вместить 5 символов */
+}
+
+.time-module {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: -20px;
+    gap: 0;
+}
+
+.master-info-time {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    gap: 0;
+}

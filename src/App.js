@@ -12,6 +12,8 @@ import EditServiceCard from "./pages/EditServiceCardPage";
 import AddServiceCard from "./pages/AddServiceCardPage";
 import CategoryPage from "./pages/CategoryPage";
 import OrdersPage from "./pages/OrdersPage";
+import ReviewsPage from "./pages/ReviewsPage";
+import Test from "./pages/Test";
 
 function App() {
   return (
@@ -31,6 +33,7 @@ function App() {
             <Route path="/messages/:id" element={<Messages />} />
             <Route path="/service-card/edit/:id" element={<EditServiceCard />} />
             <Route path="/service-card/add/:id" element={<AddServiceCard />} />
+            <Route path="/reviews/:id" element={<ReviewsPage />} />
             <Route path="/collection/category/:id" element={<CategoryPage />} />
             <Route path="/orders" element={<OrdersPage />} />
           </Routes>

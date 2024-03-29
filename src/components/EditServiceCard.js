@@ -1,11 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import '../styles/ServiceCard.css';
-import { faBoltLightning, faClock, faLightbulb, faStar, faTimes, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+    faAdd,
+    faBoltLightning,
+    faClock, faDollar,
+    faLightbulb,
+    faStar,
+    faTimes,
+    faTimesCircle, faTrash
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PhotoList from "../components/PhotoList";
 import {useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
+import {useDropzone} from "react-dropzone";
 
 const ServiceCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
@@ -25,8 +34,12 @@ const ServiceCard = ({ service, isNew, id }) => {
     const [editedPrice, setEditedPrice] = useState(service.price);
     const [editedAddress, setEditedAddress] = useState(service.address);
     //const [editedPhotos, setEditedPhotos] = useState();
-    const [editedPhotos, setEditedPhotos] = useState([...service.imageURLs]);
+    const [editedPhotos, setEditedPhotos] = useState([...service.photos]);
     const [servicesLookupData, setServicesLookupData] = useState([]);
+    const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [uploadedPhotos, setUploadedPhotos] = useState([]);
+    const [files, setFiles] = useState([]);
 
     const reverseFormatTime = (formattedTime, editedDuration) => {
         const [hours, minutes] = formattedTime.split(':').map(Number);
@@ -65,7 +78,7 @@ const ServiceCard = ({ service, isNew, id }) => {
             address: editedAddress,
             duration: reverseFormatTime(editedDuration, service.duration),
             price: editedPrice,
-            imageURLs: editedPhotos.map(photo => photo.url),
+            photos: editedPhotos.map(photo => photo),
         };
         const token = Cookies.get('token');
         if(!token)
@@ -96,7 +109,7 @@ const ServiceCard = ({ service, isNew, id }) => {
             address: editedAddress,
             duration: reverseFormatTime(editedDuration, date),
             price: editedPrice,
-            imageURLs: editedPhotos.map(photo => photo.url), // assuming editedPhotos has an array of objects with a 'url' property
+            photos: editedPhotos.map(photo => photo), // assuming editedPhotos has an array of objects with a 'url' property
         };
 
         // Make a POST request to your server endpoint
@@ -116,19 +129,147 @@ const ServiceCard = ({ service, isNew, id }) => {
     };
 
     const handleAddPhoto = () => {
-        // Здесь можно реализовать загрузку новой фотографии и добавить ее в editedPhotos
-        // Можно использовать библиотеку для загрузки изображений или реализовать свой способ
-        // После добавления фото обновите editedPhotos
+        setUploadPhotoModal(true);
     };
+
+/*    return (
+        <div className="centr-esc">
+            <div className="service-card-edit-photo">
+                <div className="photos-esc">
+                    <PhotoList photos={editedPhotos} onDeletePhoto={handleDeletePhoto} />
+                </div>
+                <button className="add-photo-button-new" onClick={handleAddPhoto}>
+                    <p className="order-text-esc"><FontAwesomeIcon icon={faAdd} /> Добавить фото</p>
+                </button>
+            </div>
+            <div className="service-card-edit-master">
+                <div className="master-info-time">
+                    <div className="master-info-time">
+                        <select
+                            name="procedure"
+                            value={editedServiceTypeId.serviceTypeId}
+                            onChange={(e) => setEditedServiceTypeId({ ...editedServiceTypeId, serviceTypeId: e.target.value })}
+                            className="input-field"
+                        >
+                            <option value="">Выберите услугу</option>
+                            {servicesLookupData.map((service) => (
+                                <option key={service.id} value={service.id}>
+                                    {service.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="time-module">
+                        <h4>Продолжительность</h4>
+                        <input
+                            type="time"
+                            placeholder="50"
+                            value={editedDuration || formatTime(service.duration)}
+                            onChange={(e) => setEditedDuration(e.target.value)}
+                        />
+                        <h4>min</h4>
+                    </div>
+                    <div className="time-module">
+                        <h4>Стоимость</h4>
+                        <input
+                            type="number"
+                            value={editedPrice || service.price}
+                            onChange={(e) => setEditedPrice(e.target.value)}
+                        />
+                        <h4>Byn</h4>
+                    </div>
+                </div>
+                <div>
+                    <input
+                        placeholder="address"
+                        type="text"
+                        value={editedAddress || service.address}
+                        onChange={(e) => setEditedAddress(e.target.value)}
+                        className="input-field"
+                    />
+                </div>
+                <div>
+                    <input
+                        placeholder="Duration"
+                        type="text"
+                        value={editedDescription || service.description}
+                        onChange={(e) => setEditedDescription(e.target.value)}
+                        className="input-field"
+                    />
+                </div>
+                <div>
+                    <button className="order-button" onClick={isNew ? handleAddSave : handleEditSave}>
+                        <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> Сохранить</p>
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+    );
+};*/
+
+    const Dropzone = () => {
+        const { getRootProps, getInputProps } = useDropzone({
+            accept: 'image/*',
+            onDrop: acceptedFiles => {
+                setFiles(prev => [...prev, ...acceptedFiles.map(file => Object.assign(file, {
+                    preview: URL.createObjectURL(file)
+                }))]);
+            },
+            multiple: true
+        });
+
+        const images = files.map((file, index) => (
+            <div className="dropzone-centrize" key={file.name}>
+                <img src={file.preview} style={{width: '50%'}} alt="preview" />
+                <button className='trash-icon' onClick={() => {
+                    const newFiles = [...files];
+                    newFiles.splice(index, 1);
+                    setFiles(newFiles);
+                }}><FontAwesomeIcon icon={faTrash} />  Удалить</button>
+            </div>
+        ));
+
+        return (
+            <div className="dropzone-centrize">
+                {images}
+                <div {...getRootProps({style: {border: '2px solid blue', padding: '20px', width: '400px', height: '400px'}})}>
+                    <input {...getInputProps()} />
+                    <p>Перетащите сюда файлы или кликните для выбора</p>
+                </div>
+            </div>
+        );
+    }
+
+    const handleUpload = async () => {
+        for (const file of files) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await axios.post('http://localhost:5155/minio/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            setEditedPhotos(prevState => [...prevState, ...response.data]);
+        }
+
+        setFiles([]); // очистите files
+        setUploadPhotoModal(false);
+    };
+
+
 
     return (
         <div className="centrize">
         <div className="service-card-edit">
                 <div key={service.id} className="master-card">
-                    <div className="photos">
+                    <div className="photos-edit">
                         <PhotoList photos={editedPhotos} onDeletePhoto={handleDeletePhoto} />
-                        <button className="add-photo-button" onClick={handleAddPhoto}>
-                            <FontAwesomeIcon icon={faTimesCircle} className="add-photo-icon" />
+                        <button className="add-photo-button-new" onClick={handleAddPhoto}>
+                            <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> Добавить фото</p>
                         </button>
                     </div>
                     <div className="master-info">
@@ -163,21 +304,28 @@ const ServiceCard = ({ service, isNew, id }) => {
                             value={editedDescription || service.description}
                             onChange={(e) => setEditedDescription(e.target.value)}
                         />
-                        <p>Available Slots: {service.availableSlots}</p>
+                        {/*<p>Available Slots: {service.availableSlots}</p>*/}
                     </div>
                     <div className="master-info">
-                        <FontAwesomeIcon icon={faClock} className = 'item-icon'/>
-                        <input
-                            type="time"
-                            placeholder="50"
-                            value={editedDuration || formatTime(service.duration)}
-                            onChange={(e) => setEditedDuration(e.target.value)}
-                        /><h4 className="go-left">min</h4>
-                        <input
-                            type="number"
-                            value={editedPrice || service.price}
-                            onChange={(e) => setEditedPrice(e.target.value)}
-                        /><h4 className="go-left">Byn</h4>
+                        <div className="time-module">
+                            <FontAwesomeIcon icon={faClock} className = 'item-icon'/>
+                            <input
+                                type="time"
+                                placeholder="50"
+                                value={editedDuration || formatTime(service.duration)}
+                                onChange={(e) => setEditedDuration(e.target.value)}
+                            />
+                            <h4>min</h4>
+                        </div>
+                        <div className="time-module">
+                            <FontAwesomeIcon icon={faDollar} className = 'item-icon'/>
+                            <input
+                                type="number"
+                                value={editedPrice || service.price}
+                                onChange={(e) => setEditedPrice(e.target.value)}
+                            />
+                            <h4>Byn</h4>
+                        </div>
                     </div>
                     <div>
                         <button className="order-button" onClick={isNew ? handleAddSave : handleEditSave}>
@@ -186,6 +334,17 @@ const ServiceCard = ({ service, isNew, id }) => {
                     </div>
                 </div>
         </div>
+            {uploadPhotoModal && (
+                <div className="filter-modal">
+                    <div className="modal-content">
+                    <span className="close" onClick={() => setUploadPhotoModal(false)}>
+                        &times;
+                    </span>
+                        <Dropzone />
+                        <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> Сохранить</p></button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

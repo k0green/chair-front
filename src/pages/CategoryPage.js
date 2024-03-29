@@ -37,7 +37,13 @@ const HomePage = ({ user, onLogout }) => {
                         address: service.address,
                         executorId: service.executorId,
                         //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
-                        photos: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' }],
+                        photos: service.photos.length > 0 ? service.photos.map(photo => ({
+                            id: photo.id,
+                            url: photo.url,
+                        })) : [{
+                            id: 'default',
+                            url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+                        }],
                     })),
                 }));
 

@@ -40,13 +40,6 @@ const PhotoList = ({photos}) => {
 
     return (
         <div className="category-container">
-{/*            <div className="pagination-arrow-container">
-                <FontAwesomeIcon
-                    icon={faChevronLeft}
-                    className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
-                    onClick={goToPreviousPage}
-                />
-            </div>*/}
             <div className="category-list">
                 {visiblePhotos.map((photo) => (
                     <Photo
@@ -69,13 +62,6 @@ const PhotoList = ({photos}) => {
                     </div>
                 )}
             </div>
-{/*            <div className="pagination-arrow-container">
-                <FontAwesomeIcon
-                    icon={faChevronRight}
-                    className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
-                    onClick={goToNextPage}
-                />
-            </div>*/}
         </div>
     );
 };

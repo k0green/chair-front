@@ -42,7 +42,7 @@
     align-items: center;
     justify-content: center; /* Центрирование по вертикали */
     text-align: center; /* Центрирование текста по центру */
-    margin-left: -5.2%; /* Убираем внешний отступ */
+    /*margin-left: -5.2%;*/ /* Убираем внешний отступ */
     padding: 0; /* Убираем внутренний отступ */
 }
 
@@ -54,6 +54,8 @@
     object-fit: cover;
     display: block;
     margin: 0 auto;
+    background-image: url('https://th.bing.com/th/id/OIG2.01QU5flA2Zrk9DFkj8wU?w=1024&h=1024&rs=1&pid=ImgDetMain');
+    background-size: 100%;
 }
 
 .contact-item {

@@ -79,20 +79,6 @@ const ServiceCard = ({ service, isProfile }) => {
                     <div className="service-card">
                         <div key={master.id} className="master-card">
                             <div className="photos">
-                                {/*{master.photos.map((photo, index) => (
-                            <img
-                                key={photo.id}
-                                src={photo.url}
-                                alt={`Photo ${photo.id}`}
-                                className={index === 0 ? "active" : ""}
-                            />
-                        ))}
-                        {master.photos.length > 1 && (
-                            <div className="arrow-buttons">
-                                <button>&larr;</button>
-                                <button>&rarr;</button>
-                            </div>
-                        )}*/}
                                 <PhotoList photos={master.photos}/>
                             </div>
                             <div className="master-info">

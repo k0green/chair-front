@@ -20,7 +20,10 @@ const AddServiceCardPage = () => {
             //availableSlots: 3,
             duration: '0001-01-01T01:00:00',
             serviceTypeId: "36dc8d14-c955-4d33-9b2b-cf2ea432da3c",
-            imageURLs: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' }],
+            photos:  [{
+                id: 'default',
+                url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+            }],
         };
 
     return (

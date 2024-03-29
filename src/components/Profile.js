@@ -135,7 +135,7 @@ const Profile = ({user, services, contacts, current}) => {
         <div className="profile-page">
             <div className="profile-header">
                 <div className="profile-avatar">
-                    <img src={user.imageUrl} alt="User Avatar" className="avatar-image"/>
+                    <img src={user.imageUrl} alt="" className="avatar-image"/>
                 </div>
                 <div className="profile-bio">
                     {isEditing ? (

@@ -51,6 +51,7 @@
 
 .main-category-icon-dark-theme {
     font-size: 24px;
+    font-size: 24px;
     margin-bottom: 5px;
     color: white;
     background-color: white;
@@ -65,12 +66,16 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin-top: 20px;
+    /*margin-top: 20px;*/
+    max-height: 500px;
+    max-width: 500px;
+    min-width: 300px;
 }
 
 .category-container {
     display: flex;
     align-items: center;
+    padding-top: -20px;
 }
 
 .pagination-arrow-container {

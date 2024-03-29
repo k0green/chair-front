@@ -32,7 +32,13 @@ const EditServiceCardPage = () => {
                     duration: response.data.duration,
                     address: response.data.address,
                     //imageURLs: response.data.imageURLs.map((url, index) => ({ id: index + 1, url })),
-                    imageURLs: [{ id: 1, url: 'path/to/photo1.jpg' }, { id: 2, url: 'path/to/photo2.jpg' }],
+                    photos: response.data.photos.length > 0 ? response.data.photos.map(photo => ({
+                        id: photo.id,
+                        url: photo.url,
+                    })) : [{
+                        id: 'default',
+                        url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+                    }],
                 };
                 setService(formattedData);
             } catch (error) {
