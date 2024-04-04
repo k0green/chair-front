@@ -1,14 +1,8 @@
 import React, {useContext, useEffect, useState} from "react";
-import { ThemeContext } from "../context/ThemeContext";
-import Footer from '../components/Footer';
-import Header from '../components/Header';
+import { ThemeContext } from "../components/ThemeContext";
 import "../styles/Main.css";
-import Icon from '../components/Categories';
 import ServiceList from '../components/ServiceList';
-import ph1 from '../testPhotos/ph1.png';
-import ph2 from '../testPhotos/ph2.png';
 import axios from "axios";
-import { parseISO, format } from 'date-fns';
 import {useParams} from "react-router-dom";
 
 const HomePage = ({ user, onLogout }) => {
@@ -65,11 +59,9 @@ const HomePage = ({ user, onLogout }) => {
 
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
-            <Header user={user} onLogout={onLogout} />
             <div>
                 <ServiceList services={servicesData} />
             </div>
-            <Footer />
         </div>
     );
 };

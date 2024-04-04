@@ -56,9 +56,9 @@ const ReviewsPage = () => {
 
     return (
         <div>
-            <Header />
+{/*            <Header />*/}
             {service && <Reviews service={service}/>}
-            <Footer />
+{/*            <Footer />*/}
         </div>
     );
 };

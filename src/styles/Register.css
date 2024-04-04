@@ -21,12 +21,20 @@
     margin-left: 38%;
 }
 
+.register-header.dark {
+    color: white;
+}
+
 .register-label {
     display: block;
     font-size: 16px;
     font-weight: bold;
     margin-top: 10px;
     margin-bottom: 2px;
+}
+
+.register-label.dark {
+    color: white;
 }
 
 .register-input {
@@ -37,6 +45,15 @@
     margin: 0 10px 0 -10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.register-input.dark{
+    background-color: #695b5b;
+    color: white;
+}
+
+.register-input.dark::placeholder{
+    color: #adadad;
 }
 
 .register-input:focus {
@@ -83,4 +100,12 @@
 
 .register-button.active:hover {
     background-color: #0069d9;
+}
+
+.login-redirect-text{
+    color: white;
+}
+
+.login-redirect-link{
+    color: #5674ff;
 }

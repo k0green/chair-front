@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext } from '../components/ThemeContext';
 import "../styles/Main.css";
 import Login from '../components/Login';
 
@@ -7,7 +7,7 @@ const LoginPage = ({ user, onLogout }) => {
     const { theme } = useContext(ThemeContext);
 
     return (
-        <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
+        <div className={`login-container ${theme === 'light' ? 'main-light-theme' : 'main-dark-theme'}`}>
             <div>
                 <Login />
             </div>

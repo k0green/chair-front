@@ -2,9 +2,8 @@ import React, {useContext, useEffect, useState} from 'react';
 import '../styles/Calendar.css';
 import { faChevronCircleLeft, faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ThemeContext } from "../context/ThemeContext";
-import { v4 as uuidv4 } from 'uuid';
-import {useParams} from "react-router-dom";
+import { ThemeContext } from "./ThemeContext";
+import {useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -26,28 +25,30 @@ const Calendar = ({full}) => {
     const [servicesLookupData, setServicesLookupData] = useState([]);
     const { theme } = useContext(ThemeContext);
     let { id } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch data from the backend when the component mounts or currentMonth changes
         fetchData();
     }, [currentMonth]);
 
     useEffect(() => {
-        // Fetch data from the backend when the component mounts or currentMonth changes
-
         fetchLookupData();
     }, []);
 
     const fetchLookupData = async () => {
         try {
-            const token = localStorage.getItem('token');
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            const token = Cookies.get('token');
+            if(!token)
+                navigate("/login");
+            else{
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 const response = await axios.get('http://localhost:5155/executor-service/executor-services/lookup', { withCredentials: true });
                 const serverData = response.data.map(item => ({
                     id: item.id,
                     name: item.name
                 }));
                 setServicesLookupData(serverData);
+            }
         } catch (error) {
             console.error("Error fetching data:", error);
         }
@@ -240,7 +241,7 @@ const Calendar = ({full}) => {
     const renderDaysOfWeek = () => {
         const daysOfWeek = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
         return daysOfWeek.map((day, index) => (
-            <div key={index} className="dayOfWeek">{day}</div>
+            <div key={index} className={`dayOfWeek ${theme === 'dark' ? 'dark' : ''}`}>{day}</div>
         ));
     };
 
@@ -250,35 +251,33 @@ const Calendar = ({full}) => {
         const emptyDays = Array.from({ length: firstDayOfWeek }, (_, i) => <div key={i} className="emptyDay" />);
 
         return (
-            <div className="calendar">
-                <div className="monthNavigation">
+            <div className={`calendar ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className={`monthNavigation ${theme === 'dark' ? 'dark' : ''}`}>
                     <button className="monthButton" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}>
                         <FontAwesomeIcon
                             icon={faChevronCircleLeft}
                             className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
-                            style={{ color: "gray" }}
+                            style={{ color: "gray", backgroundColor: "transparent" }}
                         />
                     </button>
-                    <div className="currentMonth">{currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
+                    <div className={`currentMonth ${theme === 'dark' ? 'dark' : ''}`}>{currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
                     <button className="monthButton" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}>
                         <FontAwesomeIcon
                             icon={faChevronCircleRight}
                             className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
-                            style={{ color: "gray" }}
+                            style={{ color: "gray", backgroundColor: "transparent"  }}
                         />
                     </button>
                 </div>
-
-
-                <div className="daysContainer">
+                <div className="daysOfWeek">{renderDaysOfWeek()}</div>
+                <div className={`daysContainer ${theme === 'dark' ? 'dark' : ''}`}>
                     {emptyDays}
                     {daysInMonth.map((day, index) => {
                         const hasAppointments = appointmentsData.some(appointment => appointment.day === day);
                         return (
                             <div
                                 key={index}
-                                //className={`day ${selectedDays.includes(day) ? "selectedDay" : ""} ${hasAppointments ? "hasAppointments" : ""}`}
-                                className={`day ${selectedDays.includes(day) ? "selectedDay" : `${hasAppointments ? "hasAppointments" : ""}`}`}
+                                className={`day ${theme === 'dark' ? 'dark' : ''} ${selectedDays.includes(day) ? "selectedDay" : `${hasAppointments ? "hasAppointments" : ""}`}`}
                                 onClick={() => handleDayClick(day)}
                             >
                                 {day}
@@ -314,6 +313,11 @@ const Calendar = ({full}) => {
         });
     };
 
+    const handleNewAppointmentCancel = () => {
+        setIsNewAppointment(false);
+        setSelectedDays([]);
+    };
+
     const addMinutes = (time, minutes) => {
         const [hours, oldMinutes] = time.split(':').map(Number);
         const newMinutes = oldMinutes + minutes;
@@ -330,10 +334,10 @@ const Calendar = ({full}) => {
                 <div className="appointmentAdd">
                     <div className="appointmentAdd-details">
                         <div>
-                            Н:{" "}
                             {
                                 <select
                                     name="procedure"
+                                    className={`select ${theme === 'dark' ? 'dark' : ''}`}
                                     value={newAppointmentData.procedure}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, procedure: e.target.value })}
                                 >
@@ -353,6 +357,8 @@ const Calendar = ({full}) => {
                                     type="time"
                                     name="starDate"
                                     placeholder="Время начала (HH:mm)"
+                                    style={{width: "auto"}}
+                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                     value={newAppointmentData.starDate}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, startTime: e.target.value })}
                                 />
@@ -364,7 +370,8 @@ const Calendar = ({full}) => {
                                 <input
                                     type="number"
                                     name="sessionCount"
-                                    className="small-input" // Add this class
+                                    style={{width: "8ch"}}
+                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                     placeholder="Количество сеансов"
                                     value={newAppointmentData.sessionCount}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, sessionCount: e.target.value })}
@@ -377,7 +384,8 @@ const Calendar = ({full}) => {
                                 <input
                                     type="number"
                                     name="breakTime"
-                                    className="small-input" // Add this class
+                                    style={{width: "8ch"}}
+                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                     placeholder="Время перерыва (минуты)"
                                     value={newAppointmentData.breakTime}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, breakTime: e.target.value })}
@@ -389,9 +397,10 @@ const Calendar = ({full}) => {
                             Продолжительность:{" "}
                             {
                                 <input
+                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                     type="number"
                                     name="duration"
-                                    className="small-input" // Add this class
+                                    style={{width: "8ch"}}
                                     placeholder="Продолжительность (минуты)"
                                     value={newAppointmentData.duration}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, duration: e.target.value })}
@@ -405,8 +414,9 @@ const Calendar = ({full}) => {
                                 <input
                                     type="number"
                                     name="cost"
+                                    style={{width: "8ch"}}
                                     placeholder="Стоимость"
-                                    className="small-input" // Add this class
+                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                     value={newAppointmentData.cost}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, cost: e.target.value })}
                                 />
@@ -415,7 +425,10 @@ const Calendar = ({full}) => {
                         </div>
                     </div>
                     {
-                        <button className="save" onClick={handleNewAppointmentSave}>Сохранить</button>
+                        <div>
+                            <button className="save" onClick={handleNewAppointmentSave}>Сохранить</button>
+                            <button className="cancel" onClick={handleNewAppointmentCancel}>Отмена</button>
+                        </div>
                     }
                 </div>
             </div>
@@ -436,19 +449,14 @@ const Calendar = ({full}) => {
                     <div>
                         {appointments.map((appointment, index) => (
                             <div key={index} className="appointmentContainer">
-                                <div className="appointment">
+                                <div className={`appointment ${theme === 'dark' ? 'dark' : ''}`}>
                                     <div className="appointment-details">
-                                        <div>
+                                        <div style={theme === 'dark' ? { color: "white"} : ''}>
                                             Название:{" "}
                                             {editingAppointmentId === appointment.id ? (
- /*                                               <input
-                                                    type="text"
-                                                    name="procedure"
-                                                    value={editedAppointments[appointment.id]?.serviceTypeName || ""}
-                                                    onChange={(e) => handleInputChange(e, appointment.id)}
-                                                />*/
                                                 <select
                                                     name="procedure"
+                                                    className={`select ${theme === 'dark' ? 'dark' : ''}`}
                                                     value={appointment.executorServiceId}
                                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, procedure: e.target.value })}
                                                 >
@@ -463,11 +471,11 @@ const Calendar = ({full}) => {
                                                 <strong>{appointment.serviceTypeName}</strong>
                                             )}
                                         </div>
-                                        <div>
+                                        <div style={theme === 'dark' ? { color: "white"} : ''}>
                                             Время начала:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
-                                                    type="text"
+                                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                                     name="starDate"
                                                     value={editedAppointments[appointment.id]?.starDate || ""}
                                                     onChange={(e) => handleInputChange(e, appointment.id)}
@@ -476,11 +484,11 @@ const Calendar = ({full}) => {
                                                 <strong>{formatTime(appointment.starDate)}</strong>
                                             )}
                                         </div>
-                                        <div>
+                                        <div style={theme === 'dark' ? { color: "white"} : ''}>
                                             Продолжительность:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
-                                                    type="text"
+                                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                                     name="duration"
                                                     value={editedAppointments[appointment.id]?.duration || ""}
                                                     onChange={(e) => handleInputChange(e, appointment.id)}
@@ -489,11 +497,11 @@ const Calendar = ({full}) => {
                                                 <strong>{formatTime(appointment.duration)}</strong>
                                             )}
                                         </div>
-                                        <div>
+                                        <div style={theme === 'dark' ? { color: "white"} : ''}>
                                             Стоимость:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
-                                                    type="text"
+                                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                                     name="price"
                                                     value={editedAppointments[appointment.id]?.price || ""}
                                                     onChange={(e) => handleInputChange(e, appointment.id)}
@@ -525,7 +533,7 @@ const Calendar = ({full}) => {
 
     return (
         <div>
-            <div className="calendarContainer">
+            <div className={`calendarContainer ${theme === 'dark' ? 'dark' : ''}`}>
                 {renderCalendar()}
             </div>
             <div className="newAppointmentContainer">

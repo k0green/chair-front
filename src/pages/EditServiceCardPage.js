@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios';
 import '../styles/ServiceCard.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,8 +7,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import EditServiceCard from "../components/EditServiceCard";
 import Footer from "../components/Footer";
+import {ThemeContext} from "../components/ThemeContext";
 
 const EditServiceCardPage = () => {
+    const { theme, toggleTheme } = useContext(ThemeContext);
     const [service, setService] = useState(null);
     const { id } = useParams();
     const navigate = useNavigate();
@@ -50,10 +52,8 @@ const EditServiceCardPage = () => {
     }, [id, navigate]);
 
     return (
-        <div>
-            <Header />
+        <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
             {service && <EditServiceCard service={service} isNew={isNew} id={id}/>}
-            <Footer />
         </div>
     );
 };

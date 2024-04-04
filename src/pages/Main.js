@@ -1,7 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import { ThemeContext } from "../context/ThemeContext";
-import Footer from '../components/Footer';
-import Header from '../components/Header';
+import { ThemeContext } from "../components/ThemeContext";
 import "../styles/Main.css";
 import Icon from '../components/Categories';
 import ServiceList from '../components/ServiceList';
@@ -9,7 +7,6 @@ import axios from "axios";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import {isSameDay} from "date-fns";
-import ServiceCard from "../components/ServiceCard";
 import PhotoList from "../components/PhotoList";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBoltLightning, faClock, faHouse, faPencil, faStar, faTrash} from "@fortawesome/free-solid-svg-icons";
@@ -550,7 +547,6 @@ const HomePage = ({ user, onLogout }) => {
 
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
-            <Header user={user} onLogout={onLogout} />
             <div>
                 <Icon categories={categories}/>
             </div>
@@ -840,7 +836,6 @@ const HomePage = ({ user, onLogout }) => {
                     </div>
                 </div>
             )}
-            <Footer />
         </div>
     );
 };

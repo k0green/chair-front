@@ -7,26 +7,23 @@ import {
     faChevronRight
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {ThemeContext} from "../context/ThemeContext";
 import {useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
-import Cookies from "js-cookie"; // Подключаем файл стилей
+import Cookies from "js-cookie";
+import {ThemeContext} from "./ThemeContext"; // Подключаем файл стилей
 
 const Calendar = ({full}) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [currentYear, setCurrentYear] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
     const [appointmentsData, setAppointmentsData] = useState([]);
-    const { theme } = useContext(ThemeContext);
-    // Здесь нужно будет добавить логику запроса для получения данных о записях на сервере
+    const { theme, toggleTheme } = useContext(ThemeContext);
     let { id } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch data from the backend when the component mounts or currentMonth changes
         const token = Cookies.get('token');
         if (!token) {
-            // Редирект на страницу входа
             navigate('/login');
         }
         fetchData();
@@ -91,31 +88,6 @@ const Calendar = ({full}) => {
         const minutes = date.getMinutes().toString().padStart(2, '0');
         return `${hours}:${minutes}`;
     };
-    // Пример данных о записях
-    /*const appointmentsData = [
-        {
-            day: 3,
-            procedure: 'Процедура 1',
-            start: '18:00',
-            duration: '1 час',
-            cost: '100',
-        },
-        {
-            day: 3,
-            procedure: 'Процедура 3',
-            start: '18:00',
-            duration: '1 час',
-            cost: '200',
-        },
-        {
-            day: 10,
-            procedure: 'Процедура 2',
-            start: '18:00',
-            duration: '2 часа',
-            cost: '150',
-        },
-        // ...другие записи
-    ];*/
 
     const handleDayClick = (day) => {
         setSelectedDay(day);
@@ -142,7 +114,7 @@ const Calendar = ({full}) => {
     const renderDaysOfWeek = () => {
         const daysOfWeek = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
         return daysOfWeek.map((day, index) => (
-            <div key={index} className="dayOfWeek">{day}</div>
+            <div key={index} className={`dayOfWeek ${theme === 'dark' ? 'dark' : ''}`}>{day}</div>
         ));
     };
 
@@ -152,21 +124,21 @@ const Calendar = ({full}) => {
         const emptyDays = Array.from({ length: firstDayOfWeek }, (_, i) => <div key={i} className="emptyDay" />);
 
         return (
-            <div className="calendar">
-                <div className="monthNavigation">
+            <div className={`calendar ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className={`monthNavigation ${theme === 'dark' ? 'dark' : ''}`}>
                     <button className="monthButton" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}>
                         <FontAwesomeIcon
                             icon={faChevronCircleLeft}
                             className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
-                            style={{ color: "gray" }}
+                            style={{ color: "gray", backgroundColor: "transparent" }}
                         />
                     </button>
-                    <div className="currentMonth">{currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
+                    <div className={`currentMonth ${theme === 'dark' ? 'dark' : ''}`}>{currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
                     <button className="monthButton" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}>
                         <FontAwesomeIcon
                             icon={faChevronCircleRight}
                             className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
-                            style={{ color: "gray" }}
+                            style={{ color: "gray", backgroundColor: "transparent" }}
                         />
                     </button>
                 </div>
@@ -178,8 +150,7 @@ const Calendar = ({full}) => {
                         return (
                             <div
                                 key={index}
-                                //className={`day ${selectedDays.includes(day) ? "selectedDay" : ""} ${hasAppointments ? "hasAppointments" : ""}`}
-                                className={`day ${selectedDay === day ? "selectedDay" : `${hasAppointments ? "hasAppointments" : ""}`}`}
+                                className={`day ${theme === 'dark' ? 'dark' : ''} ${selectedDay === day ? "selectedDay" : `${hasAppointments ? "hasAppointments" : ""}`}`}
                                 onClick={() => handleDayClick(day)}
                             >
                                 {day}
@@ -199,14 +170,14 @@ const Calendar = ({full}) => {
                     <div>
                         {appointments.map((appointment, index) => (
                             <div key={index} className="appointmentContainer">
-                                <div className="appointment">
+                                <div className={`appointment ${theme === 'dark' ? 'dark' : ''}`}>
                                     <div className="appointment-details">
-                                        <div>Название: <strong>{appointment.serviceTypeName}</strong> </div>
-                                        <div>Время начала: <strong>{formatTime(appointment.starDate)}</strong></div>
-                                        <div>Продолжительность: <strong>{formatTime(appointment.duration)}</strong></div>
-                                        <div>Стоимость: <strong>{appointment.price} byn</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white"} : ''}>Название: <strong>{appointment.serviceTypeName}</strong> </div>
+                                        <div style={theme === 'dark' ? { color: "white"} : ''}>Время начала: <strong>{formatTime(appointment.starDate)}</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white"} : ''}>Продолжительность: <strong>{formatTime(appointment.duration)}</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white"} : ''}>Стоимость: <strong>{appointment.price} byn</strong></div>
                                     </div>
-                                    <button onClick={()=>enrollButtonClick(appointment.id)}>Записаться</button>
+                                    <button style={{ backgroundColor: "transparent" }} onClick={()=>enrollButtonClick(appointment.id)}>Записаться</button>
                                 </div>
                             </div>
                         ))}
@@ -222,7 +193,7 @@ const Calendar = ({full}) => {
 
     return (
         <div>
-            <div className="calendarContainer">
+            <div className={`calendarContainer ${theme === 'dark' ? 'dark' : ''}`}>
                 {renderCalendar()}
             </div>
             <div>

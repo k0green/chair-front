@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import '../styles/Profile.css';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
@@ -6,11 +6,13 @@ import Profile from '../components/Profile';
 import {useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import Cookies from 'js-cookie';
+import {ThemeContext} from "../components/ThemeContext";
 
 const ProfilePage = () => {
 
     let { id } = useParams();
     const navigate = useNavigate();
+    const { theme, toggleTheme } = useContext(ThemeContext);
 
     const [userData, setUserData] = useState([]);
     const [servicesData, setServicesData] = useState([]);
@@ -32,7 +34,7 @@ const ProfilePage = () => {
                         const userData = {
                             id: response.data.id,
                             name: response.data.name,
-                            imageUrl: response.data.imageUrl || 'https://wallpapercave.com/wp/wp9784502.jpg',
+                            imageUrl: response.data.imageUrl,
                             description: response.data.description,
                             userId: response.data.userId,
                             contacts: response.data.contacts.map(contact => ({
@@ -96,7 +98,7 @@ const ProfilePage = () => {
                         const userData = {
                             id: response.data.id,
                             name: response.data.name,
-                            imageUrl: response.data.imageUrl || 'https://wallpapercave.com/wp/wp9784502.jpg',
+                            imageUrl: response.data.imageUrl,
                             description: response.data.description,
                             userId: response.data.userId,
                             contacts: response.data.contacts.map(contact => ({
@@ -165,10 +167,8 @@ const ProfilePage = () => {
     };
 
     return (
-        <div>
-            <Header/>
+        <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
             <Profile user = {userData} services = {servicesData} contacts={contactData} current = {!id}/>
-            <Footer/>
         </div>
     );
 };

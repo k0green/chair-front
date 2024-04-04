@@ -11,7 +11,6 @@ const ThemeSwitcher = () => {
                 checked={theme === "dark"}
                 onChange={() => toggleTheme()}
             />
-            {/*Dark Theme*/}
         </label>
     );
 };

@@ -6,6 +6,10 @@
     border-bottom: 1px solid #ccc;
 }
 
+.header.dark {
+    background-color: #2d2828;
+}
+
 .search-input-container {
     position: relative;
 }
@@ -56,12 +60,20 @@
     scale: 1.2;
 }
 
+.logo.dark {
+    color: white;
+}
+
 .navigate {
     /*margin: 0 0 0 3%;*/
     color: #666666;
     cursor: pointer;
     margin-left: 100px;
     /*scale: 1.2;*/
+}
+
+.navigate.dark {
+    color: #dedede;
 }
 
 .navigate:hover{
@@ -86,6 +98,13 @@
     font-size: 18px;
     text-decoration: none;
     scale: 1.05;
+    cursor: pointer;
+}
+
+.profile-header-button.dark {
+    background-color: #2d2828;
+    border: 2px solid white;
+    color: #2d2828;
 }
 
 .settings-button {

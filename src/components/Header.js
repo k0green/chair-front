@@ -2,14 +2,16 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faSearch, faMessage, faPerson, faUser} from "@fortawesome/free-solid-svg-icons";
-import React, { useState } from "react";
+import React, {useContext, useState} from "react";
 import "../styles/Header.css";
 import ThemeSwitcher from "./ThemeSwitcher";
 import Cookies from "js-cookie";
+import {ThemeContext} from "./ThemeContext";
 
 const Header = ({ user, onLogout }) => {
     const navigate = useNavigate();
     const [darkTheme, setDarkTheme] = useState(false);
+    const { theme, toggleTheme } = useContext(ThemeContext);
 
     const handleLoginClick = () => {
         const token = Cookies.get('token');
@@ -46,35 +48,27 @@ const Header = ({ user, onLogout }) => {
     };
 
     return (
-        <header className="header">
+        <header className={`header ${theme === 'dark' ? 'dark' : ''}`}>
             <div className="header-content">
                 <div className="search-container">
-                <h1 className="logo" onClick={handleLogoClick}>Chair</h1>
+                <h1 className={`logo ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLogoClick}>Chair</h1>
                 </div>
                 <div className="search-container">
-                    <h3 className="navigate" onClick={handleCalendarClick}>Календарь</h3>
-                {/*<h3 className="logo" onClick={handleLogoClick}>Заявки(в этом разделе будут подтвержденные неподтвержденные выбираться будут через как у нас в ерп при импорте и так же там будт на неделю на сегодня на 30 дней)</h3>*/}
-                    <h3 className="navigate" onClick={handleOrderClick}>Заявки</h3>
-                    <h3 className="navigate" onClick={handleMessageClick}>Сообщения</h3>
+                    <h3 className={`navigate ${theme === 'dark' ? 'dark' : ''}`} onClick={handleCalendarClick}>Календарь</h3>
+                    <h3 className={`navigate ${theme === 'dark' ? 'dark' : ''}`} onClick={handleOrderClick}>Заявки</h3>
+                    <h3 className={`navigate ${theme === 'dark' ? 'dark' : ''}`} onClick={handleMessageClick}>Сообщения</h3>
                 </div>
 
                 <div className="search-container">
-                    <ThemeSwitcher />
-{/*                    <div className="search-input-container">
-                        <input type="text" placeholder="Поиск" className="search-input" />
-                        <button className="search-button" onClick={handleSearchClick}>
-                            <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                        </button>
-                    </div>*/}
-                    <button className="profile-header-button" onClick={handleSearchClick}>
-                        <FontAwesomeIcon icon={faSearch} flip="horizontal" style={{color: "#000",}} />
+                    <button onClick={toggleTheme}>
+                        {theme === 'light' ? 'Темная тема' : 'Светлая тема'}
                     </button>
-                    <button className="profile-header-button" onClick={handleLoginClick}>
-                        <FontAwesomeIcon icon={faUser} flip="horizontal" style={{color: "#000",}} />
+                    <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleSearchClick}>
+                        <FontAwesomeIcon icon={faSearch} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
                     </button>
-{/*                    <button className="settings-button" onClick={handleMessageClick}>
-                        <FontAwesomeIcon icon={faMessage} flip="horizontal" style={{color: "#000000",}} />
-                    </button>*/}
+                    <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLoginClick}>
+                        <FontAwesomeIcon icon={faUser} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
+                    </button>
                 </div>
             </div>
         </header>

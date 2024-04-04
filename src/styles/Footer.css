@@ -8,5 +8,33 @@
 
 .footer-text {
     font-size: 12px;
-    color: gray;
+    color: #838383;
+}
+
+.app-footer {
+    width: 100%;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    background-color: white;
+    border-top: 1px solid #ccc;
+    margin-top: 25px;
+}
+
+.app-footer.dark {
+    background-color: #2d2828;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.app.dark {
+    background-color: #342e2e;
+}
+
+.app-content {
+    flex-grow: 1;
 }

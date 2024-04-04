@@ -1,8 +1,16 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import '../styles/Profile.css'; // Файл стилей для страницы профиля
 import ServiceCard from '../components/ServiceCard';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faComment, faCross, faPencil, faSave, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {
+    faBoltLightning,
+    faCancel,
+    faComment,
+    faCross,
+    faPencil,
+    faSave,
+    faTrash
+} from "@fortawesome/free-solid-svg-icons";
 import EditServiceCard from "./EditServiceCard";
 import {useNavigate} from "react-router-dom";
 import telegram from '../icons/telegram.svg';
@@ -15,13 +23,18 @@ import webSite from '../icons/webSite.png';
 import mail from '../icons/mail.png';
 import axios from "axios";
 import Cookies from "js-cookie";
+import Dropzone, {useDropzone} from "react-dropzone";
+import {ThemeContext} from "./ThemeContext";
 
 const Profile = ({user, services, contacts, current}) => {
     const navigate = useNavigate();
+    const { theme, toggleTheme } = useContext(ThemeContext);
 
     const [isEditing, setIsEditing] = useState(false);
     const [editedUser, setEditedUser] = useState({ ...user });
     const [editedContacts, setEditedContacts] = useState([...contacts]);
+    const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
+    const [file, setFile] = useState(null);
 
     if (!user || !user.services) {
         return <div>Loading...</div>; // You can customize the loading state as needed
@@ -91,6 +104,7 @@ const Profile = ({user, services, contacts, current}) => {
                     .then((response) => {
                         console.log('Success:', response.data);
                         setIsEditing(false);
+                        window.location.reload();
                     })
                     .catch((error) => {
                         console.error('Error:', error);
@@ -130,17 +144,70 @@ const Profile = ({user, services, contacts, current}) => {
         });
     };
 
+    const handleAddPhoto = () => {
+        setUploadPhotoModal(true);
+    };
+
+    const handleUpload = async () => {
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await axios.post('http://localhost:5155/minio/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            editedUser.imageUrl = response.data;
+        }
+
+        setFile(null);
+        setUploadPhotoModal(false);
+    };
+
+    const Dropzone = () => {
+        const { getRootProps, getInputProps } = useDropzone({
+            accept: 'image/*',
+            onDrop: acceptedFiles => {
+                setFile(Object.assign(acceptedFiles[0], {
+                    preview: URL.createObjectURL(acceptedFiles[0])
+                }));
+            },
+            multiple: false
+        });
+
+        return (
+            <div className="dropzone-centrize">
+                <div {...getRootProps({style: {border: '2px solid blue', padding: '20px', width: '400px', height: '400px'}})}>
+                    <input {...getInputProps()} />
+                    {file && <img src={file.preview} style={{width: '50%'}} alt="preview" />}
+                    {!file && <p>Перетащите сюда файлы или кликните для выбора</p>}
+                </div>
+                {file && <button className='trash-icon' onClick={() => setFile(null)}><FontAwesomeIcon icon={faTrash} />  Удалить</button>}
+            </div>
+        );
+    }
 
     return (
         <div className="profile-page">
             <div className="profile-header">
                 <div className="profile-avatar">
-                    <img src={user.imageUrl} alt="" className="avatar-image"/>
+                    {isEditing ? (
+                        <>
+                            <img onClick={handleAddPhoto} src={user.imageUrl} alt="" className="avatar-image"/>
+                        </>
+                    ) : (
+                        <>
+                            <img src={user.imageUrl} alt="" className="avatar-image"/>
+                        </>
+                    )}
                 </div>
                 <div className="profile-bio">
                     {isEditing ? (
                         <>
                             <input
+                                className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                                 type="text"
                                 name="name"
                                 value={editedUser.name}
@@ -148,6 +215,7 @@ const Profile = ({user, services, contacts, current}) => {
                                 placeholder="Name"
                             />
                             <input
+                                className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                                 type="text"
                                 name="bio"
                                 value={editedUser.description}
@@ -157,8 +225,8 @@ const Profile = ({user, services, contacts, current}) => {
                         </>
                     ) : (
                         <>
-                            <h1>{user.name}</h1>
-                            <p>{user.description}</p>
+                            <h1 className={`profile-name ${theme === 'dark' ? 'dark' : ''}`}>{user.name}</h1>
+                            <p className={`profile-description ${theme === 'dark' ? 'dark' : ''}`}>{user.description}</p>
                         </>
                     )}
                     <div className="contact-icons">
@@ -183,9 +251,10 @@ const Profile = ({user, services, contacts, current}) => {
                                                 value={editedContact ? editedContact.name : ''}
                                                 onChange={(e) => handleContactInputChange(contactIcon.id, e.target.value)}
                                                 placeholder="Contact"
+                                                className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                                             />
                                         ) : (
-                                            <>{contact ? contact.name : ''}</>
+                                            <b className={`profile-description ${theme === 'dark' ? 'dark' : ''}`}>{contact ? contact.name : ''}</b>
                                         )}
                                     </div>
                                 )
@@ -207,10 +276,10 @@ const Profile = ({user, services, contacts, current}) => {
                             ) : (
                                 <div>
                                 <button className="message-button" onClick={handleEditSaveClick}>
-                                    <FontAwesomeIcon icon={faPencil}/> Сохранить
+                                    <FontAwesomeIcon icon={faSave}/> Сохранить
                                 </button>
                                 <button className="message-button" onClick={handleCancelEditClick}>
-                                    <FontAwesomeIcon icon={faCross}/> Отмена
+                                    <FontAwesomeIcon icon={faCancel}/> Отмена
                                 </button>
                                 </div>
                             )
@@ -228,6 +297,17 @@ const Profile = ({user, services, contacts, current}) => {
                     <ServiceCard key={service.id} service={service} isProfile = {user.userId.toString() === userId.toString()}/>
                 ))}
             </div>
+            {uploadPhotoModal && (
+                <div className="filter-modal">
+                    <div className="modal-content">
+                    <span className="close" onClick={() => setUploadPhotoModal(false)}>
+                        &times;
+                    </span>
+                        <Dropzone />
+                        <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> Сохранить</p></button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

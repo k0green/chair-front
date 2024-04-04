@@ -12,10 +12,11 @@ import {
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"; // Подключаем файл стилей
 import PhotoList from "../components/PhotoList";
 import {useNavigate} from "react-router-dom";
-import {ThemeContext} from "../context/ThemeContext";
+import {ThemeContext} from "./ThemeContext";
 
 const ServiceCard = ({ service, isProfile }) => {
     const navigate = useNavigate();
+    const { theme, toggleTheme } = useContext(ThemeContext);
     const { id, name, masters } = service;
 
     const handleOrderClick = (executorServiceId) => {
@@ -36,7 +37,6 @@ const ServiceCard = ({ service, isProfile }) => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
-    const { theme } = useContext(ThemeContext);
 
     const totalPages = Math.ceil(masters.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -69,28 +69,27 @@ const ServiceCard = ({ service, isProfile }) => {
             <div className="pagination-arrow-container">
                 <FontAwesomeIcon
                     icon={faChevronLeft}
-/*                    className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}*/
-                    className={"pagination-arrow-light-theme"}
+                    className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
                     onClick={goToPreviousPage}
                 />
             </div>
             <div className="card-list">
                 {visibleCategories.map((master) => (
-                    <div className="service-card">
+                    <div className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
                         <div key={master.id} className="master-card">
                             <div className="photos">
                                 <PhotoList photos={master.photos}/>
                             </div>
-                            <div className="master-info">
+                            <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
                                 <h4 onClick={() => handleMasterNameClickClick(master.executorId)}>{master.name}</h4>
                                 <h4>{master.rating} <FontAwesomeIcon icon={faStar} className = 'item-icon'/></h4>
                             </div>
-                            <div className="service-description">
+                            <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
                                 <p>{master.description}</p>
                                 <p><FontAwesomeIcon icon={faHouse} className = 'item-icon'/>{master.address}</p>
                                 <p>Available Slots: {master.availableSlots}</p>
                             </div>
-                            <div className="master-info">
+                            <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
                                 <h4><FontAwesomeIcon icon={faClock} className = 'item-icon'/> {master.duration}</h4>
                                 <h4>{master.price} Byn</h4>
                             </div>
@@ -119,8 +118,7 @@ const ServiceCard = ({ service, isProfile }) => {
             <div className="pagination-arrow-container">
                 <FontAwesomeIcon
                     icon={faChevronRight}
-                    /*className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}*/
-                    className={"pagination-arrow-light-theme"}
+                    className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
                     onClick={goToNextPage}
                 />
             </div>

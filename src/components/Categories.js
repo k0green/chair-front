@@ -1,5 +1,5 @@
 import React, {useState, useContext } from 'react';
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext } from "./ThemeContext";
 import CategoryItem from './CategoryItem';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
@@ -64,12 +64,6 @@ const CategoryList = ({categories}) => {
                 />
             </div>
         </div>
-/*        <div>
-                <div key={id}>
-                    <IconComponent iconName={icon} />
-                    <span>{name}</span>
-                </div>
-        </div>*/
     );
 };
 

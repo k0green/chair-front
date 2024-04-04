@@ -25,6 +25,14 @@
     font-size: 16px;
 }
 
+.profile-name.dark {
+    color: white;
+}
+
+.profile-description.dark {
+    color: white;
+}
+
 .message-button {
     margin-top: 10px;
     background-color: #007bff;
@@ -61,5 +69,14 @@
 .contact-item {
     display: inline-block; /* Вывод в одну строку */
     margin-right: 10px;    /* Добавляем немного отступа между иконками и текстом */
+}
+
+.profile-input.dark{
+    background-color: #695b5b;
+    color: white;
+}
+
+.profile-input.dark::placeholder{
+    color: #adadad;
 }
 

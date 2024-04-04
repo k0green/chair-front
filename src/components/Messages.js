@@ -1,12 +1,19 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, {useRef, useState, useEffect, useContext} from 'react';
 import '../styles/Messages.css';
 import {isVisible} from "@testing-library/user-event/dist/utils";
 import {useNavigate, useParams} from "react-router-dom";
 import Cookies from "js-cookie";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
+import {faCancel, faCheckCircle, faEdit, faHandPointer, faPencil, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {FaTrash} from "react-icons/fa";
+import { v4 as uuidv4 } from 'uuid';
+import {ThemeContext} from "./ThemeContext";
 
 const MessageComponent = ({ id, isMessageViewed }) => {
+
+    const { theme } = useContext(ThemeContext);
 
     const [chatData, setChatData] = useState([]);
     const [messages, setMessages] = useState([]);
@@ -136,17 +143,14 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                 })
                 .catch(error => {
                     if (error.response) {
-                        // Ошибка пришла с сервера (код ответа не 2xx)
                         if (error.response.status === 401) {
                             navigate("/login");
                         } else {
                             console.error(`Ошибка от сервера: ${error.response.status}`);
                         }
                     } else if (error.request) {
-                        // Запрос был сделан, но ответ не был получен
                         console.error('Ответ не был получен. Возможно, проблемы с сетью.');
                     } else {
-                        // Произошла ошибка при настройке запроса
                         console.error('Произошла ошибка при настройке запроса:', error.message);
                     }
                 });
@@ -173,9 +177,31 @@ const MessageComponent = ({ id, isMessageViewed }) => {
             }
         });
 
+        connection.on("ReceiveAllMessages", (messages) => {
+            console.log("Messages all received: ", messages);
+            messages.forEach(message => {
+                /*if (message.senderId !== localStorage.getItem('userId')) {*/
+                message.isMine = message.senderId === userId
+                    setMessages(oldMessages => {
+                        const index = oldMessages.findIndex(m => m.id === message.id);
+                        if (index !== -1) {
+                            // Если сообщение помечено как удаленное, удаляем его из списка
+                            if (message.isDeleted === true) {
+                                return [...oldMessages.slice(0, index), ...oldMessages.slice(index + 1)];
+                            } else {
+                                // Иначе заменяем существующее сообщение
+                                return [...oldMessages.slice(0, index), message, ...oldMessages.slice(index + 1)];
+                            }
+                        } else {
+                            // Если сообщение не существует в списке, добавляем его
+                            return [...oldMessages, message];
+                        }
+                    });
+/*                }*/
+            });
+        });
 
 
-        // Запуск соединения при загрузке страницы или компонента
         connection.start()
             .then(() => console.log('Connection started'))
             .catch(err => console.log('Error while starting connection: ' + err))
@@ -212,8 +238,10 @@ const MessageComponent = ({ id, isMessageViewed }) => {
 
     const handleSendMessage = () => {
         if (newMessage.trim() !== '') {
+            const messageId = uuidv4();
             // Создаем новый объект сообщения с датой и временем и добавляем его в массив messages
             const newMessageObject = {
+                id: messageId,
                 text: newMessage,
                 isMine: true,
                 isRead: false,
@@ -221,6 +249,7 @@ const MessageComponent = ({ id, isMessageViewed }) => {
             };
 
             const messageData = {
+                id: messageId,
                 text: newMessage,
                 isDeleted: false,
                 isEdited: false,
@@ -235,6 +264,7 @@ const MessageComponent = ({ id, isMessageViewed }) => {
             axios.post('http://localhost:5155/message/add', messageData)
                 .then(response => {
                     //navigate("/profile")
+                    handleMarkAsRead()
                 })
                 .catch(error => {
                     // Handle error, e.g., show an error message
@@ -262,11 +292,16 @@ const MessageComponent = ({ id, isMessageViewed }) => {
     };
 
     const handleMarkAsRead = () => {
-            const updatedMessages = messages.map((message) => ({
+/*            const updatedMessages = messages.map((message) => ({
                 ...message,
                 isRead: message.isMine ? message.isRead : true,
             }));
-            setMessages(updatedMessages);
+            setMessages(updatedMessages);*/
+        const token = Cookies.get('token');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        axios.get(`http://localhost:5155/message/mark-as-read/`+chatData.id)
+            .then(response => {})
+            .catch(error => {});
     };
 
 
@@ -305,39 +340,43 @@ const MessageComponent = ({ id, isMessageViewed }) => {
 
     return (
         <div className="chat-container">
-            <div className="message-header">
-                <div className="avatar"><img src={chatData.recipientProfileImg} className="avatar-image"/></div>
-                <div className="name">{chatData.recipientName}</div>
-                {isChoosing ? (
-                    <div className="choose-buttons">
-                        <button onClick={handleEdit}>
-                            <img src="edit-icon.png" alt="Edit" />
+            <div className={`message-header ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="message-header-image">
+                    <div className="avatar"><img src={chatData.recipientProfileImg} className="avatar-image"/></div>
+                    <div className={`name ${theme === 'dark' ? 'dark' : ''}`}>{chatData.recipientName}</div>
+                </div>
+                <div>
+                    {isChoosing ? (
+                        <div className="choose-buttons">
+                            <button className="message-control-button" onClick={handleEdit}>
+                                <FontAwesomeIcon icon={faEdit}/><> Редактировать</>
+                            </button>
+                            <button className="message-control-button" onClick={handleDelete}>
+                                <FontAwesomeIcon icon={faTrash}/><> Удалить</>
+                            </button>
+                            <button className="message-control-button" onClick={handleCancel}>
+                                <FontAwesomeIcon icon={faCancel}/>
+                            </button>
+                        </div>
+                    ) : (
+                        <button className="message-control-button" onClick={handleChoose} style={{ marginLeft: 'auto' }}>
+                            <FontAwesomeIcon icon={faCheckCircle}/><> Выбрать</>
                         </button>
-                        <button onClick={handleDelete}>
-                            <img src="delete-icon.png" alt="Delete" />
-                        </button>
-                        <button onClick={handleCancel}>
-                            Cancel
-                        </button>
-                    </div>
-                ) : (
-                    <button onClick={handleChoose} style={{ marginLeft: 'auto' }}>
-                        Choose
-                    </button>
-                )}
+                    )}
+                </div>
             </div>
             <div className="message-list">
                 {Object.keys(groupedMessages).map((date) => (
                     <div key={date} className="message-group">
-                        <div className="date">{date}</div>
+                        <div className={`date ${theme === 'dark' ? 'dark' : ''}`}>{date}</div>
                         {groupedMessages[date].map((message, index) => (
                             <div
                                 key={index}
-                                className={`message ${message.isMine ? 'mine' : 'theirs'} ${selectedMessageId === message.id ? 'selected' : ''}`}
+                                className={`message ${message.isMine ? 'mine' : `theirs ${theme === 'dark' ? 'dark' : ''}`} ${selectedMessageId === message.id ? 'selected' : ''}`}
                                 onClick={() => handleMessageClick(message.id)}
                             >
                                 {message.text}
-                                <div className="timestamp">
+                                <div className={`timestamp ${selectedMessageId === message.id ? 'selected' : ''}`}>
                                     {message.isMine && (
                                         <div className={`circle ${message.isRead ? 'viewed' : 'not-viewed'}`}></div>
                                     )}
@@ -355,10 +394,10 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                 Пометить все как прочитанные
             </div>
 
-            <div className="message-input-div">
+            <div className={`message-input-div ${theme === 'dark' ? 'dark' : ''}`}>
                 <textarea
                     id="textarea-message"
-                    className="message-input"
+                    className={`message-input ${theme === 'dark' ? 'dark' : ''}`}
                     type="text"
                     placeholder="Введите сообщение..."
                     value={newMessage}

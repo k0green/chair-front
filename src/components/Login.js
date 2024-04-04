@@ -1,8 +1,9 @@
-import React, {useState, Fragment, useEffect} from "react";
+import React, {useState, Fragment, useEffect, useContext} from "react";
 import Cookies from 'js-cookie';
 import "../styles/Login.css";
 import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
+import { ThemeContext } from './ThemeContext';
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -10,6 +11,7 @@ function Login() {
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const navigate = useNavigate();
+    const { theme } = useContext(ThemeContext);
 
     const handleEmailChange = (value) => {
         setEmail(value);
@@ -80,20 +82,19 @@ function Login() {
         <Fragment>
             <div className="login-container">
                 <form className="login-form">
-                <div className="login-header">Login</div>
-                    <label className="login-label" htmlFor="txtEmail">Email</label>
+                    <div className={`login-header ${theme === 'dark' ? 'dark' : ''}`}>Login</div>
+                    <label className={`login-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtEmail">Email</label>
                     <input
-                        className="login-input"
-                        type="text"
+                        className={`login-input ${theme === 'dark' ? 'dark' : ''}`}
                         id="txtEmail"
                         placeholder="Email"
                         value={email}
                         onChange={(e) => handleEmailChange(e.target.value)}
                     />
                     {emailError && <div className="login-error">{emailError}</div>}
-                    <label className="login-label" htmlFor="txtPassword">Password</label>
+                    <label className={`login-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtPassword">Password</label>
                     <input
-                        className="login-input"
+                        className={`login-input ${theme === 'dark' ? 'dark' : ''}`}
                         type="password"
                         id="txtPassword"
                         placeholder="Password"
@@ -101,7 +102,7 @@ function Login() {
                         onChange={(e) => handlePasswordChange(e.target.value)}
                     />
                     {passwordError && <div className="login-error">{passwordError}</div>}
-                    <p>Don't have an account? <Link to="/register">Register here</Link></p>
+                    <p className={`${theme === 'dark' ? 'register-redirect-text' : ''}`}>Don't have an account? <Link className={`${theme === 'dark' ? 'register-redirect-link' : ''}`}to="/register">Register here</Link></p>
                     <button
                         type="button"
                         className={`register-button ${emailError || passwordError ? "" : "active"}`}

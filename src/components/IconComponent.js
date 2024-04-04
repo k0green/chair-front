@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import { IconContext } from 'react-icons';
 import * as FaIcons from 'react-icons/fa';
-import {ThemeContext} from "../context/ThemeContext";
+import {ThemeContext} from "./ThemeContext";
 import "../styles/IconComponent.css";
 
 const IconComponent = ({ iconName }) => {

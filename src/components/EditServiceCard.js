@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import '../styles/ServiceCard.css';
 import {
     faAdd,
@@ -15,9 +15,11 @@ import {useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import {useDropzone} from "react-dropzone";
+import {ThemeContext} from "./ThemeContext";
 
 const ServiceCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
+    const { theme, toggleTheme } = useContext(ThemeContext);
     const { masters } = service;
 
     const formatTime = (rawTime) => {
@@ -27,18 +29,14 @@ const ServiceCard = ({ service, isNew, id }) => {
         return `${hours}:${minutes}`;
     };
 
-    // Состояния для полей редактирования
     const [editedDescription, setEditedDescription] = useState(service.description);
     const [editedServiceTypeId, setEditedServiceTypeId] = useState(service.serviceTypeId);
     const [editedDuration, setEditedDuration] = useState(formatTime(service.duration));
     const [editedPrice, setEditedPrice] = useState(service.price);
     const [editedAddress, setEditedAddress] = useState(service.address);
-    //const [editedPhotos, setEditedPhotos] = useState();
     const [editedPhotos, setEditedPhotos] = useState([...service.photos]);
     const [servicesLookupData, setServicesLookupData] = useState([]);
     const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [uploadedPhotos, setUploadedPhotos] = useState([]);
     const [files, setFiles] = useState([]);
 
     const reverseFormatTime = (formattedTime, editedDuration) => {
@@ -69,7 +67,6 @@ const ServiceCard = ({ service, isNew, id }) => {
         }, []);
 
     const handleEditSave = () => {
-        // Create an object representing the data to be sent to the server
         const updatedServiceData = {
             id: service.id,
             serviceTypeId: service.serviceTypeId,
@@ -85,14 +82,11 @@ const ServiceCard = ({ service, isNew, id }) => {
             navigate("/login");
         else {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            // Make a POST request to your server endpoint
             axios.put('http://localhost:5155/executor-service/update', updatedServiceData)
                 .then(response => {
-                    // Handle success, e.g., redirect the user to the service page
                     navigate(`/profile`);
                 })
                 .catch(error => {
-                    // Handle error, e.g., show an error message
                     console.error('Error saving data:', error);
                 });
         }
@@ -109,16 +103,14 @@ const ServiceCard = ({ service, isNew, id }) => {
             address: editedAddress,
             duration: reverseFormatTime(editedDuration, date),
             price: editedPrice,
-            photos: editedPhotos.map(photo => photo), // assuming editedPhotos has an array of objects with a 'url' property
+            photos: editedPhotos.map(photo => photo),
         };
 
-        // Make a POST request to your server endpoint
         axios.post('http://localhost:5155/executor-service/add', updatedServiceData)
             .then(response => {
                 navigate("/profile")
             })
             .catch(error => {
-                // Handle error, e.g., show an error message
                 console.error('Error saving data:', error);
             });
     };
@@ -131,83 +123,6 @@ const ServiceCard = ({ service, isNew, id }) => {
     const handleAddPhoto = () => {
         setUploadPhotoModal(true);
     };
-
-/*    return (
-        <div className="centr-esc">
-            <div className="service-card-edit-photo">
-                <div className="photos-esc">
-                    <PhotoList photos={editedPhotos} onDeletePhoto={handleDeletePhoto} />
-                </div>
-                <button className="add-photo-button-new" onClick={handleAddPhoto}>
-                    <p className="order-text-esc"><FontAwesomeIcon icon={faAdd} /> Добавить фото</p>
-                </button>
-            </div>
-            <div className="service-card-edit-master">
-                <div className="master-info-time">
-                    <div className="master-info-time">
-                        <select
-                            name="procedure"
-                            value={editedServiceTypeId.serviceTypeId}
-                            onChange={(e) => setEditedServiceTypeId({ ...editedServiceTypeId, serviceTypeId: e.target.value })}
-                            className="input-field"
-                        >
-                            <option value="">Выберите услугу</option>
-                            {servicesLookupData.map((service) => (
-                                <option key={service.id} value={service.id}>
-                                    {service.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="time-module">
-                        <h4>Продолжительность</h4>
-                        <input
-                            type="time"
-                            placeholder="50"
-                            value={editedDuration || formatTime(service.duration)}
-                            onChange={(e) => setEditedDuration(e.target.value)}
-                        />
-                        <h4>min</h4>
-                    </div>
-                    <div className="time-module">
-                        <h4>Стоимость</h4>
-                        <input
-                            type="number"
-                            value={editedPrice || service.price}
-                            onChange={(e) => setEditedPrice(e.target.value)}
-                        />
-                        <h4>Byn</h4>
-                    </div>
-                </div>
-                <div>
-                    <input
-                        placeholder="address"
-                        type="text"
-                        value={editedAddress || service.address}
-                        onChange={(e) => setEditedAddress(e.target.value)}
-                        className="input-field"
-                    />
-                </div>
-                <div>
-                    <input
-                        placeholder="Duration"
-                        type="text"
-                        value={editedDescription || service.description}
-                        onChange={(e) => setEditedDescription(e.target.value)}
-                        className="input-field"
-                    />
-                </div>
-                <div>
-                    <button className="order-button" onClick={isNew ? handleAddSave : handleEditSave}>
-                        <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> Сохранить</p>
-                    </button>
-                </div>
-            </div>
-
-
-        </div>
-    );
-};*/
 
     const Dropzone = () => {
         const { getRootProps, getInputProps } = useDropzone({
@@ -264,7 +179,7 @@ const ServiceCard = ({ service, isNew, id }) => {
 
     return (
         <div className="centrize">
-        <div className="service-card-edit">
+        <div className={`service-card-edit ${theme === 'dark' ? 'dark' : ''}`}>
                 <div key={service.id} className="master-card">
                     <div className="photos-edit">
                         <PhotoList photos={editedPhotos} onDeletePhoto={handleDeletePhoto} />
@@ -272,9 +187,10 @@ const ServiceCard = ({ service, isNew, id }) => {
                             <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> Добавить фото</p>
                         </button>
                     </div>
-                    <div className="master-info">
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
                         <select
                             name="procedure"
+                            className={`select ${theme === 'dark' ? 'dark' : ''}`}
                             value={editedServiceTypeId.serviceTypeId}
                             onChange={(e) => setEditedServiceTypeId({ ...editedServiceTypeId, serviceTypeId: e.target.value })}
                         >
@@ -285,12 +201,12 @@ const ServiceCard = ({ service, isNew, id }) => {
                                 </option>
                             ))}
                         </select>
-                        {/*<h4>{service.name}</h4>*/}
-                        <h4>{service.rating} <FontAwesomeIcon icon={faStar} className='item-icon' /></h4>
+                        <h4>{service.rating} <FontAwesomeIcon icon={faStar} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`} /></h4>
                     </div>
                     <div className="service-description">
                         <input
-                            placeholder="address"
+                            placeholder="Address"
+                            className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"
                             value={editedAddress || service.address}
                             onChange={(e) => setEditedAddress(e.target.value)}
@@ -299,7 +215,8 @@ const ServiceCard = ({ service, isNew, id }) => {
                         <br/>
                     </div><div className="service-description">
                         <input
-                            placeholder="Duration"
+                            placeholder="Description"
+                            className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"
                             value={editedDescription || service.description}
                             onChange={(e) => setEditedDescription(e.target.value)}
@@ -308,23 +225,25 @@ const ServiceCard = ({ service, isNew, id }) => {
                     </div>
                     <div className="master-info">
                         <div className="time-module">
-                            <FontAwesomeIcon icon={faClock} className = 'item-icon'/>
+                            <FontAwesomeIcon icon={faClock} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`}/>
                             <input
                                 type="time"
+                                className={`input-time ${theme === 'dark' ? 'dark' : ''}`}
                                 placeholder="50"
                                 value={editedDuration || formatTime(service.duration)}
                                 onChange={(e) => setEditedDuration(e.target.value)}
                             />
-                            <h4>min</h4>
+                            <h4 className={`item-icon ${theme === 'dark' ? 'dark' : ''}`}>  min</h4>
                         </div>
                         <div className="time-module">
-                            <FontAwesomeIcon icon={faDollar} className = 'item-icon'/>
+                            <FontAwesomeIcon icon={faDollar} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`}/>
                             <input
                                 type="number"
+                                className={`input-number ${theme === 'dark' ? 'dark' : ''}`}
                                 value={editedPrice || service.price}
                                 onChange={(e) => setEditedPrice(e.target.value)}
                             />
-                            <h4>Byn</h4>
+                            <h4 className={`item-icon ${theme === 'dark' ? 'dark' : ''}`}>  Byn</h4>
                         </div>
                     </div>
                     <div>

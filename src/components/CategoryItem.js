@@ -3,7 +3,7 @@ import "../styles/CategoryItem.css";
 import { useNavigate } from "react-router-dom";
 import React, { useState, useContext } from "react";
 import IconComponent from "./IconComponent";
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext } from "./ThemeContext";
 
 
 const CategoryItem = ({ id, name, icon }) => {

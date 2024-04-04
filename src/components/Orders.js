@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios';
 import {useNavigate} from "react-router-dom";
 import Cookies from "js-cookie";
+import {ThemeContext} from "./ThemeContext";
 
 const AppointmentsComponent = () => {
-    const [appointmentsData, setAppointmentsData] = useState([]);
+    const [appointmentsData, setAppointmentsData] = useState(null);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const navigate = useNavigate();
     const isExecutor = localStorage.getItem("userRole") === "executor";
+    const { theme, toggleTheme } = useContext(ThemeContext);
 
     useEffect(() => {
         const token = Cookies.get('token');
         if (!token) {
-            // Редирект на страницу входа
             navigate('/login');
         }
         fetchData();
@@ -24,10 +25,9 @@ const AppointmentsComponent = () => {
             const userRole = localStorage.getItem('userRole');
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-            let response;
-            if (userRole === "executor") {
-                response = await axios.get('http://localhost:5155/order/unconfirmed/executor', { withCredentials: true });
-                const serverData = response.data.map(item => ({
+            const fetchData = async (url) => {
+                const response = await axios.get(url, { withCredentials: true });
+                const mapData = (data) => data.map(item => ({
                     executorServiceId: item.executorServiceId,
                     executorProfileName: item.executorProfileName,
                     executorName: item.executorName,
@@ -45,59 +45,26 @@ const AppointmentsComponent = () => {
                     serviceTypeName: item.serviceTypeName,
                     id: item.id
                 }));
+
+                return {
+                    byMaster: mapData(response.data.byMaster),
+                    byClient: mapData(response.data.byClient),
+                    forToday: mapData(response.data.forToday),
+                    forWeek: mapData(response.data.forWeek)
+                };
+            }
+
+            if (userRole === "executor") {
+                const serverData = await fetchData('http://localhost:5155/order/unconfirmed/executor');
                 setAppointmentsData(serverData);
             } else {
-                response = await axios.get('http://localhost:5155/order/unconfirmed/client', { withCredentials: true });
-                const serverData = response.data.map(item => ({
-                    executorServiceId: item.executorServiceId,
-                    executorProfileName: item.executorProfileName,
-                    executorName: item.executorName,
-                    clientId: item.clientId,
-                    clientName: item.clientName,
-                    starDate: item.starDate,
-                    day: item.day,
-                    month: item.month,
-                    duration: item.duration,
-                    executorComment: item.executorComment,
-                    clientComment: item.clientComment,
-                    executorApprove: item.executorApprove,
-                    clientApprove: item.clientApprove,
-                    price: item.price,
-                    serviceTypeName: item.serviceTypeName,
-                    id: item.id
-                }));
+                const serverData = await fetchData('http://localhost:5155/order/unconfirmed/client');
                 setAppointmentsData(serverData);
             }
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     };
-
-    const today = new Date();
-    const sevenDaysLater = new Date();
-    sevenDaysLater.setDate(today.getDate() + 7);
-
-    const thirtyDaysLater = new Date();
-    thirtyDaysLater.setDate(today.getDate() + 30);
-
-    const todayAppointments = appointmentsData.filter(item => {
-        const appointmentDate = new Date(item.starDate);
-        return (
-            appointmentDate.getDate() === today.getDate() &&
-            appointmentDate.getMonth() === today.getMonth() &&
-            appointmentDate.getFullYear() === today.getFullYear()
-        );
-    });
-
-    const nextSevenDaysAppointments = appointmentsData.filter(item => {
-        const appointmentDate = new Date(item.starDate);
-        return appointmentDate >= today && appointmentDate <= sevenDaysLater;
-    });
-
-    const nextThirtyDaysAppointments = appointmentsData.filter(item => {
-        const appointmentDate = new Date(item.starDate);
-        return appointmentDate >= today && appointmentDate <= thirtyDaysLater;
-    });
 
     const formatTime = (rawTime) => {
         const date = new Date(rawTime);
@@ -113,17 +80,17 @@ const AppointmentsComponent = () => {
     };
 
     const renderAppointments = (filteredAppointments) => {
-        if (filteredAppointments.length > 0) {
+        if (filteredAppointments !== null && filteredAppointments.length > 0) {
             return (
                 <div>
                     {filteredAppointments.map((appointment, index) => (
                         <div key={index} className="appointmentContainer">
-                            <div className="appointment">
+                            <div className={`appointment ${theme === 'dark' ? 'dark' : ''}`}>
                                 <div className="appointment-details">
-                                    <div>Название: <strong>{appointment.serviceTypeName}</strong> </div>
-                                    <div>Время начала: <strong>{formatTime(appointment.starDate)}</strong></div>
-                                    <div>Продолжительность: <strong>{formatTime(appointment.duration)}</strong></div>
-                                    <div>Стоимость: <strong>{appointment.price} byn</strong></div>
+                                    <div style={theme === 'dark' ? { color: "white"} : ''}>Название: <strong>{appointment.serviceTypeName}</strong> </div>
+                                    <div style={theme === 'dark' ? { color: "white"} : ''}>Время начала: <strong>{formatTime(appointment.starDate)}</strong></div>
+                                    <div style={theme === 'dark' ? { color: "white"} : ''}>Продолжительность: <strong>{formatTime(appointment.duration)}</strong></div>
+                                    <div style={theme === 'dark' ? { color: "white"} : ''}>Стоимость: <strong>{appointment.price} byn</strong></div>
                                 </div>
                                 <button onClick={() => handleApproveClick(appointment.id)} disabled={isExecutor ? !appointment.clientId : !appointment.executorApprove}>Подтвердить запись</button>
                             </div>
@@ -138,14 +105,17 @@ const AppointmentsComponent = () => {
 
     return (
         <div>
-            <div className="tab">Сегодня</div>
-            {renderAppointments(todayAppointments)}
+            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`}>Ожидают подтверждения от вас</div>
+            {appointmentsData && renderAppointments(appointmentsData.byClient)}
 
-            <div className="tab">Следующие 7 дней</div>
-            {renderAppointments(nextSevenDaysAppointments)}
+            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`}>Ожидают подтверждения от мастера</div>
+            {appointmentsData && renderAppointments(appointmentsData.byMaster)}
 
-            <div className="tab">Следующие 30 дней</div>
-            {renderAppointments(nextThirtyDaysAppointments)}
+            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`}>Сегодняшние записи</div>
+            {appointmentsData && renderAppointments(appointmentsData.forToday)}
+
+            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`}>Записи на неделю</div>
+            {appointmentsData && renderAppointments(appointmentsData.forWeek)}
         </div>
     );
 };

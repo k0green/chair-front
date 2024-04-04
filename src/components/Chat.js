@@ -1,28 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Cookies from "js-cookie";
 import axios from "axios";
-
-/*const chatData = [
-    {
-        id: 1,
-        name: 'Собеседник 1',
-        lastMessage: 'Привет, как дела?',
-        unreadCount: 3,
-        avatar: 'https://klike.net/uploads/posts/2022-08/1661925591_j-34.jpg',
-    },
-    {
-        id: 2,
-        name: 'Собеседник 2',
-        lastMessage: 'Что нового?',
-        unreadCount: 0,
-        avatar: 'https://wallpapercave.com/wp/wp9784502.jpg',
-    },
-    // Добавьте другие чаты по аналогии
-];*/
+import {ThemeContext} from "./ThemeContext";
 
 function ChatList() {
     const navigate = useNavigate();
+    const { theme } = useContext(ThemeContext);
 
     const [chatData, setChatData] = useState([]);
     const [messages, setMessages] = useState([]);
@@ -80,24 +64,6 @@ function ChatList() {
         }
     }, []);
 
-    /*const chatData = [
-        {
-            id: 1,
-            name: 'Собеседник 1',
-            lastMessage: 'Привет, как дела?',
-            unreadCount: 3,
-            avatar: 'https://klike.net/uploads/posts/2022-08/1661925591_j-34.jpg',
-        },
-        {
-            id: 2,
-            recipientName: 'Собеседник 2',
-            lastMessage: 'Что нового?',
-            unreadMessagesAmount: 0,
-            recipientProfileImg: 'https://wallpapercave.com/wp/wp9784502.jpg',
-        },
-        // Добавьте другие чаты по аналогии
-    ];*/
-
     const handleChatClick = (id) => {
         // При клике на чат, перейдите на страницу чата с соответствующим ID
         navigate(`/messages/${id}`);
@@ -106,12 +72,12 @@ function ChatList() {
     return (
         <div className="chat-list">
             {chatData.map((chat) => (
-                <div key={chat.id} className="chat" onClick={() => handleChatClick(chat.recipientProfileId)}>
+                <div key={chat.id} className={`chat ${theme === 'dark' ? 'dark' : ''}`} onClick={() => handleChatClick(chat.recipientProfileId)}>
                     <div className="avatar">
-                        <img src={chat.recipientProfileImg} alt={chat.recipientName} />
+                        <img src={chat.recipientProfileImg}/>
                     </div>
                     <div className="chat-info">
-                        <div className="name">{chat.recipientName}</div>
+                        <div className={`name ${theme === 'dark' ? 'dark' : ''}`}>{chat.recipientName}</div>
                         {/*<div className="last-message">{chat.messages.length > 0 ? chat.messages[0].text : ""}</div>*/}
                     </div>
                     {chat.unreadMessagesAmount > 0 && (

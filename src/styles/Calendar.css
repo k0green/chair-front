@@ -7,6 +7,10 @@
     margin-top: 2%;
 }
 
+.calendarContainer.dark {
+    background-color: #342e2e;
+}
+
 .calendar {
     width: 100%;
     border-radius: 10px;
@@ -16,6 +20,11 @@
     margin-bottom: 20px;
 }
 
+.calendar.dark {
+    background-color: #342e2e;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.8);
+}
+
 .monthNavigation {
     display: flex;
     align-items: center;
@@ -23,9 +32,18 @@
     margin-bottom: 10px;
 }
 
+.monthNavigation.dark {
+    background-color: #342e2e;
+    color: white;
+}
+
 .currentMonth {
     font-size: 24px;
     font-weight: bold;
+}
+
+.currentMonth.dark {
+    color: white;
 }
 
 .daysOfWeek {
@@ -39,10 +57,18 @@
     text-align: center;
 }
 
+.dayOfWeek.dark {
+    color: white;
+}
+
 .daysContainer {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 10px;
+}
+
+.daysContainer.dark {
+    background-color: #342e2e;
 }
 
 .day {
@@ -54,6 +80,11 @@
     background-color: #f5f5f5;
     border-radius: 8px;
     cursor: pointer;
+}
+
+.day.dark {
+    background-color: #2d2828;
+    color: white;
 }
 
 .emptyDay {
@@ -82,6 +113,11 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
 }
 
+.appointment.dark {
+    background-color: #2d2828;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.8);
+}
+
 .appointment-details {
     display: flex;
     align-items: center;
@@ -108,13 +144,9 @@
 }
 
 .monthButton{
-    background-color: white;
+    background-color: transparent;
     border: none;
 }
-
-
-/**/
-/* ... (ваш существующий CSS код) */
 
 .appointment button {
     border: 2px solid #007bff;
@@ -130,16 +162,24 @@
 .appointment button.edit {
     border: 2px solid #17a2b8;
     color: #17a2b8;
-    background-color: white;
+    background-color: transparent;
+    border-radius: 5px;
+}
+
+.appointment button.delete {
+    border: 2px solid red;
+    color: red;
+    background-color: transparent;
+    border-radius: 5px;
+    margin-left: 5px;
 }
 
 .appointment button.save {
     border: 2px solid #28a745;
     color: #28a745;
-    background-color: white;
+    background-color: transparent;
+    border-radius: 5px;
 }
-
-/* ... (ваш существующий CSS код) */
 
 .newAppointmentContainer {
     display: flex;
@@ -153,10 +193,11 @@
     padding: 6px 12px;
     font-weight: bold;
     color: #007bff;
-    background-color: white;
+    background-color: transparent;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
     margin-right: 10px;
+    margin-top: 10px;
 }
 
 .newAppointmentButton:hover {
@@ -169,11 +210,19 @@
     flex-direction: column;
 }
 
-.newAppointmentForm input {
-    margin-bottom: 10px;
+.newAppointmentForm-input {
     padding: 6px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.newAppointmentForm-input.dark{
+    background-color: #695b5b;
+    color: white;
+}
+
+.newAppointmentForm-input.dark::placeholder{
+    color: #adadad;
 }
 
 .newAppointmentForm button {
@@ -221,7 +270,18 @@
 .appointmentAdd button.save {
     border: 2px solid #28a745;
     color: #28a745;
-    background-color: white;
+    background-color: transparent;
+    font-size: 18px;
+    border-radius: 10px;
+}
+
+.appointmentAdd button.cancel {
+    border: 2px solid red;
+    color: red;
+    background-color: transparent;
+    font-size: 18px;
+    border-radius: 10px;
+    margin-left: 5px;
 }
 
 .small-input {
@@ -238,6 +298,11 @@
     border-bottom: 2px solid #000;
     cursor: pointer;
     margin-bottom: 10px;
+}
+
+.tab.dark {
+    border-bottom: 2px solid #ffffff;
+    color: white;
 }
 
 /* Add styles for the up and down arrows indicating tab state */
@@ -261,4 +326,9 @@
 
 .day.hasAppointments {
     background-color: rgb(12, 255, 0);
+    color: black;
+}
+
+.save{
+
 }

@@ -22,12 +22,20 @@
     margin-left: 41%;
 }
 
+.login-header.dark{
+    color: white;
+}
+
 .login-label {
     display: block;
     font-size: 16px;
     font-weight: bold;
     margin-top: 10px;
     margin-bottom: 2px;
+}
+
+.login-label.dark{
+    color: white;
 }
 
 .login-input {
@@ -43,6 +51,15 @@
 .login-input:focus {
     outline: none;
     border-color: #0077ff;
+}
+
+.login-input.dark{
+    background-color: #695b5b;
+    color: white;
+}
+
+.login-input.dark::placeholder{
+    color: #adadad;
 }
 
 .login-error {
@@ -106,6 +123,12 @@
     border-color: #0077ff;
 }
 
-/* ... (ваш предыдущий CSS код) */
+.register-redirect-text{
+    color: white;
+}
+
+.register-redirect-link{
+    color: #5674ff;
+}
 
 

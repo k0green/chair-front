@@ -1,5 +1,5 @@
 .main-dark-theme {
-    background-color: black;
+    background-color: #342e2e;
 }
 
 .main-light-theme {
@@ -12,11 +12,10 @@
 }
 
 .filter-button {
-    /* Другие стили */
     margin-right: 10px;
-    background-color: white;
-    border: 1px solid blue;
-    color: blue;
+    background-color: transparent;
+    border: 1px solid #007bff;
+    color: #007bff;
     padding: 5px 10px;
     cursor: pointer;
     border-radius: 5px;
@@ -58,19 +57,16 @@
 }
 
 .arrow.active {
-    color: #008000; /* Green color for active arrows */
-    font-size: 30px; /* Increase font size for active arrows */
+    color: #008000;
+    font-size: 30px;
     scale: 2;
 }
 
 .arrow {
-    font-size: 22px; /* Increase font size for active arrows */
+    font-size: 22px;
     scale: 2;
 }
 
-/* Добавьте следующие стили в ваш файл CSS или в компонент React */
-
-/* Стили для toggle-переключателя */
 .toggle-container {
     display: flex;
     align-items: center;
@@ -114,4 +110,3 @@
     color: #fff;
     border-radius: 50%;
 }
-/* Примените стили в вашем компоненте */

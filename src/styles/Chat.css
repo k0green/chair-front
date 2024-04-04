@@ -1,23 +1,36 @@
 .chat {
     display: flex;
     align-items: center;
-    width: 100%; /* Изменено на 100% */
+    width: 100%;
     margin-bottom: 16px;
-    background-color: #f5f5f5; /* Изменен цвет фона */
-    border-radius: 20px; /* Увеличен радиус скругления */
+    background-color: #f5f5f5;
+    border-radius: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 12px;
+    cursor: pointer;
+}
+.chat:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chat.dark {
+    background-color: #342e2e;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.6);
+}
+
+.chat.dark:hover {
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 1);
 }
 
 .chat-list {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Изменено на flex-start */
-    background-color: #ffffff;
+    justify-content: flex-start;
+    background-color: transparent;
     height: 100vh;
-    padding-top: 20px; /* Добавлен отступ сверху */
-    width: 40%; /* Добавлено */
+    padding-top: 20px;
+    width: 40%;
     margin: 0 auto; /* Добавлено для центрирования */
 }
 
@@ -27,7 +40,9 @@
     height: 40px;
     border-radius: 50%;
     overflow: hidden;
-    margin-left: 12px; /* Изменено на margin-left */
+    margin-left: 12px;
+    background-image: url('https://th.bing.com/th/id/OIG2.01QU5flA2Zrk9DFkj8wU?w=1024&h=1024&rs=1&pid=ImgDetMain');
+    background-size: 100%;
 }
 
 .chat-info {
@@ -36,12 +51,16 @@
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    margin-left: 12px; /* Изменено на margin-left */
+    margin-left: 12px;
 }
 
 .name {
     font-weight: bold;
-    margin-bottom: 4px; /* Добавлено расстояние между именем и сообщением */
+    margin-bottom: 4px;
+}
+
+.name.dark {
+    color: white;
 }
 
 
@@ -57,7 +76,7 @@
 }
 
 .unread-count {
-    background-color: #ff0000; /* Красный цвет для непрочитанных сообщений */
+    background-color: #2fa6ff;
     color: #ffffff;
     border-radius: 50%;
     width: 24px;

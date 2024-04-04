@@ -2,12 +2,14 @@
 .chat-container {
     width: 40%;
     height: 90vh;
-    margin: 10px auto;
+    /*margin: 10px auto;*/
+    margin: 0px auto;
     display: flex;
     flex-direction: column;
     border: 1px solid #ccc;
     border-radius: 10px;
     overflow: hidden;
+    min-width: 500px;
 }
 
 .message-header {
@@ -18,16 +20,24 @@
     border-bottom: 1px solid #ccc;
 }
 
+.message-header.dark {
+    background-color: #2d2828;
+}
+
 .avatar {
     width: 40px;
     height: 40px;
-    background-color: #3498db; /* Цвет фона круга (можете заменить) */
+    background-color: #3498db;
     border-radius: 50%;
     margin-right: 10px;
 }
 
 .name {
     font-weight: bold;
+}
+
+.name.dark {
+    color: white;
 }
 
 .message-list {
@@ -48,13 +58,18 @@
 
 .mine {
     align-self: flex-end;
-    background-color: #3498db; /* Ваш цвет сообщений */
+    background-color: #34c8db; /* Ваш цвет сообщений */
     color: #fff;
 }
 
 .theirs {
     align-self: flex-start;
     background-color: #f0f0f0; /* Цвет сообщений собеседника */
+}
+
+.theirs.dark {
+    background-color: #695b5b;
+    color: white;
 }
 
 /* Добавляем отступы к сообщениям, чтобы они не прилипали друг к другу */
@@ -72,12 +87,24 @@
     border-radius: 0 0 10px 10px;
 }
 
+.message-input-div.dark {
+    background-color: #2d2828;
+}
+
 .message-input {
     flex-grow: 1;
     padding: 10px;
     border-radius: 20px;
     border: none;
     outline: none;
+}
+
+.message-input.dark {
+    background-color: #695b5b;
+}
+
+.message-input.dark::placeholder {
+    color: #adadad;
 }
 
 .send-button {
@@ -121,6 +148,11 @@
     font-size: 14px;
 }
 
+.date.dark {
+    background-color: #2d2828;
+    color: white;
+}
+
 .message {
     max-width: 70%;
     padding: 8px 16px;
@@ -130,7 +162,7 @@
 
 .mine {
     align-self: flex-end;
-    background-color: #007bff;
+    background-color: #2fa6ff;
     color: white;
 }
 
@@ -144,7 +176,7 @@
     display: flex; /* Добавляем flex-контейнер для времени и кружочка */
 
     font-size: 12px;
-    color: white;
+    color: #002aff;
     margin-top: 4px;
     text-align: right;
     justify-content: space-between; /* Добавил выравнивание по горизонтали */
@@ -181,14 +213,12 @@
 
 .mark-as-read {
     cursor: pointer;
-    background-color: #007bff;
+    background-color: #2fa6ff;
     color: white;
     text-align: center;
     padding: 8px;
-    margin-top: 10px;
     border-radius: 4px;
 }
-
 
 .message-list {
     flex-grow: 1;
@@ -200,7 +230,13 @@
 
 /* Добавляем стиль для выделенных сообщений */
 .message.selected {
-    background-color: yellow;
+    background-color: #004cda;
+}
+
+/* Добавляем стиль для выделенных сообщений */
+.timestamp.selected {
+    background-color: transparent;
+    color: white;
 }
 
 /* Обновляем стили для кнопки "Выбрать" */
@@ -216,4 +252,30 @@
 .choose-buttons {
     display: flex;
     gap: 10px;
+}
+
+.message-control-button {
+    background-color: transparent;
+    color: #2fa6ff;
+    border: 2px solid #2fa6ff;
+    border-radius: 10px;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.message-control-button:hover {
+    background-color: #2fa6ff;
+    color: white;
+}
+
+.message-header-image {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Добавляем выравнивание по горизонтали */
+    background-color: transparent;
 }

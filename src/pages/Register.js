@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
 import "../styles/Main.css";
 import Register from '../components/Register';
+import {ThemeContext} from "../components/ThemeContext";
 
 const RegisterPage = ({ user, onLogout }) => {
     const { theme } = useContext(ThemeContext);
