@@ -1,12 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
 import '../styles/Profile.css';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
 import Profile from '../components/Profile';
 import {useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import Cookies from 'js-cookie';
 import {ThemeContext} from "../components/ThemeContext";
+import {toast} from "react-toastify";
 
 const ProfilePage = () => {
 
@@ -19,7 +18,6 @@ const ProfilePage = () => {
     const [contactData, setContactData] = useState([]);
 
     useEffect(() => {
-        // Выполнение запроса при монтировании компонента
         const token = Cookies.get('token');
         if(!token)
             navigate("/login");
@@ -75,18 +73,26 @@ const ProfilePage = () => {
                         setContactData(userData.contacts);
                     })
                     .catch(error => {
+                        if (!toast.isActive(error.message)) {
+                            toast.error(error.message, {
+                                position: "top-center",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                toastId: error.message,
+                            });
+                        }
                         if (error.response) {
-                            // Ошибка пришла с сервера (код ответа не 2xx)
                             if (error.response.status === 401) {
                                 navigate("/login");
                             } else {
                                 console.error(`Ошибка от сервера: ${error.response.status}`);
                             }
                         } else if (error.request) {
-                            // Запрос был сделан, но ответ не был получен
                             console.error('Ответ не был получен. Возможно, проблемы с сетью.');
                         } else {
-                            // Произошла ошибка при настройке запроса
                             console.error('Произошла ошибка при настройке запроса:', error.message);
                         }
                     });
@@ -94,7 +100,6 @@ const ProfilePage = () => {
             else {
                 axios.get(`http://localhost:5155/executor-profile/get-by-id/`+id)
                     .then(response => {
-                        // Преобразование данных с сервера в необходимый формат
                         const userData = {
                             id: response.data.id,
                             name: response.data.name,
@@ -140,18 +145,26 @@ const ProfilePage = () => {
                         setContactData(userData.contacts);
                     })
                     .catch(error => {
+                        if (!toast.isActive(error.message)) {
+                            toast.error(error.message, {
+                                position: "top-center",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                toastId: error.message,
+                            });
+                        }
                         if (error.response) {
-                            // Ошибка пришла с сервера (код ответа не 2xx)
                             if (error.response.status === 401) {
                                 navigate("/login");
                             } else {
                                 console.error(`Ошибка от сервера: ${error.response.status}`);
                             }
                         } else if (error.request) {
-                            // Запрос был сделан, но ответ не был получен
                             console.error('Ответ не был получен. Возможно, проблемы с сетью.');
                         } else {
-                            // Произошла ошибка при настройке запроса
                             console.error('Произошла ошибка при настройке запроса:', error.message);
                         }
                     });

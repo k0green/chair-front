@@ -11,6 +11,7 @@ import PhotoList from "../components/PhotoList";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBoltLightning, faClock, faHouse, faPencil, faStar, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
 
 const HomePage = ({ user, onLogout }) => {
     const { theme } = useContext(ThemeContext);
@@ -248,6 +249,17 @@ const HomePage = ({ user, onLogout }) => {
                 setCategories(response.data);  // Обновление состояния с данными с сервера
             })
             .catch(error => {
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
                 console.error('Error fetching data:', error);
             });
 
@@ -290,6 +302,17 @@ const HomePage = ({ user, onLogout }) => {
                 setServicesData(newServicesData);
             })
             .catch(error => {
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
                 console.error('Error fetching data:', error);
             });
 
@@ -500,6 +523,17 @@ const HomePage = ({ user, onLogout }) => {
                     setServicesData(newServicesData);
                 })
                 .catch(error => {
+                    if (!toast.isActive(error.message)) {
+                        toast.error(error.message, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: error.message,
+                        });
+                    }
                     console.error('Error fetching data:', error);
                 });
 
@@ -565,8 +599,8 @@ const HomePage = ({ user, onLogout }) => {
                 <ServiceList services={servicesData} />
             </div>
             {showFilterModal && (
-                <div className="filter-modal">
-                    <div className="modal-content">
+                <div className={`filter-modal ${theme === 'dark' ? 'dark' : ''}`}>
+                    <div className={`modal-content ${theme === 'dark' ? 'dark' : ''}`}>
             <span className="close" onClick={handleModalClose}>
               &times;
             </span>
@@ -727,8 +761,8 @@ const HomePage = ({ user, onLogout }) => {
                 </div>
             )}
             {optimizeServiceModal && (
-                <div className="filter-modal">
-                    <div className="modal-content">
+                <div className={`filter-modal ${theme === 'dark' ? 'dark' : ''}`}>
+                    <div className={`modal-content ${theme === 'dark' ? 'dark' : ''}`}>
                         <span className="close" onClick={() => setOptimizeServiceModal(false)}>
                             &times;
                         </span>
@@ -758,8 +792,8 @@ const HomePage = ({ user, onLogout }) => {
                 </div>
             )}
             {showOprResModal && (
-                <div className="filter-modal">
-                    <div className="modal-content">
+                <div className={`filter-modal ${theme === 'dark' ? 'dark' : ''}`}>
+                    <div className={`modal-content ${theme === 'dark' ? 'dark' : ''}`}>
                         <span className="close" onClick={() => setShowOprResModal(false)}>
                             &times;
                         </span>

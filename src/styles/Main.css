@@ -40,6 +40,26 @@
     padding: 20px;
     border: 1px solid #888;
     width: 30%;
+    min-height: 300px;
+    min-width: 400px;
+    border-radius: 15px;
+}
+
+.filter-modal.dark {
+    background-color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.modal-content.dark {
+    background-color: #342e2e;
+}
+
+.extra-modal-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
 }
 
 .close {

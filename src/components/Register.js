@@ -6,6 +6,8 @@ import '../styles/Register.css';
 import {Link, useNavigate} from "react-router-dom";
 import Cookies from "js-cookie";
 import {ThemeContext} from "./ThemeContext";
+import {LanguageContext} from "./LanguageContext";
+import {toast} from "react-toastify";
 
 function Register() {
     const options = [
@@ -15,6 +17,7 @@ function Register() {
 
     const navigate = useNavigate();
     const { theme } = useContext(ThemeContext);
+    const { language, translations } = useContext(LanguageContext);
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -137,6 +140,17 @@ function Register() {
                 navigate("/")
             })
             .catch((error) => {
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
                 alert(error);
             });
     };
@@ -145,12 +159,12 @@ function Register() {
         <Fragment>
             <div className="register-container">
                 <form className="register-form">
-                    <div className={`register-header ${theme === 'dark' ? 'dark' : ''}`}>Register</div>
-                    <label className={`register-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtName">Name</label>
+                    <div className={`register-header ${theme === 'dark' ? 'dark' : ''}`}>{translations[language]['Register']}</div>
+                    <label className={`register-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtName">{translations[language]['Name']}</label>
                     <input
                         className={`register-input ${theme === 'dark' ? 'dark' : ''}`}
                         id="txtName"
-                        placeholder="Name"
+                        placeholder={translations[language]['Name']}
                         value={name}
                         onChange={(e) => handleNameChange(e.target.value)}
                     />
@@ -164,42 +178,42 @@ function Register() {
                         onChange={(e) => handleEmailChange(e.target.value)}
                     />
                     {emailError && <div className="register-error">{emailError}</div>}
-                    <label className={`register-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtPassword">Password</label>
+                    <label className={`register-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtPassword">{translations[language]['Password']}</label>
                     <input
                         className={`register-input ${theme === 'dark' ? 'dark' : ''}`}
                         type="password"
                         id="txtPassword"
-                        placeholder="Password"
+                        placeholder={translations[language]['Password']}
                         value={password}
                         onChange={(e) => handlePasswordChange(e.target.value)}
                     />
                     {password && <div className="register-error">{passwordError}</div>}
-                    <label className={`register-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtConfirmPassword">Confirm password</label>
+                    <label className={`register-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtConfirmPassword">{translations[language]['ConfirmPassword']}</label>
                     <input
                         className={`register-input ${theme === 'dark' ? 'dark' : ''}`}
                         type="password"
                         id="txtConfirmPassword"
-                        placeholder="Confirm password"
+                        placeholder={translations[language]['ConfirmPassword']}
                         value={confirmPassword}
                         onChange={(e) => handleConfirmPasswordChange(e.target.value)}
                     />
                     {confirmPasswordError && <div className="register-error">{confirmPasswordError}</div>}
-                    <label className={`register-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtName">Phone</label>
+                    <label className={`register-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtName">{translations[language]['Phone']}</label>
                     <input
                         className={`register-input ${theme === 'dark' ? 'dark' : ''}`}
                         id="txtPhone"
-                        placeholder="Phone"
+                        placeholder={translations[language]['Phone']}
                         value={phone}
                         onChange={(e) => handlePhoneChange(e.target.value)}
                     />
                     {nameError && <div className="register-error">{nameError}</div>}
-                    <p className={`${theme === 'dark' ? 'login-redirect-text' : ''}`}>Already have an account? <Link className={`${theme === 'dark' ? 'login-redirect-link' : ''}`} to="/login">Login here</Link></p>
+                    <p className={`${theme === 'dark' ? 'login-redirect-text' : ''}`}>{translations[language]['YouAlreadyHaveAnAccount']}? <Link className={`${theme === 'dark' ? 'login-redirect-link' : ''}`} to="/login">Login here</Link></p>
                     <button
                         className={`register-button ${nameError || emailError || passwordError || confirmPasswordError ? "" : "active"}`}
                         onClick={() => handleSave()}
                         //disabled={!name || !email || !password || !confirmPassword || !role ||nameError || emailError || passwordError || confirmPasswordError}
                     >
-                        Sign-up
+                        {translations[language]['SignUp']}
                     </button>
                 </form>
             </div>

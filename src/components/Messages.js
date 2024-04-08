@@ -10,6 +10,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {FaTrash} from "react-icons/fa";
 import { v4 as uuidv4 } from 'uuid';
 import {ThemeContext} from "./ThemeContext";
+import {LanguageContext} from "./LanguageContext";
+import {toast} from "react-toastify";
 
 const MessageComponent = ({ id, isMessageViewed }) => {
 
@@ -21,6 +23,8 @@ const MessageComponent = ({ id, isMessageViewed }) => {
     const [isChoosing, setIsChoosing] = useState(false);
     const [selectedMessageId, setSelectedMessageId] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
+    const { language, translations } = useContext(LanguageContext);
+
 
     const handleSave = () => {
         // Implement saving/editing logic here
@@ -42,6 +46,17 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                     console.error('Error editing message:', error);
                     setIsEditing(false);
                     setSelectedMessageId(null);
+                    if (!toast.isActive(error.message)) {
+                        toast.error(error.message, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: error.message,
+                        });
+                    }
                 });
         }
     };
@@ -87,6 +102,17 @@ const MessageComponent = ({ id, isMessageViewed }) => {
             .catch(error => {
                 console.error('Error deleting message:', error);
                 setIsChoosing(false);
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
             });
     };
 
@@ -142,6 +168,17 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                     setChatData(data);
                 })
                 .catch(error => {
+                    if (!toast.isActive(error.message)) {
+                        toast.error(error.message, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: error.message,
+                        });
+                    }
                     if (error.response) {
                         if (error.response.status === 401) {
                             navigate("/login");
@@ -221,7 +258,6 @@ const MessageComponent = ({ id, isMessageViewed }) => {
     const userRef = useRef(null);
 
     useEffect(() => {
-        // Проверяем, есть ли непрочитанные входящие сообщения
         const hasUnreadMessages = messages.some(
             (message) => !message.isMine && !message.isRead
         );
@@ -232,6 +268,7 @@ const MessageComponent = ({ id, isMessageViewed }) => {
         } else {
             setIsBarVisible(false);
         }
+        down()
     }, [messages]);
 
 
@@ -269,6 +306,17 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                 .catch(error => {
                     // Handle error, e.g., show an error message
                     console.error('Error saving data:', error);
+                    if (!toast.isActive(error.message)) {
+                        toast.error(error.message, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: error.message,
+                        });
+                    }
                 });
 
             const updatedMessages = messages.map((message) => ({
@@ -287,7 +335,9 @@ const MessageComponent = ({ id, isMessageViewed }) => {
             if (userRef.current) {
                 userRef.current.scrollIntoView({ behavior: 'smooth' });
             }
+
             setIsBarVisible(false);
+            down();
         }
     };
 
@@ -301,7 +351,27 @@ const MessageComponent = ({ id, isMessageViewed }) => {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         axios.get(`http://localhost:5155/message/mark-as-read/`+chatData.id)
             .then(response => {})
-            .catch(error => {});
+            .catch(error => {
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
+            });
+    };
+
+    const down = () => {
+        let messagesElement = document.getElementById('messages');
+        messagesElement.scrollTo({
+            top: messagesElement.scrollHeight,
+            behavior: 'smooth'
+        });
     };
 
 
@@ -349,10 +419,10 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                     {isChoosing ? (
                         <div className="choose-buttons">
                             <button className="message-control-button" onClick={handleEdit}>
-                                <FontAwesomeIcon icon={faEdit}/><> Редактировать</>
+                                <FontAwesomeIcon icon={faEdit}/><> {translations[language]['Edit']}</>
                             </button>
                             <button className="message-control-button" onClick={handleDelete}>
-                                <FontAwesomeIcon icon={faTrash}/><> Удалить</>
+                                <FontAwesomeIcon icon={faTrash}/><> {translations[language]['Delete']}</>
                             </button>
                             <button className="message-control-button" onClick={handleCancel}>
                                 <FontAwesomeIcon icon={faCancel}/>
@@ -360,12 +430,12 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                         </div>
                     ) : (
                         <button className="message-control-button" onClick={handleChoose} style={{ marginLeft: 'auto' }}>
-                            <FontAwesomeIcon icon={faCheckCircle}/><> Выбрать</>
+                            <FontAwesomeIcon icon={faCheckCircle}/><> {translations[language]['Select']}</>
                         </button>
                     )}
                 </div>
             </div>
-            <div className="message-list">
+            <div id="messages" className="message-list">
                 {Object.keys(groupedMessages).map((date) => (
                     <div key={date} className="message-group">
                         <div className={`date ${theme === 'dark' ? 'dark' : ''}`}>{date}</div>
@@ -391,21 +461,23 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                 ))}
             </div>
             <div className="mark-as-read" onClick={handleMarkAsRead} style={{ display: isBarVisible ? "block" : "none" }}>
-                Пометить все как прочитанные
+                {translations[language]['MarkAsRead']}
             </div>
+{/*            <div className="mark-as-read" onClick={down}>
+                Down
+            </div>*/}
 
             <div className={`message-input-div ${theme === 'dark' ? 'dark' : ''}`}>
                 <textarea
                     id="textarea-message"
                     className={`message-input ${theme === 'dark' ? 'dark' : ''}`}
-                    type="text"
-                    placeholder="Введите сообщение..."
+                    placeholder={translations[language]['EnterMessage']}
                     value={newMessage}
                     onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
                 />
                 <button className="send-button" onClick={handleButtonClick}>
-                    {isEditing ? 'Сохранить' : 'Отправить'}
+                    {isEditing ? translations[language]['Save'] : translations[language]['Send']}
                 </button>
             </div>
         </div>

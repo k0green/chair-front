@@ -322,3 +322,28 @@ input[type="text"] {
     color: white;
     background-color: #2d2828;
 }
+
+@media (orientation: portrait) {
+    .F {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .reviews-panel {
+        column-count: 1;
+        column-gap: 10px;
+        margin-top: 10px;
+        overflow-y: auto;
+        max-height: 540px;
+    }
+
+    .reviews-background {
+        min-width: 300px;
+        min-height: 500px;
+    }
+
+    .photos-edit {
+        min-width: 300px;
+        min-height: 320px;
+    }
+}

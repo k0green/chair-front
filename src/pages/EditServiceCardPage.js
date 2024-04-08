@@ -8,6 +8,7 @@ import Header from "../components/Header";
 import EditServiceCard from "../components/EditServiceCard";
 import Footer from "../components/Footer";
 import {ThemeContext} from "../components/ThemeContext";
+import {toast} from "react-toastify";
 
 const EditServiceCardPage = () => {
     const { theme, toggleTheme } = useContext(ThemeContext);
@@ -44,6 +45,17 @@ const EditServiceCardPage = () => {
                 };
                 setService(formattedData);
             } catch (error) {
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
                 console.error('Error fetching data:', error);
             }
         };

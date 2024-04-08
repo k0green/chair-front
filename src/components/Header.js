@@ -1,17 +1,18 @@
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faSearch, faMessage, faPerson, faUser} from "@fortawesome/free-solid-svg-icons";
-import React, {useContext, useState} from "react";
+import {faSearch, faUser} from "@fortawesome/free-solid-svg-icons";
+import React, {useContext} from "react";
 import "../styles/Header.css";
-import ThemeSwitcher from "./ThemeSwitcher";
 import Cookies from "js-cookie";
 import {ThemeContext} from "./ThemeContext";
+import {LanguageContext} from "./LanguageContext";
+import moon from '../icons/moon.png';
+import sun from '../icons/sun.png';
 
 const Header = ({ user, onLogout }) => {
     const navigate = useNavigate();
-    const [darkTheme, setDarkTheme] = useState(false);
     const { theme, toggleTheme } = useContext(ThemeContext);
+    const { language, translations } = useContext(LanguageContext);
 
     const handleLoginClick = () => {
         const token = Cookies.get('token');
@@ -54,14 +55,23 @@ const Header = ({ user, onLogout }) => {
                 <h1 className={`logo ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLogoClick}>Chair</h1>
                 </div>
                 <div className="search-container">
-                    <h3 className={`navigate ${theme === 'dark' ? 'dark' : ''}`} onClick={handleCalendarClick}>Календарь</h3>
-                    <h3 className={`navigate ${theme === 'dark' ? 'dark' : ''}`} onClick={handleOrderClick}>Заявки</h3>
-                    <h3 className={`navigate ${theme === 'dark' ? 'dark' : ''}`} onClick={handleMessageClick}>Сообщения</h3>
+                    <h3 className={`navigate ${theme === 'dark' ? 'dark' : ''}`} onClick={handleCalendarClick}>{translations[language]['calendar']}</h3>
+                    <h3 className={`navigate ${theme === 'dark' ? 'dark' : ''}`} onClick={handleOrderClick}>{translations[language]['orders']}</h3>
+                    <h3 className={`navigate ${theme === 'dark' ? 'dark' : ''}`} onClick={handleMessageClick}>{translations[language]['messages']}</h3>
                 </div>
 
                 <div className="search-container">
-                    <button onClick={toggleTheme}>
-                        {theme === 'light' ? 'Темная тема' : 'Светлая тема'}
+                    <button style={{ backgroundColor: "transparent", border: "none" }} onClick={toggleTheme}>
+                        {theme === 'light' ?
+                            <img
+                                src={moon}
+                                style={{ width: '60%', height: '60%' }}
+                            />
+                            :
+                            <img
+                                src={sun}
+                                style={{ width: '70%', height: '70%', marginRight: "10px" }}
+                            />}
                     </button>
                     <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleSearchClick}>
                         <FontAwesomeIcon icon={faSearch} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />

@@ -16,6 +16,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import {useDropzone} from "react-dropzone";
 import {ThemeContext} from "./ThemeContext";
+import {LanguageContext} from "./LanguageContext";
+import {toast} from "react-toastify";
 
 const ServiceCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
@@ -38,6 +40,7 @@ const ServiceCard = ({ service, isNew, id }) => {
     const [servicesLookupData, setServicesLookupData] = useState([]);
     const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
     const [files, setFiles] = useState([]);
+    const { language, translations } = useContext(LanguageContext);
 
     const reverseFormatTime = (formattedTime, editedDuration) => {
         const [hours, minutes] = formattedTime.split(':').map(Number);
@@ -61,6 +64,17 @@ const ServiceCard = ({ service, isNew, id }) => {
                     setServicesLookupData(serverData);
                 })
                 .catch(error => {
+                    if (!toast.isActive(error.message)) {
+                        toast.error(error.message, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: error.message,
+                        });
+                    }
                     console.error('Error fetching data:', error);
                 });
 
@@ -87,6 +101,17 @@ const ServiceCard = ({ service, isNew, id }) => {
                     navigate(`/profile`);
                 })
                 .catch(error => {
+                    if (!toast.isActive(error.message)) {
+                        toast.error(error.message, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: error.message,
+                        });
+                    }
                     console.error('Error saving data:', error);
                 });
         }
@@ -111,6 +136,17 @@ const ServiceCard = ({ service, isNew, id }) => {
                 navigate("/profile")
             })
             .catch(error => {
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
                 console.error('Error saving data:', error);
             });
     };
@@ -151,7 +187,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                 {images}
                 <div {...getRootProps({style: {border: '2px solid blue', padding: '20px', width: '400px', height: '400px'}})}>
                     <input {...getInputProps()} />
-                    <p>Перетащите сюда файлы или кликните для выбора</p>
+                    <p>{translations[language]['DragAndDrop']}</p>
                 </div>
             </div>
         );
@@ -184,7 +220,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                     <div className="photos-edit">
                         <PhotoList photos={editedPhotos} onDeletePhoto={handleDeletePhoto} />
                         <button className="add-photo-button-new" onClick={handleAddPhoto}>
-                            <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> Добавить фото</p>
+                            <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> {translations[language]['AddPhoto']}</p>
                         </button>
                     </div>
                     <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
@@ -205,7 +241,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                     </div>
                     <div className="service-description">
                         <input
-                            placeholder="Address"
+                            placeholder={translations[language]['Address']}
                             className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"
                             value={editedAddress || service.address}
@@ -215,7 +251,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                         <br/>
                     </div><div className="service-description">
                         <input
-                            placeholder="Description"
+                            placeholder={translations[language]['Description']}
                             className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"
                             value={editedDescription || service.description}
@@ -248,7 +284,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                     </div>
                     <div>
                         <button className="order-button" onClick={isNew ? handleAddSave : handleEditSave}>
-                            <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> Сохранить</p>
+                            <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p>
                         </button>
                     </div>
                 </div>
@@ -260,7 +296,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                         &times;
                     </span>
                         <Dropzone />
-                        <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> Сохранить</p></button>
+                        <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p></button>
                     </div>
                 </div>
             )}

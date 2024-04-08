@@ -13,14 +13,20 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"; // Подклю�
 import PhotoList from "../components/PhotoList";
 import {useNavigate} from "react-router-dom";
 import {ThemeContext} from "./ThemeContext";
+import {LanguageContext} from "./LanguageContext";
 
 const ServiceCard = ({ service, isProfile }) => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { id, name, masters } = service;
+    const { language, translations } = useContext(LanguageContext);
 
     const handleOrderClick = (executorServiceId) => {
         navigate("/calendar/"+ executorServiceId);
+    };
+
+    const handleReviewClick = (executorServiceId) => {
+        navigate("/reviews/"+ executorServiceId);
     };
 
     let handleMasterNameClickClick = (masterId) => {
@@ -78,16 +84,16 @@ const ServiceCard = ({ service, isProfile }) => {
                     <div className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
                         <div key={master.id} className="master-card">
                             <div className="photos">
-                                <PhotoList photos={master.photos}/>
+                                {master.photos ? <PhotoList photos={master.photos}/> : null}
                             </div>
                             <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
                                 <h4 onClick={() => handleMasterNameClickClick(master.executorId)}>{master.name}</h4>
-                                <h4>{master.rating} <FontAwesomeIcon icon={faStar} className = 'item-icon'/></h4>
+                                <h4 style={{cursor: "pointer"}} onClick={()=>handleReviewClick(master.id)}>{master.rating} <FontAwesomeIcon icon={faStar} className = 'item-icon'/></h4>
                             </div>
                             <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
                                 <p>{master.description}</p>
                                 <p><FontAwesomeIcon icon={faHouse} className = 'item-icon'/>{master.address}</p>
-                                <p>Available Slots: {master.availableSlots}</p>
+                                <p>{translations[language]['AvailableSlots']}: {master.availableSlots}</p>
                             </div>
                             <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
                                 <h4><FontAwesomeIcon icon={faClock} className = 'item-icon'/> {master.duration}</h4>
@@ -97,17 +103,17 @@ const ServiceCard = ({ service, isProfile }) => {
                                 {isProfile ?
                                     <div>
                                         <button className="order-button" onClick={()=>handleIsProfileClick(service.id)}>
-                                            <p className="order-text"><FontAwesomeIcon icon={faPencil} />    Редактировать</p>
+                                            <p className="order-text"><FontAwesomeIcon icon={faPencil} />    {translations[language]['Edit']}</p>
                                         </button>
                                         <br/>
                                         <br/>
                                         <button className="order-button" onClick={()=>handleRemoveClick(service.id)}>
-                                            <p className="order-text"><FontAwesomeIcon icon={faTrash} />    Удалить</p>
+                                            <p className="order-text"><FontAwesomeIcon icon={faTrash} />    {translations[language]['Delete']}</p>
                                         </button>
                                     </div>
                                     :
                                     <button className="order-button" onClick={()=>handleOrderClick(master.id)}>
-                                        <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} />    Записаться</p>
+                                        <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} />    {translations[language]['MakeAnAppointment']}</p>
                                     </button>
                                 }
                             </div>

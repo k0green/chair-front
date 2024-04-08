@@ -4,6 +4,8 @@ import "../styles/Login.css";
 import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 import { ThemeContext } from './ThemeContext';
+import {LanguageContext} from "./LanguageContext";
+import {toast} from "react-toastify";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -12,6 +14,8 @@ function Login() {
     const [passwordError, setPasswordError] = useState("");
     const navigate = useNavigate();
     const { theme } = useContext(ThemeContext);
+    const { language, translations } = useContext(LanguageContext);
+
 
     const handleEmailChange = (value) => {
         setEmail(value);
@@ -20,7 +24,7 @@ function Login() {
         } else {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(value)) {
-                setEmailError("Please enter a valid email address");
+                setEmailError(translations[language]['PleaseEnterValidEmailAddress']);
             } else {
                 setEmailError("");
             }
@@ -34,7 +38,7 @@ function Login() {
         } else {
             const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W])[A-Za-z\d\W]{6,}$/;
             if (!passwordRegex.test(value)) {
-                setPasswordError("Please enter a valid password with at least 6 characters, 1 uppercase letter, 1 number, and 1 special character");
+                setPasswordError(translations[language]['PasswordValidation']);
             } else {
                 setPasswordError("");
             }
@@ -68,7 +72,17 @@ function Login() {
                             localStorage.setItem('userRole', serverData.role);
                         })
                         .catch(error => {
-                            // Handle error
+                            if (!toast.isActive(error.message)) {
+                                toast.error(error.message, {
+                                    position: "top-center",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    toastId: error.message,
+                                });
+                            }
                             console.error('Error fetching data:', error);
                         });
                 navigate("/")
@@ -92,24 +106,24 @@ function Login() {
                         onChange={(e) => handleEmailChange(e.target.value)}
                     />
                     {emailError && <div className="login-error">{emailError}</div>}
-                    <label className={`login-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtPassword">Password</label>
+                    <label className={`login-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtPassword">{translations[language]['Password']}</label>
                     <input
                         className={`login-input ${theme === 'dark' ? 'dark' : ''}`}
                         type="password"
                         id="txtPassword"
-                        placeholder="Password"
+                        placeholder={translations[language]['Password']}
                         value={password}
                         onChange={(e) => handlePasswordChange(e.target.value)}
                     />
                     {passwordError && <div className="login-error">{passwordError}</div>}
-                    <p className={`${theme === 'dark' ? 'register-redirect-text' : ''}`}>Don't have an account? <Link className={`${theme === 'dark' ? 'register-redirect-link' : ''}`}to="/register">Register here</Link></p>
+                    <p className={`${theme === 'dark' ? 'register-redirect-text' : ''}`}>{translations[language]['DontHaveAnAccount']}? <Link className={`${theme === 'dark' ? 'register-redirect-link' : ''}`}to="/register">Register here</Link></p>
                     <button
                         type="button"
                         className={`register-button ${emailError || passwordError ? "" : "active"}`}
                         onClick={() => handleSave()}
                         //disabled={!email || !password || emailError || passwordError}
                     >
-                        Sign-up
+                        {translations[language]['SignIn']}
                     </button>
                 </form>
             </div>

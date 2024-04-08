@@ -1,7 +1,7 @@
 .footer {
     background-color: white;
     border-top: 1px solid #ccc;
-    padding: 10px;
+/*    padding: 10px;*/
     text-align: center;
     margin-top: 5%;
 }
@@ -9,16 +9,22 @@
 .footer-text {
     font-size: 12px;
     color: #838383;
+/*    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);*/
 }
 
 .app-footer {
     width: 100%;
     color: white;
     text-align: center;
-    padding: 10px 0;
     background-color: white;
     border-top: 1px solid #ccc;
     margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
 .app-footer.dark {
@@ -37,4 +43,12 @@
 
 .app-content {
     flex-grow: 1;
+}
+
+.language-select{
+    background-color: transparent;
+    color: #838383;
+    border: none;
+    position: absolute;
+    right: 15px;
 }

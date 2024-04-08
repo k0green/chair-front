@@ -4,6 +4,8 @@ import "../styles/Main.css";
 import ServiceList from '../components/ServiceList';
 import axios from "axios";
 import {useParams} from "react-router-dom";
+import {toast} from "react-toastify";
+import ImageWithButton from "../components/EmptyComponent";
 
 const HomePage = ({ user, onLogout }) => {
     const { theme } = useContext(ThemeContext);
@@ -45,6 +47,17 @@ const HomePage = ({ user, onLogout }) => {
                 setServicesData(newServicesData);
             })
             .catch(error => {
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
                 console.error('Error fetching data:', error);
             });
 
@@ -60,7 +73,7 @@ const HomePage = ({ user, onLogout }) => {
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
             <div>
-                <ServiceList services={servicesData} />
+                {servicesData.length > 0 ? <ServiceList services={servicesData} /> : <ImageWithButton imageUrl="https://th.bing.com/th/id/OIG3.P9oT9D3EIP9NQhSwgVqH?w=1024&h=1024&rs=1&pid=ImgDetMain" text="К сожалению тут пусто"/> }
             </div>
         </div>
     );

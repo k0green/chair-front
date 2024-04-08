@@ -6,6 +6,8 @@ import { ThemeContext } from "./ThemeContext";
 import {useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
+import {LanguageContext} from "./LanguageContext";
+import {toast} from "react-toastify";
 
 const Calendar = ({full}) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -26,6 +28,7 @@ const Calendar = ({full}) => {
     const { theme } = useContext(ThemeContext);
     let { id } = useParams();
     const navigate = useNavigate();
+    const { language, translations } = useContext(LanguageContext);
 
     useEffect(() => {
         fetchData();
@@ -50,6 +53,17 @@ const Calendar = ({full}) => {
                 setServicesLookupData(serverData);
             }
         } catch (error) {
+            if (!toast.isActive(error.message)) {
+                toast.error(error.message, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: error.message,
+                });
+            }
             console.error("Error fetching data:", error);
         }
     };
@@ -106,6 +120,17 @@ const Calendar = ({full}) => {
                 setAppointmentsData(serverData);
             }
         } catch (error) {
+            if (!toast.isActive(error.message)) {
+                toast.error(error.message, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: error.message,
+                });
+            }
             console.error("Error fetching data:", error);
         }
     };
@@ -151,7 +176,17 @@ const Calendar = ({full}) => {
             console.log('Data saved successfully', response.data);
             await fetchData();
         } catch (error) {
-            // Handle errors, e.g., show an error message
+            if (!toast.isActive(error.message)) {
+                toast.error(error.message, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: error.message,
+                });
+            }
             console.error('Error saving data', error);
         }
 
@@ -180,7 +215,17 @@ const Calendar = ({full}) => {
             setEditingAppointmentId(null);
             setEditedAppointments({});
         } catch (error) {
-            // Handle errors, e.g., show an error message
+            if (!toast.isActive(error.message)) {
+                toast.error(error.message, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: error.message,
+                });
+            }
             console.error('Error deleting data', error);
         }
     };
@@ -206,7 +251,17 @@ const Calendar = ({full}) => {
                 // Handle the response, e.g., show a success message
                 console.log('Data updated successfully');
             } catch (error) {
-                // Handle errors, e.g., show an error message
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
                 console.error('Error updating data', error);
             }
 
@@ -239,7 +294,7 @@ const Calendar = ({full}) => {
     };
 
     const renderDaysOfWeek = () => {
-        const daysOfWeek = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+        const daysOfWeek = [translations[language]['sun'], translations[language]['mon'], translations[language]['tue'], translations[language]['wed'], translations[language]['thu'], translations[language]['fri'], translations[language]['sat']];
         return daysOfWeek.map((day, index) => (
             <div key={index} className={`dayOfWeek ${theme === 'dark' ? 'dark' : ''}`}>{day}</div>
         ));
@@ -260,7 +315,7 @@ const Calendar = ({full}) => {
                             style={{ color: "gray", backgroundColor: "transparent" }}
                         />
                     </button>
-                    <div className={`currentMonth ${theme === 'dark' ? 'dark' : ''}`}>{currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
+                    <div className={`currentMonth ${theme === 'dark' ? 'dark' : ''}`}>{currentMonth.toLocaleString(language, { month: 'long', year: 'numeric' })}</div>
                     <button className="monthButton" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}>
                         <FontAwesomeIcon
                             icon={faChevronCircleRight}
@@ -356,7 +411,7 @@ const Calendar = ({full}) => {
                                 <input
                                     type="time"
                                     name="starDate"
-                                    placeholder="Время начала (HH:mm)"
+                                    placeholder={translations[language]['StartTime']}
                                     style={{width: "auto"}}
                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                     value={newAppointmentData.starDate}
@@ -372,7 +427,7 @@ const Calendar = ({full}) => {
                                     name="sessionCount"
                                     style={{width: "8ch"}}
                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
-                                    placeholder="Количество сеансов"
+                                    placeholder={translations[language]['NumberOfSessions']}
                                     value={newAppointmentData.sessionCount}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, sessionCount: e.target.value })}
                                 />
@@ -386,7 +441,7 @@ const Calendar = ({full}) => {
                                     name="breakTime"
                                     style={{width: "8ch"}}
                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
-                                    placeholder="Время перерыва (минуты)"
+                                    placeholder={translations[language]['BreakTime']}
                                     value={newAppointmentData.breakTime}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, breakTime: e.target.value })}
                                 />
@@ -401,7 +456,7 @@ const Calendar = ({full}) => {
                                     type="number"
                                     name="duration"
                                     style={{width: "8ch"}}
-                                    placeholder="Продолжительность (минуты)"
+                                    placeholder={translations[language]['Duration']}
                                     value={newAppointmentData.duration}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, duration: e.target.value })}
                                 />
@@ -415,7 +470,7 @@ const Calendar = ({full}) => {
                                     type="number"
                                     name="cost"
                                     style={{width: "8ch"}}
-                                    placeholder="Стоимость"
+                                    placeholder={translations[language]['Cost']}
                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                     value={newAppointmentData.cost}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, cost: e.target.value })}
@@ -426,8 +481,8 @@ const Calendar = ({full}) => {
                     </div>
                     {
                         <div>
-                            <button className="save" onClick={handleNewAppointmentSave}>Сохранить</button>
-                            <button className="cancel" onClick={handleNewAppointmentCancel}>Отмена</button>
+                            <button className="save" onClick={handleNewAppointmentSave}>{translations[language]['Save']}</button>
+                            <button className="cancel" onClick={handleNewAppointmentCancel}>{translations[language]['Cancel']}</button>
                         </div>
                     }
                 </div>
@@ -436,7 +491,7 @@ const Calendar = ({full}) => {
         }
         return (
             <button className="newAppointmentButton" onClick={handleNewAppointmentClick}>
-                Добавить
+                {translations[language]['Add']}
             </button>
         );
     };
@@ -451,8 +506,8 @@ const Calendar = ({full}) => {
                             <div key={index} className="appointmentContainer">
                                 <div className={`appointment ${theme === 'dark' ? 'dark' : ''}`}>
                                     <div className="appointment-details">
-                                        <div style={theme === 'dark' ? { color: "white"} : ''}>
-                                            Название:{" "}
+                                        <div style={theme === 'dark' ? { color: "white"} : {}}>
+                                            {translations[language]['Name']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <select
                                                     name="procedure"
@@ -471,8 +526,8 @@ const Calendar = ({full}) => {
                                                 <strong>{appointment.serviceTypeName}</strong>
                                             )}
                                         </div>
-                                        <div style={theme === 'dark' ? { color: "white"} : ''}>
-                                            Время начала:{" "}
+                                        <div style={theme === 'dark' ? { color: "white"} : {}}>
+                                            {translations[language]['StartTime']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
                                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
@@ -484,8 +539,8 @@ const Calendar = ({full}) => {
                                                 <strong>{formatTime(appointment.starDate)}</strong>
                                             )}
                                         </div>
-                                        <div style={theme === 'dark' ? { color: "white"} : ''}>
-                                            Продолжительность:{" "}
+                                        <div style={theme === 'dark' ? { color: "white"} : {}}>
+                                            {translations[language]['Duration']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
                                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
@@ -497,8 +552,8 @@ const Calendar = ({full}) => {
                                                 <strong>{formatTime(appointment.duration)}</strong>
                                             )}
                                         </div>
-                                        <div style={theme === 'dark' ? { color: "white"} : ''}>
-                                            Стоимость:{" "}
+                                        <div style={theme === 'dark' ? { color: "white"} : {}}>
+                                            {translations[language]['Cost']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
                                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
@@ -512,11 +567,11 @@ const Calendar = ({full}) => {
                                         </div>
                                     </div>
                                     {editingAppointmentId === appointment.id ? (
-                                        <button className="save" onClick={handleSaveClick}>Сохранить</button>
+                                        <button className="save" onClick={handleSaveClick}>{translations[language]['Save']}</button>
                                     ) : (
                                         <div>
-                                            <button className="edit" onClick={() => handleEditClick(appointment)}>Редактировать</button>
-                                            <button className="delete" onClick={() => handleDeleteClick(appointment)}>Удалить</button>
+                                            <button className="edit" onClick={() => handleEditClick(appointment)}>{translations[language]['Edit']}</button>
+                                            <button className="delete" onClick={() => handleDeleteClick(appointment)}>{translations[language]['Delete']}</button>
                                         </div>
                                     )}
                                 </div>

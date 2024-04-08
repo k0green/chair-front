@@ -10,7 +10,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
-import {ThemeContext} from "./ThemeContext"; // Подключаем файл стилей
+import {ThemeContext} from "./ThemeContext";
+import {LanguageContext} from "./LanguageContext";
+import {toast} from "react-toastify"; // Подключаем файл стилей
 
 const Calendar = ({full}) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -20,6 +22,7 @@ const Calendar = ({full}) => {
     const { theme, toggleTheme } = useContext(ThemeContext);
     let { id } = useParams();
     const navigate = useNavigate();
+    const { language, translations } = useContext(LanguageContext);
 
     useEffect(() => {
         const token = Cookies.get('token');
@@ -78,6 +81,17 @@ const Calendar = ({full}) => {
                 setAppointmentsData(serverData);
             }
         } catch (error) {
+            if (!toast.isActive(error.message)) {
+                toast.error(error.message, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: error.message,
+                });
+            }
             console.error("Error fetching data:", error);
         }
     };
@@ -99,7 +113,17 @@ const Calendar = ({full}) => {
             axios.post(`http://localhost:5155/order/enroll/${id}`);
 
         } catch (error) {
-            // Handle errors, e.g., show an error message
+            if (!toast.isActive(error.message)) {
+                toast.error(error.message, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: error.message,
+                });
+            }
             console.error('Error deleting data', error);
         }
     };
@@ -112,7 +136,8 @@ const Calendar = ({full}) => {
     };
 
     const renderDaysOfWeek = () => {
-        const daysOfWeek = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+        //const daysOfWeek = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+        const daysOfWeek = [translations[language]['sun'], translations[language]['mon'], translations[language]['tue'], translations[language]['wed'], translations[language]['thu'], translations[language]['fri'], translations[language]['sat']];
         return daysOfWeek.map((day, index) => (
             <div key={index} className={`dayOfWeek ${theme === 'dark' ? 'dark' : ''}`}>{day}</div>
         ));
@@ -133,7 +158,7 @@ const Calendar = ({full}) => {
                             style={{ color: "gray", backgroundColor: "transparent" }}
                         />
                     </button>
-                    <div className={`currentMonth ${theme === 'dark' ? 'dark' : ''}`}>{currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
+                    <div className={`currentMonth ${theme === 'dark' ? 'dark' : ''}`}>{currentMonth.toLocaleString(language, { month: 'long', year: 'numeric' })}</div>
                     <button className="monthButton" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}>
                         <FontAwesomeIcon
                             icon={faChevronCircleRight}
@@ -172,12 +197,12 @@ const Calendar = ({full}) => {
                             <div key={index} className="appointmentContainer">
                                 <div className={`appointment ${theme === 'dark' ? 'dark' : ''}`}>
                                     <div className="appointment-details">
-                                        <div style={theme === 'dark' ? { color: "white"} : ''}>Название: <strong>{appointment.serviceTypeName}</strong> </div>
-                                        <div style={theme === 'dark' ? { color: "white"} : ''}>Время начала: <strong>{formatTime(appointment.starDate)}</strong></div>
-                                        <div style={theme === 'dark' ? { color: "white"} : ''}>Продолжительность: <strong>{formatTime(appointment.duration)}</strong></div>
-                                        <div style={theme === 'dark' ? { color: "white"} : ''}>Стоимость: <strong>{appointment.price} byn</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white"} : {}}>{translations[language]['Name']}: <strong>{appointment.serviceTypeName}</strong> </div>
+                                        <div style={theme === 'dark' ? { color: "white"} : {}}>{translations[language]['StartTime']}: <strong>{formatTime(appointment.starDate)}</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white"} : {}}>{translations[language]['Duration']}: <strong>{formatTime(appointment.duration)}</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white"} : {}}>{translations[language]['Cost']}: <strong>{appointment.price} byn</strong></div>
                                     </div>
-                                    <button style={{ backgroundColor: "transparent" }} onClick={()=>enrollButtonClick(appointment.id)}>Записаться</button>
+                                    <button style={{ backgroundColor: "transparent" }} onClick={()=>enrollButtonClick(appointment.id)}>{translations[language]['MakeAnAppointment']}</button>
                                 </div>
                             </div>
                         ))}

@@ -14,22 +14,77 @@ import CategoryPage from "./pages/CategoryPage";
 import OrdersPage from "./pages/OrdersPage";
 import ReviewsPage from "./pages/ReviewsPage";
 import Test from "./pages/Test";
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { ThemeProvider } from './components/ThemeProvider';
 import {ThemeContext} from "./components/ThemeContext";
+import { LanguageContext } from './components/LanguageContext';
+import translationEN from './locales/translationEn.json';
+import translationRU from './locales/translationRu.json';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const translations = {
+    en: translationEN,
+    ru: translationRU
+};
+
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null, errorInfo: null };
+    }
+
+    static getDerivedStateFromError(error) {
+        return { hasError: true };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.log(error, errorInfo);
+        this.setState({
+            error: error,
+            errorInfo: errorInfo
+        });
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+                    <h1>Что-то пошло не так.</h1>
+                    <details style={{ whiteSpace: 'pre-wrap' }}>
+                        {this.state.error && this.state.error.toString()}
+                        <br />
+                        {this.state.errorInfo.componentStack}
+                    </details>
+                    <button onClick={() => window.location.href = '/'}>Перейти на главную</button>
+                </div>
+            );
+        }
+
+        return this.props.children;
+    }
+}
 
 
 function App() {
-  return (
-      <ThemeProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </ThemeProvider>
-  );
+    const [language, setLanguage] = useState('en');
+
+    return (
+        <LanguageContext.Provider value={{ language, setLanguage, translations }}>
+            <ThemeProvider>
+                <Router>
+                    <ErrorBoundary>
+                        <AppContent />
+                    </ErrorBoundary>
+                    <ToastContainer />
+                </Router>
+            </ThemeProvider>
+        </LanguageContext.Provider>
+    );
 }
+
 
 function AppContent() {
   const { theme } = useContext(ThemeContext);

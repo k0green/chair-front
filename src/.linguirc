@@ -1,0 +1,7 @@
+{
+  "locales": ["en", "ru"],
+  "sourceLocale": "en",
+  "format": "po",
+  "srcPathDirs": ["src"],
+  "srcPathIgnorePatterns": ["**/node_modules/**"]
+}

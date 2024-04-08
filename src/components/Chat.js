@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Cookies from "js-cookie";
 import axios from "axios";
 import {ThemeContext} from "./ThemeContext";
+import {toast} from "react-toastify";
 
 function ChatList() {
     const navigate = useNavigate();
@@ -47,6 +48,17 @@ function ChatList() {
                 })
                 .catch(error => {
                     if (error.response) {
+                        if (!toast.isActive(error.message)) {
+                            toast.error(error.message, {
+                                position: "top-center",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                toastId: error.message,
+                            });
+                        }
                         // Ошибка пришла с сервера (код ответа не 2xx)
                         if (error.response.status === 401) {
                             navigate("/login");

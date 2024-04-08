@@ -10,21 +10,12 @@ const ExecutorServiceCard = ({ id, name, collection, image, likeAmount, descript
     const handleItemClick = () => {
         //navigate(/item/${id});
     };
-    /*    const handleUserButtonClick = () => {
-            navigate(/user/${id});
-        };
-        const handleThemeButtonClick = () => {
-            navigate(/collection/category/${id});
-        };*/
 
     return (
         <button className="item-card" onClick={handleItemClick}>
-            {/*<button className="category" onClick={handleThemeButtonClick}>{theme}</button>*/}
-            {/*<img src={} className="item-image" />*/}
             <div className="down-show">
                 <div className="item-name">{name}</div>
                 <div className="item-count">{likeAmount} <FontAwesomeIcon icon={faStar} className = 'item-icon'/></div>
-                {/*<button className="user" onClick={handleUserButtonClick}>{user}</button>*/}
             </div>
             <div className="collection">{collection}</div>
             <div className="description">{description}</div>
