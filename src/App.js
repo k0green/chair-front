@@ -5,6 +5,7 @@ import Calendar from "./pages/Calendar";
 import CalendarEdit from "./pages/CalendarEdit";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import EditUser from "./pages/EditUser";
 import Chat from "./pages/ChatPage";
 import Messages from "./pages/MessagesPage";
 import Profile from "./pages/ProfilePage";
@@ -101,6 +102,7 @@ function AppContent() {
             <Route path="/calendar/full/edit" element={<CalendarEdit full={true}/>}/>
             <Route path="/login" element={<Login/>}/>
             <Route path="/register" element={<Register/>}/>
+            <Route path="/edit-user" element={<EditUser/>}/>
             <Route path="/chats" element={<Chat/>}/>
             <Route path="/profile/:id" element={<Profile/>}/>
             <Route path="/profile" element={<Profile/>}/>

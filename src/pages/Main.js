@@ -1,10 +1,10 @@
 import React, {useContext, useEffect, useState} from "react";
-import { ThemeContext } from "../components/ThemeContext";
+import {ThemeContext} from "../components/ThemeContext";
 import "../styles/Main.css";
 import Icon from '../components/Categories';
 import ServiceList from '../components/ServiceList';
 import axios from "axios";
-import DatePicker from 'react-datepicker';
+import DatePicker, {registerLocale} from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
 import {isSameDay} from "date-fns";
 import PhotoList from "../components/PhotoList";
@@ -12,9 +12,12 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBoltLightning, faClock, faHouse, faPencil, faStar, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
+import {LanguageContext} from "../components/LanguageContext";
+import ru from "date-fns/locale/ru";
+import en from "date-fns/locale/en-US";
 
-const HomePage = ({ user, onLogout }) => {
-    const { theme } = useContext(ThemeContext);
+const HomePage = ({user, onLogout}) => {
+    const {theme} = useContext(ThemeContext);
     const navigate = useNavigate();
     //const { theme } = true;
 
@@ -45,27 +48,25 @@ const HomePage = ({ user, onLogout }) => {
     const [ratingToValue, setRatingToValue] = useState('');
     const [durationFromValue, setDurationFromValue] = useState('');
     const [durationToValue, setDurationToValue] = useState('');
-// Add state variables for sort arrows
     const [executorNameSort, setExecutorNameSort] = useState(null);
     const [priceSort, setPriceSort] = useState(null);
     const [availableSlotsSort, setAvailableSlotsSort] = useState(null);
     const [ratingSort, setRatingSort] = useState(null);
     const [durationSort, setDurationSort] = useState(null);
     const [oprData, setOprData] = useState(null);
-
+    const {language, translations} = useContext(LanguageContext);
+    registerLocale("ru", ru);
+    registerLocale("en", en);
 
     const isDateSelected = (date) => {
-        // Проверяем, выбран ли день
         return selectedDates.some((selectedDate) =>
             isSameDay(selectedDate, date)
         );
     };
 
     const handleDateChange = (date) => {
-        // Convert the selected date to UTC to avoid time zone issues
         const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 
-        // If the day is already selected, remove it; otherwise, add it to the list
         if (isDateSelected(utcDate)) {
             const updatedDates = selectedDates.filter(
                 (selectedDate) => !isSameDay(selectedDate, utcDate)
@@ -86,7 +87,7 @@ const HomePage = ({ user, onLogout }) => {
 
 
     const handleAddTimeRange = () => {
-        setTimeRanges((prevRanges) => [...prevRanges, { startTime: null, endTime: null }]);
+        setTimeRanges((prevRanges) => [...prevRanges, {startTime: null, endTime: null}]);
     };
 
 
@@ -108,7 +109,7 @@ const HomePage = ({ user, onLogout }) => {
 
     const handleResetFilters = () => {
         setSelectedDates([]);
-        setTimeRanges([{ startTime: null, endTime: null }]);
+        setTimeRanges([{startTime: null, endTime: null}]);
     };
 
     const handleOPRClick = () => {
@@ -141,14 +142,13 @@ const HomePage = ({ user, onLogout }) => {
     const handleOptimizeServiceClick = () => {
         // Prepare the request body
         const requestBody = {
-            filterModel: {
-            },
+            filterModel: {},
             serviceTypeId: selectedServiceType,
             conditions: [
-                { column: 1, value: freeSlots, lambda: 0.4 },
-                { column: 2, value: priceSwitch, lambda: 0.2 },
-                { column: 3, value: ratingSwitch, lambda: 0.3 },
-                { column: 4, value: durationSwitch, lambda: 0.1 },
+                {column: 1, value: freeSlots, lambda: 0.4},
+                {column: 2, value: priceSwitch, lambda: 0.2},
+                {column: 3, value: ratingSwitch, lambda: 0.3},
+                {column: 4, value: durationSwitch, lambda: 0.1},
             ],
         };
 
@@ -156,15 +156,15 @@ const HomePage = ({ user, onLogout }) => {
         axios.post('http://localhost:5155/executor-service/optimize-service', requestBody)
             .then(response => {
                 const newServicesData = {
-                        id: response.data.id,
-                        name: response.data.executorName,
-                        description: response.data.description,
-                        price: response.data.price,
-                        availableSlots: response.data.availableSlots,
-                        duration: formatTime(response.data.duration),
-                        rating: response.data.rating,
-                        address: response.data.address,
-                        executorId: response.data.executorId,
+                    id: response.data.id,
+                    name: response.data.executorName,
+                    description: response.data.description,
+                    price: response.data.price,
+                    availableSlots: response.data.availableSlots,
+                    duration: formatTime(response.data.duration),
+                    rating: response.data.rating,
+                    address: response.data.address,
+                    executorId: response.data.executorId,
                     photos: response.data.photos.length > 0 ? response.data.photos.map(photo => ({
                         id: photo.id,
                         url: photo.url,
@@ -181,19 +181,19 @@ const HomePage = ({ user, onLogout }) => {
             });
 
 
-/*        setTimeout(() => {
-            setOptimizeServiceModal(true);
-            setShowOprResModal(true);
-        }, 300000);*/
+        /*        setTimeout(() => {
+                    setOptimizeServiceModal(true);
+                    setShowOprResModal(true);
+                }, 300000);*/
         setOptimizeServiceModal(true);
-        if(oprData)
+        if (oprData)
             setShowOprResModal(true);
     };
 
     const handleSortClick = (field, direction) => {
         // Update the sort direction for the selected field
         setSortOptions((prevSortOptions) => {
-            const newSortOptions = { ...prevSortOptions, [field]: direction };
+            const newSortOptions = {...prevSortOptions, [field]: direction};
             // Check if both arrows should be deactivated on the third click
             const clickCount = Object.values(newSortOptions).filter((value) => value !== null).length;
             if (clickCount >= 5000) {
@@ -243,8 +243,7 @@ const HomePage = ({ user, onLogout }) => {
 
     useEffect(() => {
         // Выполнение запроса при монтировании компонента
-        axios.get('http://localhost:5155/service-types/get-all', {
-        })
+        axios.get('http://localhost:5155/service-types/get-all', {})
             .then(response => {
                 setCategories(response.data);  // Обновление состояния с данными с сервера
             })
@@ -364,80 +363,80 @@ const HomePage = ({ user, onLogout }) => {
         setRatingSort(sortOptions.rating);
         setDurationSort(sortOptions.duration);
 
-            const filters = [];
+        const filters = [];
 
-            if (masterNameValue) {
-                const nameFilter = {
-                    logic: "and",
-                    filters: [],
-                };
+        if (masterNameValue) {
+            const nameFilter = {
+                logic: "and",
+                filters: [],
+            };
 
-                    nameFilter.filters.push({
-                        field: "executorName",
-                        value: '"'+masterNameValue+'"',
-                        operator: "contains",
-                    });
+            nameFilter.filters.push({
+                field: "executorName",
+                value: '"' + masterNameValue + '"',
+                operator: "contains",
+            });
 
-                filters.push(nameFilter);
-            }
+            filters.push(nameFilter);
+        }
 
-            if (priceFromValue || priceToValue) {
-                const priceFilter = {
-                    logic: "and",
-                    filters: [],
-                };
+        if (priceFromValue || priceToValue) {
+            const priceFilter = {
+                logic: "and",
+                filters: [],
+            };
 
-                if (priceFromValue) {
-                    priceFilter.filters.push({
-                        field: "price",
-                        value: priceFromValue,
-                        operator: ">=",
-                    });
-                }
-
-                if (priceToValue) {
-                    priceFilter.filters.push({
-                        field: "price",
-                        value: priceToValue,
-                        operator: "<=",
-                    });
-                }
-
-                filters.push(priceFilter);
-            }
-
-            if (ratingFromValue || ratingToValue) {
-                const ratingFilter = {
-                    logic: "and",
-                    filters: [],
-                };
-
-                if (ratingFromValue) {
-                    ratingFilter.filters.push({
-                        field: "rating",
-                        value: ratingFromValue,
-                        operator: ">=",
-                    });
-                }
-
-                if (ratingToValue) {
-                    ratingFilter.filters.push({
-                        field: "rating",
-                        value: ratingToValue,
-                        operator: "<=",
-                    });
-                }
-
-                filters.push(ratingFilter);
-            }
-
-/*            if (durationFromValue) {
-                filters.push({
-                    field: "duration",
-                    value: durationValue,
-                    operator: "contains",
+            if (priceFromValue) {
+                priceFilter.filters.push({
+                    field: "price",
+                    value: priceFromValue,
+                    operator: ">=",
                 });
-            }*/
+            }
+
+            if (priceToValue) {
+                priceFilter.filters.push({
+                    field: "price",
+                    value: priceToValue,
+                    operator: "<=",
+                });
+            }
+
+            filters.push(priceFilter);
+        }
+
+        if (ratingFromValue || ratingToValue) {
+            const ratingFilter = {
+                logic: "and",
+                filters: [],
+            };
+
+            if (ratingFromValue) {
+                ratingFilter.filters.push({
+                    field: "rating",
+                    value: ratingFromValue,
+                    operator: ">=",
+                });
+            }
+
+            if (ratingToValue) {
+                ratingFilter.filters.push({
+                    field: "rating",
+                    value: ratingToValue,
+                    operator: "<=",
+                });
+            }
+
+            filters.push(ratingFilter);
+        }
+
+        /*            if (durationFromValue) {
+                        filters.push({
+                            field: "duration",
+                            value: durationValue,
+                            operator: "contains",
+                        });
+                    }*/
 
         if (durationFromValue || durationToValue) {
             const durationFilter = {
@@ -464,78 +463,78 @@ const HomePage = ({ user, onLogout }) => {
             filters.push(durationFilter);
         }
 
-            const filter = filters.length > 1 ? { logic: "and", filters } : filters[0];
+        const filter = filters.length > 1 ? {logic: "and", filters} : filters[0];
 
-            // Rest of your code remains the same
+        // Rest of your code remains the same
 
-            const sort = Object.entries(sortOptions)
-                .filter(([key, value]) => value !== null)
-                .map(([key, value]) => ({
-                    field: key,
-                    direction: value,
+        const sort = Object.entries(sortOptions)
+            .filter(([key, value]) => value !== null)
+            .map(([key, value]) => ({
+                field: key,
+                direction: value,
+            }));
+
+        const requestBody = {
+            filter: {
+                skip: 0,
+                take: 10,
+                sort,
+                filter,
+            },
+            dates: selectedDates,
+            times: timeRanges.map((timeRange) => ({
+                startTime: timeRange.startTime ? new Date(`2023-11-02T${timeRange.startTime}:00.000Z`).toISOString() : null,
+                endTime: timeRange.endTime ? new Date(`2023-11-02T${timeRange.endTime}:00.000Z`).toISOString() : null,
+            })),
+        };
+
+        axios.post('http://localhost:5155/executor-service/all', requestBody)
+            .then(response => {
+                // Преобразование данных с сервера в необходимый формат
+                const newServicesData = response.data.map(serviceType => ({
+                    id: serviceType.id,
+                    name: serviceType.serviceTypeName,
+                    masters: serviceType.services.map(service => ({
+                        id: service.id,
+                        name: service.executorName,
+                        description: service.description,
+                        price: service.price,
+                        availableSlots: service.availableSlots,
+                        duration: formatTime(service.duration),
+                        rating: service.rating,
+                        address: service.address,
+                        executorId: service.executorId,
+                        //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
+                        photos: service.photos.length > 0 ? service.photos.map(photo => ({
+                            id: photo.id,
+                            url: photo.url,
+                        })) : [{
+                            id: 'default',
+                            url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+                        }],
+                        /*photos: [{ id: service.photos.id, url: 'https://www.desktopbackground.org/download/o/2014/07/09/790888_chrome-set-as-wallpapers-wallpapers-zone_7539x5031_h.jpg' }, { id: 2, url: 'path/to/photo2.jpg' },
+                            { id: 3, url: 'http://priroda.club/uploads/posts/2022-07/1658478016_13-priroda-club-p-krasivie-prirodnie-peizazhi-priroda-krasiv-13.jpg' }, { id: 4, url: 'path/to/photo4.jpg' },
+                            { id: 5, url: 'https://gas-kvas.com/uploads/posts/2023-02/1675444651_gas-kvas-com-p-fonovii-risunok-rabochego-priroda-10.jpg' }, { id: 6, url: 'path/to/photo6.jpg' }],*/
+                    })),
                 }));
 
-            const requestBody = {
-                filter: {
-                    skip: 0,
-                    take: 10,
-                    sort,
-                    filter,
-                },
-                dates: selectedDates,
-                times: timeRanges.map((timeRange) => ({
-                    startTime: timeRange.startTime ? new Date(`2023-11-02T${timeRange.startTime}:00.000Z`).toISOString() : null,
-                    endTime: timeRange.endTime ? new Date(`2023-11-02T${timeRange.endTime}:00.000Z`).toISOString() : null,
-                })),
-            };
-
-            axios.post('http://localhost:5155/executor-service/all', requestBody)
-                .then(response => {
-                    // Преобразование данных с сервера в необходимый формат
-                    const newServicesData = response.data.map(serviceType => ({
-                        id: serviceType.id,
-                        name: serviceType.serviceTypeName,
-                        masters: serviceType.services.map(service => ({
-                            id: service.id,
-                            name: service.executorName,
-                            description: service.description,
-                            price: service.price,
-                            availableSlots: service.availableSlots,
-                            duration: formatTime(service.duration),
-                            rating: service.rating,
-                            address: service.address,
-                            executorId: service.executorId,
-                            //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
-                            photos: service.photos.length > 0 ? service.photos.map(photo => ({
-                                id: photo.id,
-                                url: photo.url,
-                            })) : [{
-                                id: 'default',
-                                url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
-                            }],
-                            /*photos: [{ id: service.photos.id, url: 'https://www.desktopbackground.org/download/o/2014/07/09/790888_chrome-set-as-wallpapers-wallpapers-zone_7539x5031_h.jpg' }, { id: 2, url: 'path/to/photo2.jpg' },
-                                { id: 3, url: 'http://priroda.club/uploads/posts/2022-07/1658478016_13-priroda-club-p-krasivie-prirodnie-peizazhi-priroda-krasiv-13.jpg' }, { id: 4, url: 'path/to/photo4.jpg' },
-                                { id: 5, url: 'https://gas-kvas.com/uploads/posts/2023-02/1675444651_gas-kvas-com-p-fonovii-risunok-rabochego-priroda-10.jpg' }, { id: 6, url: 'path/to/photo6.jpg' }],*/
-                        })),
-                    }));
-
-                    // Обновление состояния с новыми данными
-                    setServicesData(newServicesData);
-                })
-                .catch(error => {
-                    if (!toast.isActive(error.message)) {
-                        toast.error(error.message, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: error.message,
-                        });
-                    }
-                    console.error('Error fetching data:', error);
-                });
+                // Обновление состояния с новыми данными
+                setServicesData(newServicesData);
+            })
+            .catch(error => {
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
+                console.error('Error fetching data:', error);
+            });
 
         // Close the filter modal after applying filters
         setShowFilterModal(false);
@@ -550,7 +549,7 @@ const HomePage = ({ user, onLogout }) => {
         setRatingFromValue(null);
         setRatingToValue(null);
         setDurationFromValue(null);
-        setDurationToValue( null);
+        setDurationToValue(null);
 
         setExecutorNameSort(null);
         setPriceSort(null);
@@ -560,24 +559,43 @@ const HomePage = ({ user, onLogout }) => {
     };
 
     const renderToggle = (field, checked, onChange) => (
-        <div className="toggle-container">
-            <span className="toggle-label">{field}</span>
-            <label>Min</label>
-            <label className="toggle-switch">
-                <input type="checkbox" checked={checked} onChange={onChange} />
-                <span className="toggle-slider"></span>
-            </label>
-            <label>Max</label>
+        <div style={{justifyContent: "space-between", display: "flex"}}>
+            <div>
+                <span className={`toggle-label ${theme === 'dark' ? 'dark' : ''}`}>{field}</span>
+
+            </div>
+            <div>
+                <label style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['Min']}</label>
+                <label className="toggle-switch">
+                    <input type="checkbox" checked={checked} onChange={onChange}/>
+                    <span className="toggle-slider"></span>
+                </label>
+                <label style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['Max']}</label>
+            </div>
         </div>
     );
 
     const handleOrderClick = (executorServiceId) => {
-        navigate("/calendar/"+ executorServiceId);
+        navigate("/calendar/" + executorServiceId);
     };
 
     let handleMasterNameClickClick = (masterId) => {
         navigate("/profile/" + masterId);
     };
+
+    const SortArrow = ({theme, sortOptions, field, handleSortClick, handleCancelSortClick}) => {
+        const isActive = sortOptions[field];
+        const style = theme === 'dark' ? {color: "white"} : {};
+        return (
+            <div className="sort-arrows">
+                <span style={style} className={`arrow ${isActive === 'asc' ? 'active' : ''}`}
+                      onClick={() => handleSortClick(field, 'asc')}>&#8593;</span>
+                <span style={style} className={`arrow ${isActive === 'desc' ? 'active' : ''}`}
+                      onClick={() => handleSortClick(field, 'desc')}>&#8595;</span>
+                <span style={style} onClick={() => handleCancelSortClick(field)}>&#215;</span>
+            </div>
+        );
+    }
 
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
@@ -587,16 +605,16 @@ const HomePage = ({ user, onLogout }) => {
             <div>
                 <div className="parent-container">
                     <button className="filter-button" onClick={handleOPRClick}>
-                        Найти наилучший вариант
+                        {translations[language]['FindTheBestOption']}
                     </button>
                     <button className="filter-button" onClick={handlePeriodClick}>
-                        Подбор по датам
+                        {translations[language]['SelectionByDates']}
                     </button>
                     <button className="filter-button" onClick={handleFilterClick}>
-                        Filter
+                        {translations[language]['Filter']}
                     </button>
                 </div>
-                <ServiceList services={servicesData} />
+                <ServiceList services={servicesData}/>
             </div>
             {showFilterModal && (
                 <div className={`filter-modal ${theme === 'dark' ? 'dark' : ''}`}>
@@ -604,190 +622,179 @@ const HomePage = ({ user, onLogout }) => {
             <span className="close" onClick={handleModalClose}>
               &times;
             </span>
-                        <h2>Filter</h2>
-                        <div>
-                            <label htmlFor="masterName">Master Name:</label>
-                            <input defaultValue={masterNameValue} style={{width: '45%'}} type="text" className="custom-input" id="masterName" placeholder="Enter master name" />
-                        </div>
-                        <div>
-                            <label htmlFor="priceFrom">Price Range:</label>
-                            <input defaultValue={priceFromValue} style={{width: '15%'}} type="number" id="priceFrom" placeholder="From" />
-                            <label> - </label>
-                            <input defaultValue={priceToValue} style={{width: '15%'}} type="number" id="priceTo" placeholder="To" />
-                        </div>
-                        <div>
-                            <label htmlFor="rating">Rating:</label>
-                            <input
-                                defaultValue={ratingFromValue}
-                                type="number"
-                                id="ratingFrom"
-                                min="0"
-                                max="5"
-                                style={{width: '10%'}}
-                            />
-                            <label> - </label>
-                            <input
-                                defaultValue={ratingToValue}
-                                type="number"
-                                id="ratingTo"
-                                min="0"
-                                max="5"
-                                className="custom-input"
-                                style={{width: '10%'}}
-                            />
-                        </div>
-                            <div>
-                                <label htmlFor="durationFrom">Duration:</label>
-                                <input defaultValue={durationFromValue} style={{width: '15%'}} type="time" id="durationFrom" placeholder="Enter duration" />
-                        <label>-</label>
-                                <input defaultValue={durationToValue} style={{width: '15%'}} type="time" id="durationTo" placeholder="Enter duration" />
+                        <div style={{justifyContent: "space-between", display: "flex"}}>
+                            <div style={{maxWidth: "48%"}}>
+                                <h2 className="dropzone-centrize"
+                                    style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['Filter']}</h2>
+                                <div style={{justifyContent: "space-between", display: "flex", marginTop: "5px"}}>
+                                    <label style={theme === 'dark' ? {color: "white"} : {}}
+                                           htmlFor="durationFrom">{translations[language]['Duration']}:</label>
+                                    <div>
+                                        <input defaultValue={durationFromValue} style={{width: 'auto'}} type="time"
+                                               id="durationFrom" placeholder="Enter duration"
+                                               className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                        />
+                                        <label style={theme === 'dark' ? {color: "white"} : {}}> - </label>
+                                        <input defaultValue={durationToValue} style={{width: 'auto'}} type="time"
+                                               id="durationTo"
+                                               placeholder="Enter duration"
+                                               className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{justifyContent: "space-between", display: "flex", marginTop: "5px"}}>
+                                    <label style={theme === 'dark' ? {color: "white"} : {}} htmlFor="priceFrom">{translations[language]['Cost']}:</label>
+                                    <div>
+                                        <input defaultValue={priceFromValue} style={{width: '8ch'}} type="number"
+                                               id="priceFrom"
+                                               placeholder={translations[language]['From']}
+                                               className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                        />
+                                        <label style={theme === 'dark' ? {color: "white"} : {}}> - </label>
+                                        <input defaultValue={priceToValue} style={{width: '8ch'}} type="number"
+                                               id="priceTo"
+                                               placeholder={translations[language]['To']}
+                                               className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{justifyContent: "space-between", display: "flex", marginTop: "5px"}}>
+                                    <label style={theme === 'dark' ? {color: "white"} : {}} htmlFor="masterName">{translations[language]['MasterName']}:</label>
+                                    <input defaultValue={masterNameValue} style={{width: '45%'}}
+                                           className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                           id="masterName" placeholder={translations[language]['EnterMasterName']}/>
+                                </div>
+                                <div style={{justifyContent: "space-between", display: "flex", marginTop: "5px"}}>
+                                    <label style={theme === 'dark' ? {color: "white"} : {}}
+                                           htmlFor="rating">{translations[language]['Rating']}:</label>
+                                    <div>
+                                        <input
+                                            defaultValue={ratingFromValue}
+                                            type="number"
+                                            id="ratingFrom"
+                                            min="0"
+                                            max="5"
+                                            style={{width: "4ch"}}
+                                            className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                        />
+                                        <label style={theme === 'dark' ? {color: "white"} : {}}> - </label>
+                                        <input
+                                            defaultValue={ratingToValue}
+                                            type="number"
+                                            id="ratingTo"
+                                            min="0"
+                                            max="5"
+                                            className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                            style={{width: "4ch"}}
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                        <h3>Sort By:</h3>
-                        <div>
-                            <label>Name:</label>
-                            <div className="sort-arrows">
-                        <span
-                            className={`arrow ${sortOptions.executorName === 'asc' ? 'active' : ''}`}
-                            onClick={() => handleSortClick('executorName', 'asc')}
-                        >
-                            &#8593;
-                        </span>
-                                <span
-                                    className={`arrow ${sortOptions.executorName === 'desc' ? 'active' : ''}`}
-                                    onClick={() => handleSortClick('executorName', 'desc')}
-                                >
-                            &#8595;
-                        </span>
-                                <span
-                                    onClick={() => handleCancelSortClick('executorName')}
-                                >
-                            &#215;
-                        </span>
-                            </div>
-                        </div>
-                        <div>
-
-                            <label>Price:</label>
-                            <div className="sort-arrows">
-                        <span
-                            className={`arrow ${sortOptions.price === 'asc' ? 'active' : ''}`}
-                            onClick={() => handleSortClick('price', 'asc')}
-                        >
-                            &#8593;
-                        </span>
-                                <span
-                                    className={`arrow ${sortOptions.price === 'desc' ? 'active' : ''}`}
-                                    onClick={() => handleSortClick('price', 'desc')}
-                                >
-                            &#8595;
-                        </span>
-                                <span
-                                    onClick={() => handleCancelSortClick('price')}
-                                >
-                            &#215;
-                        </span>
-                            </div>
-                        </div>
-                        <div>
-
-                            <label>Available Slots:</label>
-                            <div className="sort-arrows">
-                        <span
-                            className={`arrow ${sortOptions.availableSlots === 'asc' ? 'active' : ''}`}
-                            onClick={() => handleSortClick('availableSlots', 'asc')}
-                        >
-                            &#8593;
-                        </span>
-                                <span
-                                    className={`arrow ${sortOptions.availableSlots === 'desc' ? 'active' : ''}`}
-                                    onClick={() => handleSortClick('availableSlots', 'desc')}
-                                >
-                            &#8595;
-                        </span>
-                                <span
-                                    onClick={() => handleCancelSortClick('availableSlots')}
-                                >
-                            &#215;
-                        </span>
-                            </div>
-                        </div>
-                        <div>
-                            <label>Rating:</label>
-                            <div className="sort-arrows">
-                        <span
-                            className={`arrow ${sortOptions.rating === 'asc' ? 'active' : ''}`}
-                            onClick={() => handleSortClick('rating', 'asc')}
-                        >
-                            &#8593;
-                        </span>
-                                <span
-                                    className={`arrow ${sortOptions.rating === 'desc' ? 'active' : ''}`}
-                                    onClick={() => handleSortClick('rating', 'desc')}
-                                >
-                            &#8595;
-                        </span>
-                                <span
-                                    onClick={() => handleCancelSortClick('rating')}
-                                >
-                            &#215;
-                        </span>
-                            </div>
-                        </div>
-                        <div>
-                            <label>Duration:</label>
-                            <div className="sort-arrows">
-                        <span
-                            className={`arrow ${sortOptions.duration === 'asc' ? 'active' : ''}`}
-                            onClick={() => handleSortClick('duration', 'asc')}
-                        >
-                            &#8593;
-                        </span>
-                                <span
-                                    className={`arrow ${sortOptions.duration === 'desc' ? 'active' : ''}`}
-                                    onClick={() => handleSortClick('duration', 'desc')}
-                                >
-                            &#8595;
-                        </span>
-                                <span
-                                    onClick={() => handleCancelSortClick('duration')}
-                                >
-                            &#215;
-                        </span>
+                            <div style={{maxWidth: "50%", minWidth: "48%"}}>
+                                <h3 className="dropzone-centrize" style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['SortBy']}:</h3>
+                                <div>
+                                    <div style={{justifyContent: "space-between", display: "flex"}}>
+                                        <div>
+                                            <label
+                                                style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['Name']}:</label>
+                                        </div>
+                                        <div>
+                                            <SortArrow theme={theme} sortOptions={sortOptions} field='executorName'
+                                                       handleSortClick={handleSortClick}
+                                                       handleCancelSortClick={handleCancelSortClick}/>
+                                        </div>
+                                    </div>
+                                    <div style={{justifyContent: "space-between", display: "flex"}}>
+                                        <div>
+                                            <label
+                                                style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['Cost']}:</label>
+                                        </div>
+                                        <div>
+                                            <SortArrow theme={theme} sortOptions={sortOptions} field='price'
+                                                       handleSortClick={handleSortClick}
+                                                       handleCancelSortClick={handleCancelSortClick}/>
+                                        </div>
+                                    </div>
+                                    <div style={{justifyContent: "space-between", display: "flex"}}>
+                                        <div>
+                                            <label
+                                                style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['AvailableSlots']}:</label>
+                                        </div>
+                                        <div>
+                                            <SortArrow theme={theme} sortOptions={sortOptions} field='availableSlots'
+                                                       handleSortClick={handleSortClick}
+                                                       handleCancelSortClick={handleCancelSortClick}/>
+                                        </div>
+                                    </div>
+                                    <div style={{justifyContent: "space-between", display: "flex"}}>
+                                        <div>
+                                            <label
+                                                style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['Rating']}:</label>
+                                        </div>
+                                        <div>
+                                            <SortArrow theme={theme} sortOptions={sortOptions} field='rating'
+                                                       handleSortClick={handleSortClick}
+                                                       handleCancelSortClick={handleCancelSortClick}/>
+                                        </div>
+                                    </div>
+                                    <div style={{justifyContent: "space-between", display: "flex"}}>
+                                        <div>
+                                            <label
+                                                style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['Duration']}:</label>
+                                        </div>
+                                        <div>
+                                            <SortArrow theme={theme} sortOptions={sortOptions} field='duration'
+                                                       handleSortClick={handleSortClick}
+                                                       handleCancelSortClick={handleCancelSortClick}/>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                            <button onClick={handleFilterClear}>Clear</button>
-                            <button onClick={handleFilterApply}>Apply Filters</button>
+                        <div className="dropzone-centrize">
+                            <button className="filter-button" onClick={handleFilterClear}>{translations[language]['Clear']}</button>
+                            <button className="filter-button" onClick={handleFilterApply}>{translations[language]['ApplyFilters']}</button>
                         </div>
+                    </div>
                 </div>
             )}
             {optimizeServiceModal && (
                 <div className={`filter-modal ${theme === 'dark' ? 'dark' : ''}`}>
-                    <div className={`modal-content ${theme === 'dark' ? 'dark' : ''}`}>
+                    <div className={`modal-content-optimal ${theme === 'dark' ? 'dark' : ''}`}>
                         <span className="close" onClick={() => setOptimizeServiceModal(false)}>
                             &times;
                         </span>
-                        <h2>Optimize Service</h2>
                         <div>
-                            <label htmlFor="serviceType">Service Type:</label>
-                            <select id="serviceType" onChange={handleServiceTypeChange} value={selectedServiceType}>
-                                {categories.map(category => (
-                                        <option key={category.id} value={category.id}>{category.name}</option>
-                                ))}
-                            </select>
+                            <div className="dropzone-centrize">
+                                <h2 style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['OptimizeService']}</h2>
+                                <div>
+                                    <label style={theme === 'dark' ? {color: "white"} : {}}
+                                           htmlFor="serviceType">{translations[language]['ServiceType']}:</label>
+                                    <select id="serviceType" className={`select ${theme === 'dark' ? 'dark' : ''}`}
+                                            onChange={handleServiceTypeChange} value={selectedServiceType}>
+                                        {categories.map(category => (
+                                            <option key={category.id} value={category.id}>{category.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                {renderToggle(translations[language]['AvailableSlots'], freeSlots, () => handleSwitchChange('freeSlots'))}
+                            </div>
+                            <div>
+                                {renderToggle(translations[language]['Cost'], priceSwitch, () => handleSwitchChange('price'))}
+                            </div>
+                            <div>
+                                {renderToggle(translations[language]['Rating'], ratingSwitch, () => handleSwitchChange('rating'))}
+                            </div>
+                            <div>
+                                {renderToggle(translations[language]['Duration'], durationSwitch, () => handleSwitchChange('Duration'))}
+                            </div>
+                            <div className="dropzone-centrize">
+                                <button className="filter-button"
+                                        onClick={handleOptimizeServiceClick}>{translations[language]['OptimizeService']}</button>
+                            </div>
                         </div>
-                        <div>
-                            {renderToggle('Free Slots', freeSlots, () => handleSwitchChange('freeSlots'))}
-                        </div>
-                        <div>
-                            {renderToggle('Price', priceSwitch, () => handleSwitchChange('price'))}
-                        </div>
-                        <div>
-                            {renderToggle('Rating', ratingSwitch, () => handleSwitchChange('rating'))}
-                        </div>
-                        <div>
-                            {renderToggle('Duration', durationSwitch, () => handleSwitchChange('duration'))}
-                        </div>
-                        <button onClick={handleOptimizeServiceClick}>Optimize Service</button>
                     </div>
                 </div>
             )}
@@ -798,31 +805,33 @@ const HomePage = ({ user, onLogout }) => {
                             &times;
                         </span>
                         <div style={{display: "flex", justifyContent: "center"}}>
-                        <div className="service-card">
-                            <div key={oprData.id} className="master-card">
-                                <div className="photos">
-                                    <PhotoList photos={oprData.photos}/>
-                                </div>
-                                <div className="master-info">
-                                    <h4 onClick={() => handleMasterNameClickClick(oprData.executorId)}>{oprData.name}</h4>
-                                    <h4>{oprData.rating} <FontAwesomeIcon icon={faStar} className = 'item-icon'/></h4>
-                                </div>
-                                <div className="service-description">
-                                    <p>{oprData.description}</p>
-                                    <p><FontAwesomeIcon icon={faHouse} className = 'item-icon'/>{oprData.address}</p>
-                                    <p>Available Slots: {oprData.availableSlots}</p>
-                                </div>
-                                <div className="master-info">
-                                    <h4><FontAwesomeIcon icon={faClock} className = 'item-icon'/> {oprData.duration}</h4>
-                                    <h4>{oprData.price} Byn</h4>
-                                </div>
-                                <div>
-                                        <button className="order-button" onClick={()=>handleOrderClick(oprData.id)}>
-                                            <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} />    Записаться</p>
+                            <div className="service-card">
+                                <div key={oprData.id} className="master-card">
+                                    <div className="photos">
+                                        <PhotoList photos={oprData.photos}/>
+                                    </div>
+                                    <div className="master-info">
+                                        <h4 onClick={() => handleMasterNameClickClick(oprData.executorId)}>{oprData.name}</h4>
+                                        <h4>{oprData.rating} <FontAwesomeIcon icon={faStar} className='item-icon'/></h4>
+                                    </div>
+                                    <div className="service-description">
+                                        <p>{oprData.description}</p>
+                                        <p><FontAwesomeIcon icon={faHouse} className='item-icon'/>{oprData.address}</p>
+                                        <p>Available Slots: {oprData.availableSlots}</p>
+                                    </div>
+                                    <div className="master-info">
+                                        <h4><FontAwesomeIcon icon={faClock} className='item-icon'/> {oprData.duration}
+                                        </h4>
+                                        <h4>{oprData.price} Byn</h4>
+                                    </div>
+                                    <div>
+                                        <button className="order-button" onClick={() => handleOrderClick(oprData.id)}>
+                                            <p className="order-text"><FontAwesomeIcon
+                                                icon={faBoltLightning}/> Записаться</p>
                                         </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         </div>
                     </div>
                 </div>
@@ -833,40 +842,46 @@ const HomePage = ({ user, onLogout }) => {
                         <span className="close" onClick={() => setShowPeriodModal(false)}>
                             &times;
                         </span>
-                        <div>
-                            <DatePicker
-                                selected={null} // Установите выбранную дату в null, чтобы позволить выбирать дни
-                                onChange={handleDateChange}
-                                inline // Рендер календаря всегда видимым
-                                dayClassName={(date) => (isDateSelected(date) ? 'selected' : '')} // Добавляем класс к выделенным дням
-                            />
-                        </div>
-                        {timeRanges.map((timeRange, index) => (
-                            <div key={index}>
-                                <label>Time Range {index + 1}:</label>
-                                <input
-                                    type="time"
-                                    style={{width: '15%'}}
-                                    value={timeRange.startTime || ''}
-                                    onChange={(e) => handleTimeChange(index, 'startTime', e.target.value)}
+                        <div className="dropzone-centrize">
+                            <div>
+                                <DatePicker
+                                    selected={null} // Установите выбранную дату в null, чтобы позволить выбирать дни
+                                    onChange={handleDateChange}
+                                    inline // Рендер календаря всегда видимым
+                                    dayClassName={(date) => (isDateSelected(date) ? 'selected' : '')} // Добавляем класс к выделенным дням
+                                    locale={language}
                                 />
-                                <span> - </span>
-                                <input
-                                    type="time"
-                                    style={{width: '15%'}}
-                                    value={timeRange.endTime || ''}
-                                    onChange={(e) => handleTimeChange(index, 'endTime', e.target.value)}
-                                />
-                                {index > -1 && (
-                                    <button onClick={() => handleRemoveTimeRange(index)}>
-                                        Remove Time Range
-                                    </button>
-                                )}
                             </div>
-                        ))}
-                        <button onClick={handleAddTimeRange}>Add Time Range</button>
-                        <button onClick={handleResetFilters}>Reset Filters</button>
-                        <button onClick={handleFilterApply}>Apply Filters</button>
+                            {timeRanges.map((timeRange, index) => (
+                                <div key={index}>
+                                    <label>Time Range {index + 1}:</label>
+                                    <input
+                                        type="time"
+                                        style={{width: '15%'}}
+                                        value={timeRange.startTime || ''}
+                                        onChange={(e) => handleTimeChange(index, 'startTime', e.target.value)}
+                                    />
+                                    <span> - </span>
+                                    <input
+                                        type="time"
+                                        style={{width: '15%'}}
+                                        value={timeRange.endTime || ''}
+                                        onChange={(e) => handleTimeChange(index, 'endTime', e.target.value)}
+                                    />
+                                    {index > -1 && (
+                                        <button onClick={() => handleRemoveTimeRange(index)}>
+                                            Remove Time Range
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                            <button className="filter-button"
+                                    onClick={handleAddTimeRange}>{translations[language]['AddTimeRange']}</button>
+                            <button className="filter-button"
+                                    onClick={handleResetFilters}>{translations[language]['ResetFilters']}</button>
+                            <button className="filter-button"
+                                    onClick={handleFilterApply}>{translations[language]['ApplyFilters']}</button>
+                        </div>
                     </div>
                 </div>
             )}

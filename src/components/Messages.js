@@ -5,13 +5,22 @@ import {useNavigate, useParams} from "react-router-dom";
 import Cookies from "js-cookie";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
-import {faCancel, faCheckCircle, faEdit, faHandPointer, faPencil, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {
+    faBoltLightning,
+    faCancel,
+    faCheckCircle,
+    faEdit,
+    faHandPointer, faPaperclip,
+    faPencil,
+    faTrash
+} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {FaTrash} from "react-icons/fa";
 import { v4 as uuidv4 } from 'uuid';
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
+import {useDropzone} from "react-dropzone";
 
 const MessageComponent = ({ id, isMessageViewed }) => {
 
@@ -24,6 +33,8 @@ const MessageComponent = ({ id, isMessageViewed }) => {
     const [selectedMessageId, setSelectedMessageId] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const { language, translations } = useContext(LanguageContext);
+    const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
+    const [files, setFiles] = useState([]);
 
 
     const handleSave = () => {
@@ -161,6 +172,7 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                             senderId: message.senderId,
                             isMine: message.senderId === userId,
                             id: message.id,
+                            type: message.type,
                         })),
                     };
 
@@ -408,6 +420,128 @@ const MessageComponent = ({ id, isMessageViewed }) => {
         return `${hours}:${minutes}`;
     };
 
+    const Dropzone = () => {
+        const { getRootProps, getInputProps } = useDropzone({
+            accept: 'image/*',
+            onDrop: acceptedFiles => {
+                setFiles(prev => [...prev, ...acceptedFiles.map(file => Object.assign(file, {
+                    preview: URL.createObjectURL(file)
+                }))]);
+            },
+            multiple: true
+        });
+
+        const images = files.map((file, index) => (
+            <div className="dropzone-centrize" key={file.name}>
+                <img src={file.preview} style={{width: '50%'}} alt="preview" />
+                <button className='trash-icon' onClick={() => {
+                    const newFiles = [...files];
+                    newFiles.splice(index, 1);
+                    setFiles(newFiles);
+                }}><FontAwesomeIcon icon={faTrash} />  Удалить</button>
+            </div>
+        ));
+
+        return (
+            <div className="dropzone-centrize">
+                {images}
+                <div {...getRootProps({style: {border: '2px solid blue', padding: '20px', width: '400px', height: '400px'}})}>
+                    <input {...getInputProps()} />
+                    <p>{translations[language]['DragAndDrop']}</p>
+                </div>
+            </div>
+        );
+    }
+
+    const handleUpload = async () => {
+        for (const file of files) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await axios.post('http://localhost:5155/minio/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            const url = response.data.url;
+
+            /*setEditedPhotos(prevState => [...prevState, ...response.data]);*/
+                const messageId = uuidv4();
+                // Создаем новый объект сообщения с датой и временем и добавляем его в массив messages
+                const newMessageObject = {
+                    id: messageId,
+                    text: url,
+                    isMine: true,
+                    isRead: false,
+                    createdDate: new Date(),
+                    type: 1
+                };
+
+                const messageData = {
+                    id: messageId,
+                    text: url,
+                    isDeleted: false,
+                    isEdited: false,
+                    isRead: false,
+                    chatId: chatData.id,
+                    recipientId: chatData.recipientId,
+                    senderId: chatData.senderId,
+                    type: 1
+                    //"replyId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                };
+
+                // Make a POST request to your server endpoint
+                axios.post('http://localhost:5155/message/add', messageData)
+                    .then(response => {
+                        //navigate("/profile")
+                        handleMarkAsRead()
+                    })
+                    .catch(error => {
+                        // Handle error, e.g., show an error message
+                        console.error('Error saving data:', error);
+                        if (!toast.isActive(error.message)) {
+                            toast.error(error.message, {
+                                position: "top-center",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                toastId: error.message,
+                            });
+                        }
+                    });
+
+                const updatedMessages = messages.map((message) => ({
+                    ...message,
+                    isRead: message.isMine ? message.isRead : true,
+                }));
+
+                setMessages([...updatedMessages, newMessageObject]);
+
+                // Очищаем поле ввода после отправки
+                setNewMessage('');
+
+                setIsBarVisible(false);
+
+                // Прокручиваем элемент пользователя вниз списка сообщений
+                if (userRef.current) {
+                    userRef.current.scrollIntoView({ behavior: 'smooth' });
+                }
+
+                setIsBarVisible(false);
+                down();
+            }
+
+        setFiles([]); // очистите files
+        setUploadPhotoModal(false);
+    };
+
+    const handleAddPhoto = () => {
+        setUploadPhotoModal(true);
+    };
+
     return (
         <div className="chat-container">
             <div className={`message-header ${theme === 'dark' ? 'dark' : ''}`}>
@@ -445,7 +579,19 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                                 className={`message ${message.isMine ? 'mine' : `theirs ${theme === 'dark' ? 'dark' : ''}`} ${selectedMessageId === message.id ? 'selected' : ''}`}
                                 onClick={() => handleMessageClick(message.id)}
                             >
-                                {message.text}
+                                {message.type === 1 ? (
+                                    <img
+                                        src={message.text}
+                                        alt=""
+                                        style={{
+                                            width: '300px',
+                                            height: '300px',
+                                            borderRadius: '15px'
+                                        }}
+                                    />
+                                ) : (
+                                    message.text
+                                )}
                                 <div className={`timestamp ${selectedMessageId === message.id ? 'selected' : ''}`}>
                                     {message.isMine && (
                                         <div className={`circle ${message.isRead ? 'viewed' : 'not-viewed'}`}></div>
@@ -468,6 +614,9 @@ const MessageComponent = ({ id, isMessageViewed }) => {
             </div>*/}
 
             <div className={`message-input-div ${theme === 'dark' ? 'dark' : ''}`}>
+                <button style={{backgroundColor: "transparent", color: "gray", border: "none", scale: "1.5", marginRight: "10px"}} onClick={handleAddPhoto}>
+                    <FontAwesomeIcon icon={faPaperclip} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`} />
+                </button>
                 <textarea
                     id="textarea-message"
                     className={`message-input ${theme === 'dark' ? 'dark' : ''}`}
@@ -480,6 +629,19 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                     {isEditing ? translations[language]['Save'] : translations[language]['Send']}
                 </button>
             </div>
+            {uploadPhotoModal && (
+                <div className="filter-modal">
+                    <div className="modal-content">
+                    <span className="close" onClick={() => setUploadPhotoModal(false)}>
+                        &times;
+                    </span>
+                        <div className="dropzone-centrize">
+                            <Dropzone />
+                            <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p></button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

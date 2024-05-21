@@ -19,6 +19,7 @@
     padding: 5px 10px;
     cursor: pointer;
     border-radius: 5px;
+    margin-top: 5px;
 }
 
 .filter-modal {
@@ -34,15 +35,43 @@
     background-color: rgba(0, 0, 0, 0.4);
 }
 
+.filter-modal-optimal {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
 .modal-content {
     background-color: white;
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 30%;
+    width: 34%;
     min-height: 300px;
     min-width: 400px;
     border-radius: 15px;
+}
+
+.modal-content-optimal {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 15%;
+    min-height: 200px;
+    min-width: 300px;
+    border-radius: 15px;
+}
+
+.modal-content-optimal.dark {
+    background-color: #342e2e;
 }
 
 .filter-modal.dark {
@@ -94,6 +123,12 @@
 
 .toggle-label {
     margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.toggle-label.dark {
+    color: white;
 }
 
 .toggle-switch {
@@ -109,7 +144,7 @@
 .toggle-slider {
     position: absolute;
     top: 50%;
-    transform: translate(-100%, -50%);
+    transform: translate(0%, -50%);
     width: 18px;
     height: 18px;
     background-color: #fff;
@@ -122,7 +157,7 @@
 }
 
 .toggle-switch input:checked + .toggle-slider {
-    transform: translate(0%, -50%);
+    transform: translate(110%, -50%);
 }
 
 .selected {

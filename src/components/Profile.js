@@ -25,6 +25,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Dropzone, {useDropzone} from "react-dropzone";
 import {ThemeContext} from "./ThemeContext";
+import {LanguageContext} from "./LanguageContext";
+import {toast} from "react-toastify";
 
 const Profile = ({user, services, contacts, current}) => {
     const navigate = useNavigate();
@@ -35,6 +37,7 @@ const Profile = ({user, services, contacts, current}) => {
     const [editedContacts, setEditedContacts] = useState([...contacts]);
     const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
     const [file, setFile] = useState(null);
+    const { language, translations } = useContext(LanguageContext);
 
     if (!user || !user.services) {
         return <div>Loading...</div>; // You can customize the loading state as needed
@@ -107,6 +110,17 @@ const Profile = ({user, services, contacts, current}) => {
                         window.location.reload();
                     })
                     .catch((error) => {
+                        if (!toast.isActive(error.message)) {
+                            toast.error(error.message, {
+                                position: "top-center",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                toastId: error.message,
+                            });
+                        }
                         console.error('Error:', error);
                     });
             }
@@ -182,9 +196,9 @@ const Profile = ({user, services, contacts, current}) => {
                 <div {...getRootProps({style: {border: '2px solid blue', padding: '20px', width: '400px', height: '400px'}})}>
                     <input {...getInputProps()} />
                     {file && <img src={file.preview} style={{width: '50%'}} alt="preview" />}
-                    {!file && <p>Перетащите сюда файлы или кликните для выбора</p>}
+                    {!file && <p>{translations[language]['DragAndDrop']}</p>}
                 </div>
-                {file && <button className='trash-icon' onClick={() => setFile(null)}><FontAwesomeIcon icon={faTrash} />  Удалить</button>}
+                {file && <button className='trash-icon' onClick={() => setFile(null)}><FontAwesomeIcon icon={faTrash} />  {translations[language]['Delete']}</button>}
             </div>
         );
     }
@@ -212,7 +226,7 @@ const Profile = ({user, services, contacts, current}) => {
                                 name="name"
                                 value={editedUser.name}
                                 onChange={handleInputChange}
-                                placeholder="Name"
+                                placeholder={translations[language]['Name']}
                             />
                             <input
                                 className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
@@ -220,7 +234,7 @@ const Profile = ({user, services, contacts, current}) => {
                                 name="bio"
                                 value={editedUser.description}
                                 onChange={handleInputChange}
-                                placeholder="Bio"
+                                placeholder={translations[language]['Description']}
                             />
                         </>
                     ) : (
@@ -264,22 +278,22 @@ const Profile = ({user, services, contacts, current}) => {
 
                     {!current ? (
                         <button className="message-button" onClick={handleMessageClick}>
-                            <FontAwesomeIcon icon={faComment} /> Написать сообщение
+                            <FontAwesomeIcon icon={faComment} /> {translations[language]['SendMessage']}
                         </button>
                     ) : (
                         !isEditing ? (
                             <div>
                                 <button className="message-button" onClick={handleEditSaveClick}>
-                                    <FontAwesomeIcon icon={faPencil}/> Редактировать
+                                    <FontAwesomeIcon icon={faPencil}/> {translations[language]['Edit']}
                                 </button>
                             </div>
                             ) : (
                                 <div>
                                 <button className="message-button" onClick={handleEditSaveClick}>
-                                    <FontAwesomeIcon icon={faSave}/> Сохранить
+                                    <FontAwesomeIcon icon={faSave}/> {translations[language]['Save']}
                                 </button>
                                 <button className="message-button" onClick={handleCancelEditClick}>
-                                    <FontAwesomeIcon icon={faCancel}/> Отмена
+                                    <FontAwesomeIcon icon={faCancel}/> {translations[language]['Cancel']}
                                 </button>
                                 </div>
                             )
@@ -288,7 +302,7 @@ const Profile = ({user, services, contacts, current}) => {
                 {
                     userRole === 'executor' ?
                         <button className="newAppointmentButton" onClick={handleNewServiceClick}>
-                            Добавить
+                            {translations[language]['Add']}
                         </button> : <p></p>
                 }
             </div>
@@ -304,7 +318,7 @@ const Profile = ({user, services, contacts, current}) => {
                         &times;
                     </span>
                         <Dropzone />
-                        <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> Сохранить</p></button>
+                        <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p></button>
                     </div>
                 </div>
             )}

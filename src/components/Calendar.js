@@ -202,7 +202,9 @@ const Calendar = ({full}) => {
                                         <div style={theme === 'dark' ? { color: "white"} : {}}>{translations[language]['Duration']}: <strong>{formatTime(appointment.duration)}</strong></div>
                                         <div style={theme === 'dark' ? { color: "white"} : {}}>{translations[language]['Cost']}: <strong>{appointment.price} byn</strong></div>
                                     </div>
-                                    <button style={{ backgroundColor: "transparent" }} onClick={()=>enrollButtonClick(appointment.id)}>{translations[language]['MakeAnAppointment']}</button>
+                                    {new Date(appointment.starDate) > new Date() &&
+                                        <button style={{ backgroundColor: "transparent" }} onClick={()=>enrollButtonClick(appointment.id)}>{translations[language]['MakeAnAppointment']}</button>
+                                    }
                                 </div>
                             </div>
                         ))}
@@ -212,9 +214,6 @@ const Calendar = ({full}) => {
         }
         return null;
     };
-
-
-
 
     return (
         <div>

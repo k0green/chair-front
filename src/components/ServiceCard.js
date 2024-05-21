@@ -84,7 +84,15 @@ const ServiceCard = ({ service, isProfile }) => {
                     <div className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
                         <div key={master.id} className="master-card">
                             <div className="photos">
-                                {master.photos ? <PhotoList photos={master.photos}/> : null}
+                                {/*{master.photos ? <PhotoList photos={master.photos}/> : null}*/}
+                                {master.photos ? <PhotoList photos={master.photos}/> :     <img
+                                    key={id}
+                                    src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
+                                    /*//alt={id}*/
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'; // Замените на вашу альтернативную ссылку
+                                    }}/>}
                             </div>
                             <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
                                 <h4 onClick={() => handleMasterNameClickClick(master.executorId)}>{master.name}</h4>

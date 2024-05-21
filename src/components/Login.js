@@ -86,6 +86,7 @@ function Login() {
                             console.error('Error fetching data:', error);
                         });
                 navigate("/")
+                window.location.reload()
             })
             .catch((error) => {
                 alert(error);

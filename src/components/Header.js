@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faSearch, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faDoorOpen, faSearch, faUser, faUserEdit} from "@fortawesome/free-solid-svg-icons";
 import React, {useContext} from "react";
 import "../styles/Header.css";
 import Cookies from "js-cookie";
@@ -8,12 +8,15 @@ import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import moon from '../icons/moon.png';
 import sun from '../icons/sun.png';
+import axios from "axios";
+import {toast} from "react-toastify";
 
 const Header = ({ user, onLogout }) => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { language, translations } = useContext(LanguageContext);
 
+    const userId = localStorage.getItem('userId');
     const handleLoginClick = () => {
         const token = Cookies.get('token');
         if(!token)
@@ -48,6 +51,53 @@ const Header = ({ user, onLogout }) => {
         navigate("/orders");
     };
 
+    const handleEditClick = () => {
+        navigate("/edit-user");
+    };
+
+    const handleExitClick = () => {
+        const token = Cookies.get('token');
+        if (!token)
+            navigate("/login");
+        else {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            axios.post(`http://localhost:5155/account/logout`)
+                .then(responce => {
+                        localStorage.removeItem('userName');
+                        localStorage.removeItem('userId');
+                        localStorage.removeItem('userEmail');
+                        localStorage.removeItem('userRole');
+                    Cookies.remove('token');
+                    navigate("/");
+                    window.location.reload()
+                })
+                .catch(error => {
+                    if (!toast.isActive(error.message)) {
+                        toast.error(error.message, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: error.message,
+                        });
+                    }
+                    if (error.response) {
+                        if (error.response.status === 401) {
+                            navigate("/login");
+                        } else {
+                            console.error(`Ошибка от сервера: ${error.response.status}`);
+                        }
+                    } else if (error.request) {
+                        console.error('Ответ не был получен. Возможно, проблемы с сетью.');
+                    } else {
+                        console.error('Произошла ошибка при настройке запроса:', error.message);
+                    }
+                });
+        }
+    }
+
     return (
         <header className={`header ${theme === 'dark' ? 'dark' : ''}`}>
             <div className="header-content">
@@ -79,6 +129,16 @@ const Header = ({ user, onLogout }) => {
                     <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLoginClick}>
                         <FontAwesomeIcon icon={faUser} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
                     </button>
+                    {userId != null &&
+                        <div>
+                            <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleEditClick}>
+                                <FontAwesomeIcon icon={faUserEdit} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
+                            </button>
+                            <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleExitClick}>
+                                <FontAwesomeIcon icon={faDoorOpen} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
+                            </button>
+                        </div>
+                    }
                 </div>
             </div>
         </header>

@@ -570,8 +570,12 @@ const Calendar = ({full}) => {
                                         <button className="save" onClick={handleSaveClick}>{translations[language]['Save']}</button>
                                     ) : (
                                         <div>
-                                            <button className="edit" onClick={() => handleEditClick(appointment)}>{translations[language]['Edit']}</button>
-                                            <button className="delete" onClick={() => handleDeleteClick(appointment)}>{translations[language]['Delete']}</button>
+                                            {appointment.clientId == null &&
+                                                <div>
+                                                    <button className="edit" onClick={() => handleEditClick(appointment)}>{translations[language]['Edit']}</button>
+                                                    <button className="delete" onClick={() => handleDeleteClick(appointment)}>{translations[language]['Delete']}</button>
+                                                </div>
+                                            }
                                         </div>
                                     )}
                                 </div>
