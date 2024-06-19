@@ -14,12 +14,15 @@ import PhotoList from "../components/PhotoList";
 import {useNavigate} from "react-router-dom";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
+import MapModal from "./MapModal";
 
 const ServiceCard = ({ service, isProfile }) => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { id, name, masters } = service;
     const { language, translations } = useContext(LanguageContext);
+    const [selectedPlace, setSelectedPlace] = useState({ position: null, address: '' });
+
 
     const handleOrderClick = (executorServiceId) => {
         navigate("/calendar/"+ executorServiceId);
@@ -70,6 +73,22 @@ const ServiceCard = ({ service, isProfile }) => {
         });
     };
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleAddressClick = (lat, lng, address) => {
+        console.log('Lat:', lat, 'Lng:', lng, 'Address:', address); // Add this line
+        console.log(service); // Add this line
+        setSelectedPlace({
+            position: {
+                lat: lat,
+                lng: lng,
+            },
+            address: address,
+        });
+        setIsModalOpen(true);
+    };
+
+
     return (
         <div className="category-container">
             <div className="pagination-arrow-container">
@@ -98,9 +117,17 @@ const ServiceCard = ({ service, isProfile }) => {
                                 <h4 onClick={() => handleMasterNameClickClick(master.executorId)}>{master.name}</h4>
                                 <h4 style={{cursor: "pointer"}} onClick={()=>handleReviewClick(master.id)}>{master.rating} <FontAwesomeIcon icon={faStar} className = 'item-icon'/></h4>
                             </div>
-                            <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
+{/*                            <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
                                 <p>{master.description}</p>
                                 <p><FontAwesomeIcon icon={faHouse} className = 'item-icon'/>{master.address}</p>
+                                <p>{translations[language]['AvailableSlots']}: {master.availableSlots}</p>
+                            </div>*/}
+                            <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
+                                <p>{master.description}</p>
+                                <p onClick={()=> handleAddressClick(master.place.position.lat, master.place.position.lng, master.place.address)} style={{ cursor: 'pointer' }}>
+                                    <FontAwesomeIcon icon={faHouse} className='item-icon' />
+                                    {master.place.address}
+                                </p>
                                 <p>{translations[language]['AvailableSlots']}: {master.availableSlots}</p>
                             </div>
                             <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
@@ -136,6 +163,12 @@ const ServiceCard = ({ service, isProfile }) => {
                     onClick={goToNextPage}
                 />
             </div>
+            <MapModal
+                isOpen={isModalOpen}
+                onRequestClose={() => setIsModalOpen(false)}
+                initialPosition={selectedPlace.position}
+                initialAddress={selectedPlace.address}
+            />
         </div>
     );
 };

@@ -14,7 +14,6 @@ import AddServiceCard from "./pages/AddServiceCardPage";
 import CategoryPage from "./pages/CategoryPage";
 import OrdersPage from "./pages/OrdersPage";
 import ReviewsPage from "./pages/ReviewsPage";
-import Test from "./pages/Test";
 import React, {useContext, useState} from 'react';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -112,7 +111,6 @@ function AppContent() {
             <Route path="/reviews/:id" element={<ReviewsPage />} />
             <Route path="/collection/category/:id" element={<CategoryPage />} />
             <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/test" element={<Test />} />
           </Routes>
         </main>
         <Footer />

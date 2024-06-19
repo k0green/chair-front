@@ -163,7 +163,14 @@ const HomePage = ({user, onLogout}) => {
                     availableSlots: response.data.availableSlots,
                     duration: formatTime(response.data.duration),
                     rating: response.data.rating,
-                    address: response.data.address,
+                    address: response.data.place.address,
+                    place: {
+                        address: response.data.place.address,
+                        position: {
+                            lat: response.data.place.position.lat,
+                            lng: response.data.place.position.lng,
+                        }
+                    },
                     executorId: response.data.executorId,
                     photos: response.data.photos.length > 0 ? response.data.photos.map(photo => ({
                         id: photo.id,
@@ -284,9 +291,14 @@ const HomePage = ({user, onLogout}) => {
                         availableSlots: service.availableSlots,
                         duration: formatTime(service.duration),
                         rating: service.rating,
-                        address: service.address,
+                        place: {
+                            address: service.place.address,
+                            position: {
+                                lat: service.place.position.lat,
+                                lng: service.place.position.lng,
+                            }
+                        },
                         executorId: service.executorId,
-                        //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
                         photos: service.photos.length > 0 ? service.photos.map(photo => ({
                             id: photo.id,
                             url: photo.url,
@@ -502,7 +514,14 @@ const HomePage = ({user, onLogout}) => {
                         availableSlots: service.availableSlots,
                         duration: formatTime(service.duration),
                         rating: service.rating,
-                        address: service.address,
+                        address: response.data.place.address,
+                        place: {
+                            address: service.place.address,
+                            position: {
+                                lat: service.place.position.lat,
+                                lng: service.place.position.lng,
+                            }
+                        },
                         executorId: service.executorId,
                         //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
                         photos: service.photos.length > 0 ? service.photos.map(photo => ({

@@ -1,0 +1,40 @@
+/* Custom CSS for the MapModal component */
+
+.leaflet-control-geosearch {
+    display: flex;
+    flex-direction: column;
+}
+
+.leaflet-control-geosearch input {
+    width: 300px; /* Increase the width of the search input */
+    font-size: 16px;
+}
+
+.geosearch leaflet-bar leaflet-control leaflet-control-geosearch leaflet-geosearch-button active{
+    display: none;
+    background-color: red;
+}
+
+.reset{
+    display: none;
+}
+
+.open{
+    background-color: white;
+    font-size: 18px;
+}
+
+.geosearch.leaflet-bar.leaflet-control.leaflet-control-geosearch.leaflet-geosearch-button.active{
+    border: none;
+}
+
+.leaflet-bar-part.leaflet-bar-part-single{
+    display: none;
+}
+
+.my-custom-icon{
+    color: red;
+    margin: 0;
+    padding: 0;
+    font-size: 48px;
+}

@@ -18,6 +18,7 @@ import {useDropzone} from "react-dropzone";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
+import MapModal from "./MapModal";
 
 const ServiceCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
@@ -86,7 +87,7 @@ const ServiceCard = ({ service, isNew, id }) => {
             serviceTypeId: service.serviceTypeId,
             executorId: service.executorId,
             description: editedDescription,
-            address: editedAddress,
+            place: editedAddress,
             duration: reverseFormatTime(editedDuration, service.duration),
             price: editedPrice,
             photos: editedPhotos.map(photo => photo),
@@ -125,7 +126,7 @@ const ServiceCard = ({ service, isNew, id }) => {
             serviceTypeId: editedServiceTypeId.serviceTypeId,
             executorId: id,
             description: editedDescription,
-            address: editedAddress,
+            place: editedAddress,
             duration: reverseFormatTime(editedDuration, date),
             price: editedPrice,
             photos: editedPhotos.map(photo => photo),
@@ -211,7 +212,15 @@ const ServiceCard = ({ service, isNew, id }) => {
         setUploadPhotoModal(false);
     };
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const handleAddressClick = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleSaveAddress = (address) => {
+        setEditedAddress(address);
+    };
 
     return (
         <div className="centrize">
@@ -244,12 +253,25 @@ const ServiceCard = ({ service, isNew, id }) => {
                             placeholder={translations[language]['Address']}
                             className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"
-                            value={editedAddress || service.address}
+                            value={editedAddress || service.place.address}
                             onChange={(e) => setEditedAddress(e.target.value)}
                         />
                         <br/>
                         <br/>
-                    </div><div className="service-description">
+                    </div>
+                    <div className="service-description">
+                        <input
+                            placeholder={translations[language]['Address']}
+                            className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
+                            type="text"
+                            value={editedAddress || service.place.address}
+                            onClick={handleAddressClick}
+                            readOnly
+                        />
+                        <br />
+                        <br />
+                    </div>
+                    <div className="service-description">
                         <input
                             placeholder={translations[language]['Description']}
                             className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
@@ -300,6 +322,11 @@ const ServiceCard = ({ service, isNew, id }) => {
                     </div>
                 </div>
             )}
+            <MapModal
+                isOpen={isModalOpen}
+                onRequestClose={() => setIsModalOpen(false)}
+                onSaveAddress={handleSaveAddress}
+            />
         </div>
     );
 };

@@ -33,7 +33,14 @@ const EditServiceCardPage = () => {
                     price: response.data.price,
                     availableSlots: response.data.availableSlots,
                     duration: response.data.duration,
-                    address: response.data.address,
+                    address: response.data.place.address,
+                    place: {
+                        address: response.data.place.address,
+                        position: {
+                            lat: response.data.place.position.lat,
+                            lng: response.data.place.position.lng,
+                        }
+                    },
                     //imageURLs: response.data.imageURLs.map((url, index) => ({ id: index + 1, url })),
                     photos: response.data.photos.length > 0 ? response.data.photos.map(photo => ({
                         id: photo.id,

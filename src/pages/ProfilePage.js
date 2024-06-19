@@ -53,7 +53,14 @@ const ProfilePage = () => {
                                         availableSlots: service.availableSlots,
                                         duration: formatTime(service.duration),
                                         rating: service.rating,
-                                        address: service.address,
+                                        address: service.place.address,
+                                        place: {
+                                            address: service.place.address,
+                                            position: {
+                                                lat: service.place.position.lat,
+                                                lng: service.place.position.lng,
+                                            }
+                                        },
                                         //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
                                         photos: service.photos.length > 0 ? service.photos.map(photo => ({
                                             id: photo.id,
@@ -124,7 +131,14 @@ const ProfilePage = () => {
                                         availableSlots: service.availableSlots,
                                         duration: formatTime(service.duration),
                                         rating: service.rating,
-                                        address: service.address,
+                                        address: service.place.address,
+                                        place: {
+                                            address: service.place.address,
+                                            position: {
+                                                lat: service.place.position.lat,
+                                                lng: service.place.position.lng,
+                                            }
+                                        },
                                         executorId: service.executorId,
                                         //photos: service.imageURLs.map((url, index) => ({ id: index + 1, url })),
                                         /*photos: service.photos.length > 0 ? service.photos.map(photo => ({
