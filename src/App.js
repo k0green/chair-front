@@ -16,6 +16,7 @@ import OrdersPage from "./pages/OrdersPage";
 import ReviewsPage from "./pages/ReviewsPage";
 import React, {useContext, useState} from 'react';
 import Header from "./components/Header";
+import MobileHeader from "./components/MobileHeader";
 import Footer from "./components/Footer";
 import { ThemeProvider } from './components/ThemeProvider';
 import {ThemeContext} from "./components/ThemeContext";
@@ -24,6 +25,7 @@ import translationEN from './locales/translationEn.json';
 import translationRU from './locales/translationRu.json';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useMediaQuery } from 'react-responsive';
 
 const translations = {
     en: translationEN,
@@ -88,10 +90,12 @@ function App() {
 
 function AppContent() {
   const { theme } = useContext(ThemeContext);
+    const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
   return (
       <div className={`app ${theme === 'dark' ? 'dark' : ''}`}>
-        <Header />
+        {!isMobile && <Header/>}
+        {isMobile && <MobileHeader/>}
         <main className="app-content">
           <Routes>
             <Route path="/" element={<Main/>}/>
