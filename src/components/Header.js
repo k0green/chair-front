@@ -10,6 +10,7 @@ import moon from '../icons/moon.png';
 import sun from '../icons/sun.png';
 import axios from "axios";
 import {toast} from "react-toastify";
+import {accountExit} from "./api";
 
 const Header = ({ user, onLogout }) => {
     const navigate = useNavigate();
@@ -17,11 +18,14 @@ const Header = ({ user, onLogout }) => {
     const { language, translations } = useContext(LanguageContext);
 
     const userId = localStorage.getItem('userId');
+    const token = Cookies.get('token');
     const handleLoginClick = () => {
         const token = Cookies.get('token');
         if(!token)
             navigate("/login");
-        navigate("/profile")
+        else{
+            navigate("/profile")
+        }
     };
 
     const handleMessageClick = () => {
@@ -56,46 +60,31 @@ const Header = ({ user, onLogout }) => {
     };
 
     const handleExitClick = () => {
-        const token = Cookies.get('token');
-        if (!token)
-            navigate("/login");
-        else {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            axios.post(`http://localhost:5155/account/logout`)
-                .then(responce => {
-                        localStorage.removeItem('userName');
-                        localStorage.removeItem('userId');
-                        localStorage.removeItem('userEmail');
-                        localStorage.removeItem('userRole');
-                    Cookies.remove('token');
-                    navigate("/");
-                    window.location.reload()
-                })
-                .catch(error => {
-                    if (!toast.isActive(error.message)) {
-                        toast.error(error.message, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: error.message,
-                        });
-                    }
-                    if (error.response) {
-                        if (error.response.status === 401) {
-                            navigate("/login");
-                        } else {
-                            console.error(`Ошибка от сервера: ${error.response.status}`);
-                        }
-                    } else if (error.request) {
-                        console.error('Ответ не был получен. Возможно, проблемы с сетью.');
-                    } else {
-                        console.error('Произошла ошибка при настройке запроса:', error.message);
-                    }
-                });
-        }
+
+        accountExit(navigate).then(newData => {
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userRole');
+            Cookies.remove('token');
+            navigate("/");
+            window.location.reload()
+        })
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: errorMessage,
+                    });
+                }
+                console.error('Error fetching data:', error);
+            });
     }
 
     return (
@@ -129,7 +118,7 @@ const Header = ({ user, onLogout }) => {
                     <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLoginClick}>
                         <FontAwesomeIcon icon={faUser} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
                     </button>
-                    {userId != null &&
+                    {token != null && userId != null &&
                         <div>
                             <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleEditClick}>
                                 <FontAwesomeIcon icon={faUserEdit} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />

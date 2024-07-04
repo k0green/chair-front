@@ -1,13 +1,10 @@
 import React, {Fragment, useContext, useEffect, useState} from 'react';
-import Select from 'react-select';
-import axios from 'axios';
-
 import '../styles/Register.css';
-import {Link, useNavigate} from "react-router-dom";
-import Cookies from "js-cookie";
+import {useNavigate} from "react-router-dom";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
+import {getEditUserInfo, getUserInfoForEdit} from "./api";
 
 function Register() {
 
@@ -19,7 +16,6 @@ function Register() {
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const [nameError, setNameError] = useState("");
-    const [phoneError, setPhoneError] = useState("");
     const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
     const [userData, setUserData] = useState([]);
@@ -27,55 +23,30 @@ function Register() {
     const [email, setEmail] = useState(userData.email);
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
-    const [role, setRole] = useState('');
-    const [phone, setPhone] = useState('');
 
     useEffect(() => {
-        const token = Cookies.get('token');
-        const userId = localStorage.getItem('userId')
-        if(!token)
-            navigate("/login");
-        else {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-            axios.get(`http://localhost:5155/account/user-info/edit/${userId}`)
-                .then(response => {
-                    // Преобразование данных с сервера в необходимый формат
-                    const userData = {
-                        id: response.data.id,
-                        name: response.data.name,
-                        email: response.data.email,
-                    };
-
-                    setUserData(userData);
-                    setEmail(userData.email);
-                    setName(userData.name);
-                })
-                .catch(error => {
-                    if (!toast.isActive(error.message)) {
-                        toast.error(error.message, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: error.message,
-                        });
-                    }
-                    if (error.response) {
-                        if (error.response.status === 401) {
-                            navigate("/login");
-                        } else {
-                            console.error(`Ошибка от сервера: ${error.response.status}`);
-                        }
-                    } else if (error.request) {
-                        console.error('Ответ не был получен. Возможно, проблемы с сетью.');
-                    } else {
-                        console.error('Произошла ошибка при настройке запроса:', error.message);
-                    }
-                });
-        }
+        const userId = localStorage.getItem('userId');
+        getUserInfoForEdit( navigate, userId)
+            .then(response => {
+                setUserData(userData);
+                setEmail(userData.email);
+                setName(userData.name);
+            })
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: errorMessage,
+                    });
+                }
+                console.error('Error fetching data:', error);
+            });
     }, []);
 
     const handleNameChange = (value) => {
@@ -93,7 +64,6 @@ function Register() {
     };
 
     const handleEmailChange = (value) => {
-        console.log("Save button clicked");
         setEmail(value);
         if (value.trim() === "") {
             setEmailError("");
@@ -114,7 +84,8 @@ function Register() {
         } else {
             const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W])[A-Za-z\d\W]{6,}$/;
             if (!passwordRegex.test(value)) {
-                setPasswordError("Please enter a valid password with at least 6 characters, 1 uppercase letter, 1 number, and 1 special character");
+                setPasswordError("Please enter a valid password with at least 6 characters," +
+                    " 1 uppercase letter, 1 number, and 1 special character");
             } else {
                 setPasswordError("");
             }
@@ -128,7 +99,8 @@ function Register() {
         } else {
             const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W])[A-Za-z\d\W]{6,}$/;
             if (!passwordRegex.test(value)) {
-                setPasswordError("Please enter a valid password with at least 6 characters, 1 uppercase letter, 1 number, and 1 special character");
+                setPasswordError("Please enter a valid password with at least 6 characters," +
+                    " 1 uppercase letter, 1 number, and 1 special character");
             } else {
                 setPasswordError("");
             }
@@ -144,46 +116,28 @@ function Register() {
             NewPassword: newPassword,
         };
 
-        console.log(data);
-        const url = "http://localhost:5155/account/user-info/edit"; // Update the URL to the registration endpoint
-
-        axios
-            .post(url, data)
-            .then((result) => {
-                Cookies.set('token', result.data, { expires: 1 });
-                axios.get(`http://localhost:5155/account/user-info?email=`+data.Email)
-                    .then(response => {
-                        const serverData = {
-                            id: response.data.id,
-                            name: response.data.name,
-                            email: response.data.email,
-                            role: response.data.role
-                        }
-                        console.log(serverData)
-                        localStorage.setItem('userName', serverData.name);
-                        localStorage.setItem('userId', serverData.id);
-                        localStorage.setItem('userEmail', serverData.email);
-                        localStorage.setItem('userRole', serverData.role);
-                    })
-                    .catch(error => {
-                        // Handle error
-                        console.error('Error fetching data:', error);
-                    });
+        getEditUserInfo( navigate, data)
+            .then(serverData => {
+                localStorage.setItem('userName', serverData.name);
+                localStorage.setItem('userId', serverData.id);
+                localStorage.setItem('userEmail', serverData.email);
+                localStorage.setItem('userRole', serverData.role);
                 navigate("/")
             })
-            .catch((error) => {
-                if (!toast.isActive(error.message)) {
-                    toast.error(error.message, {
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
                         position: "top-center",
                         autoClose: 5000,
                         hideProgressBar: false,
                         closeOnClick: true,
                         pauseOnHover: true,
                         draggable: true,
-                        toastId: error.message,
+                        toastId: errorMessage,
                     });
                 }
-                alert(error);
+                console.error('Error fetching data:', error);
             });
     };
 

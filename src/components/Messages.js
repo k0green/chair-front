@@ -21,8 +21,17 @@ import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
 import {useDropzone} from "react-dropzone";
+import {
+    addMessage,
+    BASE_URL,
+    deleteMessage,
+    editMessageText,
+    getChatById,
+    markAsReadMessage,
+    uploadMinioPhoto
+} from "./api";
 
-const MessageComponent = ({ id, isMessageViewed }) => {
+const MessageComponent = ({ id }) => {
 
     const { theme } = useContext(ThemeContext);
 
@@ -38,19 +47,16 @@ const MessageComponent = ({ id, isMessageViewed }) => {
 
 
     const handleSave = () => {
-        // Implement saving/editing logic here
         const editedMessageIndex = messages.findIndex((message) => message.id === selectedMessageId);
         if (editedMessageIndex !== -1) {
             const updatedMessages = [...messages];
             updatedMessages[editedMessageIndex].text = newMessage;
 
-            // Make a PUT request to your server endpoint for editing
-            axios.post(`http://localhost:5155/message/edit-text`, { id: selectedMessageId, name: newMessage })
+            editMessageText(navigate, selectedMessageId, newMessage)
                 .then(response => {
                     setMessages(updatedMessages);
                     setIsEditing(false);
                     setSelectedMessageId(null);
-                    // Очищаем поле ввода после отправки
                     setNewMessage('');
                 })
                 .catch(error => {
@@ -75,7 +81,7 @@ const MessageComponent = ({ id, isMessageViewed }) => {
     const accessToken = Cookies.get('token');
 
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl("http://localhost:5155/messageHub",{
+        .withUrl(`${BASE_URL}/messageHub`,{
                 accessTokenFactory: () => accessToken
             })
         .build();
@@ -93,7 +99,6 @@ const MessageComponent = ({ id, isMessageViewed }) => {
     };
 
     const handleEdit = () => {
-        // Implement editing logic here
         const selectedMessage = messages.find((message) => message.id === selectedMessageId);
         if (selectedMessage) {
             setNewMessage(selectedMessage.text);
@@ -102,10 +107,8 @@ const MessageComponent = ({ id, isMessageViewed }) => {
     };
 
     const handleDelete = () => {
-        // Implement deleting logic here
-        axios.delete(`http://localhost:5155/message/remove/${selectedMessageId}`)
+        deleteMessage(navigate, selectedMessageId)
             .then(response => {
-                // Update messages state after successful deletion
                 const updatedMessages = messages.filter(message => message.id !== selectedMessageId);
                 setMessages(updatedMessages);
                 setIsChoosing(false);
@@ -135,7 +138,6 @@ const MessageComponent = ({ id, isMessageViewed }) => {
 
     const handleMessageClick = (messageId) => {
         if (isChoosing) {
-            // Toggle selection
             setSelectedMessageId(messageId);
         }
     };
@@ -143,67 +145,27 @@ const MessageComponent = ({ id, isMessageViewed }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Выполнение запроса при монтировании компонента
-        const token = Cookies.get('token');
         const userId = localStorage.getItem('userId');
-        if(!token)
-            navigate("/login");
-        else {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            axios.get(`http://localhost:5155/chat/`+id)
-                .then(response => {
-                    const data = {
-                        id: response.data.id,
-                        recipientId: response.data.recipientId,
-                        senderId: response.data.senderId,
-                        recipientName: response.data.recipientName,
-                        recipientProfileId: response.data.recipientProfileId,
-                        recipientProfileImg: response.data.recipientProfileImg,
-                        unreadMessagesAmount: response.data.unreadMessagesAmount,
-                        messages: response.data.messages.map(message => ({
-                            text: message.text,
-                            createdDate: message.createdDate,
-                            isDeleted: message.isDeleted,
-                            isEdited: message.isEdited,
-                            isRead: message.isRead,
-                            chatId: message.chatId,
-                            replyId: message.replyId,
-                            recipientId: message.recipientId,
-                            senderId: message.senderId,
-                            isMine: message.senderId === userId,
-                            id: message.id,
-                            type: message.type,
-                        })),
-                    };
 
-                    setMessages(data.messages);
-                    setChatData(data);
-                })
-                .catch(error => {
-                    if (!toast.isActive(error.message)) {
-                        toast.error(error.message, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: error.message,
-                        });
-                    }
-                    if (error.response) {
-                        if (error.response.status === 401) {
-                            navigate("/login");
-                        } else {
-                            console.error(`Ошибка от сервера: ${error.response.status}`);
-                        }
-                    } else if (error.request) {
-                        console.error('Ответ не был получен. Возможно, проблемы с сетью.');
-                    } else {
-                        console.error('Произошла ошибка при настройке запроса:', error.message);
-                    }
-                });
-        }
+        getChatById(navigate, id)
+            .then(response => {
+                setMessages(response.messages);
+                setChatData(response);
+            })
+            .catch(error => {
+                console.error('Error saving data:', error);
+                if (!toast.isActive(error.message)) {
+                    toast.error(error.message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: error.message,
+                    });
+                }
+            });
 
         connection.on("ReceiveMessage", (message) => {
             console.log("Message received: ", message);
@@ -211,15 +173,12 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                 setMessages(messages => {
                     const index = messages.findIndex(m => m.id === message.id);
                     if (index !== -1) {
-                        // Если сообщение помечено как удаленное, удаляем его из списка
                         if (message.isDeleted === true) {
                             return [...messages.slice(0, index), ...messages.slice(index + 1)];
                         } else {
-                            // Иначе заменяем существующее сообщение
                             return [...messages.slice(0, index), message, ...messages.slice(index + 1)];
                         }
                     } else {
-                        // Если сообщение не существует в списке, добавляем его
                         return [...messages, message];
                     }
                 });
@@ -229,24 +188,19 @@ const MessageComponent = ({ id, isMessageViewed }) => {
         connection.on("ReceiveAllMessages", (messages) => {
             console.log("Messages all received: ", messages);
             messages.forEach(message => {
-                /*if (message.senderId !== localStorage.getItem('userId')) {*/
                 message.isMine = message.senderId === userId
                     setMessages(oldMessages => {
                         const index = oldMessages.findIndex(m => m.id === message.id);
                         if (index !== -1) {
-                            // Если сообщение помечено как удаленное, удаляем его из списка
                             if (message.isDeleted === true) {
                                 return [...oldMessages.slice(0, index), ...oldMessages.slice(index + 1)];
                             } else {
-                                // Иначе заменяем существующее сообщение
                                 return [...oldMessages.slice(0, index), message, ...oldMessages.slice(index + 1)];
                             }
                         } else {
-                            // Если сообщение не существует в списке, добавляем его
                             return [...oldMessages, message];
                         }
                     });
-/*                }*/
             });
         });
 
@@ -274,7 +228,6 @@ const MessageComponent = ({ id, isMessageViewed }) => {
             (message) => !message.isMine && !message.isRead
         );
 
-        // Если есть непрочитанные входящие сообщения, показываем полоску
         if (hasUnreadMessages) {
             setIsBarVisible(true);
         } else {
@@ -283,12 +236,9 @@ const MessageComponent = ({ id, isMessageViewed }) => {
         down()
     }, [messages]);
 
-
-
     const handleSendMessage = () => {
         if (newMessage.trim() !== '') {
             const messageId = uuidv4();
-            // Создаем новый объект сообщения с датой и временем и добавляем его в массив messages
             const newMessageObject = {
                 id: messageId,
                 text: newMessage,
@@ -309,14 +259,11 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                 //"replyId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
             };
 
-            // Make a POST request to your server endpoint
-            axios.post('http://localhost:5155/message/add', messageData)
+            addMessage(navigate, messageData)
                 .then(response => {
-                    //navigate("/profile")
                     handleMarkAsRead()
                 })
                 .catch(error => {
-                    // Handle error, e.g., show an error message
                     console.error('Error saving data:', error);
                     if (!toast.isActive(error.message)) {
                         toast.error(error.message, {
@@ -338,12 +285,10 @@ const MessageComponent = ({ id, isMessageViewed }) => {
 
             setMessages([...updatedMessages, newMessageObject]);
 
-            // Очищаем поле ввода после отправки
             setNewMessage('');
 
             setIsBarVisible(false);
 
-            // Прокручиваем элемент пользователя вниз списка сообщений
             if (userRef.current) {
                 userRef.current.scrollIntoView({ behavior: 'smooth' });
             }
@@ -354,15 +299,9 @@ const MessageComponent = ({ id, isMessageViewed }) => {
     };
 
     const handleMarkAsRead = () => {
-/*            const updatedMessages = messages.map((message) => ({
-                ...message,
-                isRead: message.isMine ? message.isRead : true,
-            }));
-            setMessages(updatedMessages);*/
         const token = Cookies.get('token');
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        axios.get(`http://localhost:5155/message/mark-as-read/`+chatData.id)
-            .then(response => {})
+        markAsReadMessage(navigate, chatData.id)
             .catch(error => {
                 if (!toast.isActive(error.message)) {
                     toast.error(error.message, {
@@ -385,8 +324,6 @@ const MessageComponent = ({ id, isMessageViewed }) => {
             behavior: 'smooth'
         });
     };
-
-
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -458,17 +395,29 @@ const MessageComponent = ({ id, isMessageViewed }) => {
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await axios.post('http://localhost:5155/minio/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            let url = '';
 
-            const url = response.data.url;
+            uploadMinioPhoto(navigate, formData)
+                .then(serverData => {
+                    url = serverData.data.url;
+                })
+                .catch(error => {
+                    const errorMessage = error.message || 'Failed to fetch data';
+                    if (!toast.isActive(errorMessage)) {
+                        toast.error(errorMessage, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: errorMessage,
+                        });
+                    }
+                    console.error('Error fetching data:', error);
+                });
 
-            /*setEditedPhotos(prevState => [...prevState, ...response.data]);*/
                 const messageId = uuidv4();
-                // Создаем новый объект сообщения с датой и временем и добавляем его в массив messages
                 const newMessageObject = {
                     id: messageId,
                     text: url,
@@ -491,27 +440,24 @@ const MessageComponent = ({ id, isMessageViewed }) => {
                     //"replyId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
                 };
 
-                // Make a POST request to your server endpoint
-                axios.post('http://localhost:5155/message/add', messageData)
-                    .then(response => {
-                        //navigate("/profile")
-                        handleMarkAsRead()
-                    })
-                    .catch(error => {
-                        // Handle error, e.g., show an error message
-                        console.error('Error saving data:', error);
-                        if (!toast.isActive(error.message)) {
-                            toast.error(error.message, {
-                                position: "top-center",
-                                autoClose: 5000,
-                                hideProgressBar: false,
-                                closeOnClick: true,
-                                pauseOnHover: true,
-                                draggable: true,
-                                toastId: error.message,
-                            });
-                        }
-                    });
+            addMessage(navigate, messageData)
+                .then(response => {
+                    handleMarkAsRead()
+                })
+                .catch(error => {
+                    console.error('Error saving data:', error);
+                    if (!toast.isActive(error.message)) {
+                        toast.error(error.message, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: error.message,
+                        });
+                    }
+                });
 
                 const updatedMessages = messages.map((message) => ({
                     ...message,
@@ -520,12 +466,10 @@ const MessageComponent = ({ id, isMessageViewed }) => {
 
                 setMessages([...updatedMessages, newMessageObject]);
 
-                // Очищаем поле ввода после отправки
                 setNewMessage('');
 
                 setIsBarVisible(false);
 
-                // Прокручиваем элемент пользователя вниз списка сообщений
                 if (userRef.current) {
                     userRef.current.scrollIntoView({ behavior: 'smooth' });
                 }

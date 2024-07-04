@@ -9,7 +9,7 @@
     border: 1px solid #ccc;
     border-radius: 10px;
     overflow: hidden;
-    min-width: 500px;
+    min-width: 520px;
 }
 
 .message-header {
@@ -228,22 +228,19 @@
     flex-direction: column;
 }
 
-/* Добавляем стиль для выделенных сообщений */
 .message.selected {
     background-color: #004cda;
 }
 
-/* Добавляем стиль для выделенных сообщений */
 .timestamp.selected {
     background-color: transparent;
     color: white;
 }
 
-/* Обновляем стили для кнопки "Выбрать" */
 .message-header {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Добавляем выравнивание по горизонтали */
+    justify-content: space-between;
     padding: 10px;
     background-color: #f0f0f0;
     border-bottom: 1px solid #ccc;

@@ -1,5 +1,5 @@
 import "../styles/CategoryItem.css";
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 
 

@@ -9,6 +9,7 @@ import EditServiceCard from "../components/EditServiceCard";
 import Footer from "../components/Footer";
 import {ThemeContext} from "../components/ThemeContext";
 import {toast} from "react-toastify";
+import {getExecutorServiceById, getOptimalServiceCard} from "../components/api";
 
 const EditServiceCardPage = () => {
     const { theme, toggleTheme } = useContext(ThemeContext);
@@ -18,56 +19,24 @@ const EditServiceCardPage = () => {
     const isNew = id === null
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5155/executor-service/get-by-id/${id}`);
-                const formattedData = {
-                    id: response.data.id,
-                    name: response.data.executorName || 'Unknown Master',
-                    serviceTypeId: response.data.serviceTypeId,
-                    serviceTypeName: response.data.serviceTypeName,
-                    executorId: response.data.executorId,
-                    executorName: response.data.executorName,
-                    description: response.data.description,
-                    rating: response.data.rating,
-                    price: response.data.price,
-                    availableSlots: response.data.availableSlots,
-                    duration: response.data.duration,
-                    address: response.data.place.address,
-                    place: {
-                        address: response.data.place.address,
-                        position: {
-                            lat: response.data.place.position.lat,
-                            lng: response.data.place.position.lng,
-                        }
-                    },
-                    //imageURLs: response.data.imageURLs.map((url, index) => ({ id: index + 1, url })),
-                    photos: response.data.photos.length > 0 ? response.data.photos.map(photo => ({
-                        id: photo.id,
-                        url: photo.url,
-                    })) : [{
-                        id: 'default',
-                        url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
-                    }],
-                };
-                setService(formattedData);
-            } catch (error) {
-                if (!toast.isActive(error.message)) {
-                    toast.error(error.message, {
+        getExecutorServiceById(id, navigate).then(newData => {
+            setService(newData);
+        })
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
                         position: "top-center",
                         autoClose: 5000,
                         hideProgressBar: false,
                         closeOnClick: true,
                         pauseOnHover: true,
                         draggable: true,
-                        toastId: error.message,
+                        toastId: errorMessage,
                     });
                 }
                 console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchData();
+            });
     }, [id, navigate]);
 
     return (

@@ -1,17 +1,15 @@
 import React, {useContext, useState} from 'react';
-import '../styles/Profile.css'; // Файл стилей для страницы профиля
+import '../styles/Profile.css';
 import ServiceCard from '../components/ServiceCard';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faBoltLightning,
     faCancel,
     faComment,
-    faCross,
     faPencil,
     faSave,
     faTrash
 } from "@fortawesome/free-solid-svg-icons";
-import EditServiceCard from "./EditServiceCard";
 import {useNavigate} from "react-router-dom";
 import telegram from '../icons/telegram.svg';
 import mobilePhone from '../icons/mobilePhone.png';
@@ -22,11 +20,12 @@ import whatsapp from '../icons/whatsapp.svg';
 import webSite from '../icons/webSite.png';
 import mail from '../icons/mail.png';
 import axios from "axios";
-import Cookies from "js-cookie";
 import Dropzone, {useDropzone} from "react-dropzone";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
+import {updateProfile, uploadMinioPhoto} from "./api";
+import {faAdd} from "@fortawesome/free-solid-svg-icons/faAdd";
 
 const Profile = ({user, services, contacts, current}) => {
     const navigate = useNavigate();
@@ -40,11 +39,13 @@ const Profile = ({user, services, contacts, current}) => {
     const { language, translations } = useContext(LanguageContext);
 
     if (!user || !user.services) {
-        return <div>Loading...</div>; // You can customize the loading state as needed
+        return <div>Loading...</div>;
     }
 
     const userRole = localStorage.getItem('userRole');
     const userId = localStorage.getItem('userId');
+    current = userId === user.userId;
+    console.log('cur' + current);
 
     const contactsIcons = [
         {
@@ -91,47 +92,31 @@ const Profile = ({user, services, contacts, current}) => {
 
     const handleEditSaveClick = () => {
         if (isEditing) {
-            const token = Cookies.get('token');
-            if(!token)
-                navigate("/login");
-            else {
-                editedUser.contacts = editedContacts;
-                //editedUser.avatar = "";
-                editedUser.services = [];
-                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                axios.put('http://localhost:5155/executor-profile/update', editedUser, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                    .then((response) => {
-                        console.log('Success:', response.data);
-                        setIsEditing(false);
-                        window.location.reload();
-                    })
-                    .catch((error) => {
-                        if (!toast.isActive(error.message)) {
-                            toast.error(error.message, {
-                                position: "top-center",
-                                autoClose: 5000,
-                                hideProgressBar: false,
-                                closeOnClick: true,
-                                pauseOnHover: true,
-                                draggable: true,
-                                toastId: error.message,
-                            });
-                        }
-                        console.error('Error:', error);
-                    });
-            }
+            updateProfile(editedUser, editedContacts, navigate).then(newData => {
+                setIsEditing(false);
+                window.location.reload();
+            })
+                .catch(error => {
+                    const errorMessage = error.message || 'Failed to fetch data';
+                    if (!toast.isActive(errorMessage)) {
+                        toast.error(errorMessage, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: errorMessage,
+                        });
+                    }
+                    console.error('Error fetching data:', error);
+                });
         } else {
-            // Enable editing mode
             setIsEditing(true);
             setEditedUser(user);
             setEditedContacts([...contacts]);
         }
     };
-
 
     const handleCancelEditClick = () => {
             setIsEditing(false);
@@ -166,14 +151,25 @@ const Profile = ({user, services, contacts, current}) => {
         if (file) {
             const formData = new FormData();
             formData.append('file', file);
-
-            const response = await axios.post('http://localhost:5155/minio/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-
-            editedUser.imageUrl = response.data;
+            uploadMinioPhoto(navigate, formData)
+                .then(serverData => {
+                    editedUser.imageUrl = serverData.data.url;
+                })
+                .catch(error => {
+                    const errorMessage = error.message || 'Failed to fetch data';
+                    if (!toast.isActive(errorMessage)) {
+                        toast.error(errorMessage, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: errorMessage,
+                        });
+                    }
+                    console.error('Error fetching data:', error);
+                });
         }
 
         setFile(null);
@@ -193,7 +189,7 @@ const Profile = ({user, services, contacts, current}) => {
 
         return (
             <div className="dropzone-centrize">
-                <div {...getRootProps({style: {border: '2px solid blue', padding: '20px', width: '400px', height: '400px'}})}>
+                <div {...getRootProps({style: {border: '2px solid blue', padding: '20px', width: '350px', height: '400px'}})}>
                     <input {...getInputProps()} />
                     {file && <img src={file.preview} style={{width: '50%'}} alt="preview" />}
                     {!file && <p>{translations[language]['DragAndDrop']}</p>}
@@ -300,9 +296,9 @@ const Profile = ({user, services, contacts, current}) => {
                     )}
                 </div>
                 {
-                    userRole === 'executor' ?
-                        <button className="newAppointmentButton" onClick={handleNewServiceClick}>
-                            {translations[language]['Add']}
+                    current && userRole === 'executor' ?
+                        <button className="profile-add-serviceCard-button" onClick={handleNewServiceClick}>
+                            <FontAwesomeIcon icon={faAdd}/> {translations[language]['Add']}
                         </button> : <p></p>
                 }
             </div>

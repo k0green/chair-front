@@ -80,3 +80,14 @@
     color: #adadad;
 }
 
+.profile-add-serviceCard-button{
+    margin-top: 10px;
+    background-color: transparent;
+    color: #007bff;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    border: 2px solid #007bff;
+    border-radius: 4px;
+}
+

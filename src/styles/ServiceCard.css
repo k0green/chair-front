@@ -1,6 +1,6 @@
 .service-card {
     width: 20%;
-    min-width: 300px; /* Set a minimum width */
+    min-width: 300px;
     background-color: white;
     border-radius: 15px;
     padding: 10px;
@@ -106,13 +106,31 @@
     text-align: right;
 }
 
-.service-name-left{
-    position: relative;
-    justify-content: left;
-    margin-right: 80%;
+.parent-container-type {
+    display: flex;
+    margin-top: 20px;
+    justify-content: space-between;
 }
 
-.service-name-left.dark{
+@media (max-width: 600px) {
+    .parent-container-type {
+        flex-direction: column;
+    }
+
+    .filter-button-container {
+        justify-content: flex-start;
+        margin-left: 10%;
+        font-size: 1px;
+    }
+}
+
+.type-name {
+    margin-left: 10%;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.type-name.dark{
     color: white;
 }
 
@@ -231,7 +249,7 @@ input[type="text"] {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        margin-top: 20px;
+/*        margin-top: 20px;*/
     background-color: transparent;
 }
 

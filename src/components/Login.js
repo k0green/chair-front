@@ -6,6 +6,7 @@ import axios from "axios";
 import { ThemeContext } from './ThemeContext';
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
+import {login} from "./api";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -51,45 +52,30 @@ function Login() {
             Password: password,
             RememberMe: true,
         };
-        const url = "http://localhost:5155/account/login"; // some url
 
-        axios
-            .post(url, data)
-            .then((result) => {
-                Cookies.set('token', result.data, { expires: 1 });
-                    axios.get(`http://localhost:5155/account/user-info?email=`+data.Email)
-                        .then(response => {
-                            const serverData = {
-                                id: response.data.id,
-                                name: response.data.name,
-                                email: response.data.email,
-                                role: response.data.role
-                            }
-                            console.log(serverData)
-                            localStorage.setItem('userName', serverData.name);
-                            localStorage.setItem('userId', serverData.id);
-                            localStorage.setItem('userEmail', serverData.email);
-                            localStorage.setItem('userRole', serverData.role);
-                        })
-                        .catch(error => {
-                            if (!toast.isActive(error.message)) {
-                                toast.error(error.message, {
-                                    position: "top-center",
-                                    autoClose: 5000,
-                                    hideProgressBar: false,
-                                    closeOnClick: true,
-                                    pauseOnHover: true,
-                                    draggable: true,
-                                    toastId: error.message,
-                                });
-                            }
-                            console.error('Error fetching data:', error);
-                        });
+        login(navigate, data)
+            .then(serverData => {
+                localStorage.setItem('userName', serverData.name);
+                localStorage.setItem('userId', serverData.id);
+                localStorage.setItem('userEmail', serverData.email);
+                localStorage.setItem('userRole', serverData.role);
                 navigate("/")
                 window.location.reload()
             })
-            .catch((error) => {
-                alert(error);
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: errorMessage,
+                    });
+                }
+                console.error('Error fetching data:', error);
             });
     };
 

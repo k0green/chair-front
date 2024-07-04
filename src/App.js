@@ -90,7 +90,7 @@ function App() {
 
 function AppContent() {
   const { theme } = useContext(ThemeContext);
-    const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
+    const isMobile = useMediaQuery({ query: '(max-width: 1025px)' });
 
   return (
       <div className={`app ${theme === 'dark' ? 'dark' : ''}`}>

@@ -3,7 +3,7 @@ import { ThemeContext } from "../components/ThemeContext";
 import "../styles/Main.css";
 import CalendarEdit from "../components/CalendarEdit";
 
-const HomePage = ({ user, onLogout, full }) => {
+const HomePage = ({ full }) => {
     const { theme } = useContext(ThemeContext);
 
     return (

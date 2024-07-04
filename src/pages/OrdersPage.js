@@ -3,7 +3,7 @@ import { ThemeContext } from "../components/ThemeContext";
 import "../styles/Main.css";
 import Orders from "../components/Orders";
 
-const HomePage = ({ user, onLogout, full }) => {
+const HomePage = () => {
     const { theme } = useContext(ThemeContext);
 
     return (

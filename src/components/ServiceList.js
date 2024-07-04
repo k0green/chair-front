@@ -1,22 +1,52 @@
-import React, {useContext} from 'react';
-import ServiceCard from './ServiceCard';
+import React, { useEffect, useState } from 'react';
+import ServiceCardTypeList from './ServiceCardTypeList';
 import "../styles/ServiceCard.css";
-import {ThemeContext} from "./ThemeContext";
+import { toast } from "react-toastify";
+import { getPopularServiceTypes } from './api';
+import 'react-datepicker/dist/react-datepicker.css';
 
-const ServiceList = ({ services, isProfile }) => {
-    const { theme, toggleTheme } = useContext(ThemeContext);
+const ServiceList = ({filter}) => {
+    const [popularTypesData, setPopularTypesData] = useState([]);
+
+    useEffect(() => {
+        getPopularServiceTypes({
+            skip: 0,
+            take: 5,
+        }).then(newData => {
+                setPopularTypesData(newData);
+            })
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: errorMessage,
+                    });
+                }
+                console.error('Error fetching data:', error);
+            });
+    }, []);
 
     return (
         <div>
-            {services.map((service) => (
-                <div className='card-list'>
-                    <h1 className={`service-name-left ${theme === 'dark' ? 'dark' : ''}`}>{service.name}</h1>
-                    <ServiceCard service={service} isProfile={isProfile} />
-                </div>
-            ))}
+            {popularTypesData != null && popularTypesData.length > 0 ? (
+                popularTypesData.map((type) => {
+                    return (
+                        <div key={type.id}>
+                            <ServiceCardTypeList id={type.id} name={type.name} filter={filter} />
+                        </div>
+                    );
+                })
+            ) : (
+                <p>Loading...</p>
+            )}
         </div>
     );
 };
-
 
 export default ServiceList;

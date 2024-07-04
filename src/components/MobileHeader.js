@@ -12,6 +12,7 @@ import axios from "axios";
 import {toast} from "react-toastify";
 import {faList} from "@fortawesome/free-solid-svg-icons/faList";
 import {faClose} from "@fortawesome/free-solid-svg-icons/faClose";
+import {accountExit} from "./api";
 
 const MobileHeader = ({ user, onLogout }) => {
     const navigate = useNavigate();
@@ -62,46 +63,31 @@ const MobileHeader = ({ user, onLogout }) => {
     };
 
     const handleExitClick = () => {
-        const token = Cookies.get('token');
-        if (!token)
-            navigate("/login");
-        else {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            axios.post(`http://localhost:5155/account/logout`)
-                .then(responce => {
-                        localStorage.removeItem('userName');
-                        localStorage.removeItem('userId');
-                        localStorage.removeItem('userEmail');
-                        localStorage.removeItem('userRole');
-                    Cookies.remove('token');
-                    navigate("/");
-                    window.location.reload()
-                })
-                .catch(error => {
-                    if (!toast.isActive(error.message)) {
-                        toast.error(error.message, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: error.message,
-                        });
-                    }
-                    if (error.response) {
-                        if (error.response.status === 401) {
-                            navigate("/login");
-                        } else {
-                            console.error(`Ошибка от сервера: ${error.response.status}`);
-                        }
-                    } else if (error.request) {
-                        console.error('Ответ не был получен. Возможно, проблемы с сетью.');
-                    } else {
-                        console.error('Произошла ошибка при настройке запроса:', error.message);
-                    }
-                });
-        }
+
+        accountExit(navigate).then(newData => {
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userRole');
+            Cookies.remove('token');
+            navigate("/");
+            window.location.reload()
+        })
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: errorMessage,
+                    });
+                }
+                console.error('Error fetching data:', error);
+            });
     }
 
     const handleMenuClick = () => {

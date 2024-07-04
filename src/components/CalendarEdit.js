@@ -8,6 +8,9 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
+import {addOrder, deleteOrder, enrollCalendar, getExecutorServicesLookup, getOrdersByRole, updateOrder} from "./api";
+import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
+import {faClose} from "@fortawesome/free-solid-svg-icons/faClose";
 
 const Calendar = ({full}) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -22,6 +25,7 @@ const Calendar = ({full}) => {
         breakTime: "15",
         duration: "60",
         cost: "",
+        executorComment: "",
     });
     const [appointmentsData, setAppointmentsData] = useState([]);
     const [servicesLookupData, setServicesLookupData] = useState([]);
@@ -39,103 +43,38 @@ const Calendar = ({full}) => {
     }, []);
 
     const fetchLookupData = async () => {
-        try {
-            const token = Cookies.get('token');
-            if(!token)
-                navigate("/login");
-            else{
-                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                const response = await axios.get('http://localhost:5155/executor-service/executor-services/lookup', { withCredentials: true });
-                const serverData = response.data.map(item => ({
-                    id: item.id,
-                    name: item.name
-                }));
-                setServicesLookupData(serverData);
-            }
-        } catch (error) {
-            if (!toast.isActive(error.message)) {
-                toast.error(error.message, {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    toastId: error.message,
-                });
-            }
-            console.error("Error fetching data:", error);
-        }
+        const serverData = await getExecutorServicesLookup(navigate);
+        setServicesLookupData(serverData);
     };
 
     const fetchData = async () => {
-        try {
-            if(full)
-            {
-                const token = Cookies.get('token');
-                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                const response = await axios.get('http://localhost:5155/order/executor?month=' + (currentMonth.getMonth() + 1) +'&year=' + currentMonth.getFullYear(), { withCredentials: true });
-                const serverData = response.data.map(item => ({
-                    executorServiceId: item.executorServiceId,
-                    executorProfileName: item.executorProfileName,
-                    executorName: item.executorName,
-                    clientId: item.clientId,
-                    clientName: item.clientName,
-                    starDate: item.starDate,
-                    day: item.day,
-                    month: item.month,
-                    duration: item.duration,
-                    executorComment: item.executorComment,
-                    clientComment: item.clientComment,
-                    executorApprove: item.executorApprove,
-                    clientApprove: item.clientApprove,
-                    price: item.price,
-                    serviceTypeName: item.serviceTypeName,
-                    id: item.id
-                }));
+        getOrdersByRole(navigate, full, currentMonth, id)
+            .then(serverData => {
                 setAppointmentsData(serverData);
-            }
-            else{
-                const token = Cookies.get('token');
-                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                const response = await axios.get(`http://localhost:5155/order/`+id + '?month=' + (currentMonth.getMonth() + 1) +'&year=' + currentMonth.getFullYear(), { withCredentials: true });
-                const serverData = response.data.map(item => ({
-                    executorServiceId: item.executorServiceId,
-                    executorProfileName: item.executorProfileName,
-                    executorName: item.executorName,
-                    clientId: item.clientId,
-                    clientName: item.clientName,
-                    starDate: item.starDate,
-                    day: item.day,
-                    month: item.month,
-                    duration: item.duration,
-                    executorComment: item.executorComment,
-                    clientComment: item.clientComment,
-                    executorApprove: item.executorApprove,
-                    clientApprove: item.clientApprove,
-                    price: item.price,
-                    serviceTypeName: item.serviceTypeName,
-                    id: item.id
-                }));
-                setAppointmentsData(serverData);
-            }
-        } catch (error) {
-            if (!toast.isActive(error.message)) {
-                toast.error(error.message, {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    toastId: error.message,
-                });
-            }
-            console.error("Error fetching data:", error);
-        }
+            })
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: errorMessage,
+                    });
+                }
+                console.error('Error fetching data:', error);
+            });
     };
 
     const formatTime = (rawTime) => {
+        const timeFormat = /^\d{2}:\d{2}$/;
+        if (timeFormat.test(rawTime)) {
+            return rawTime;
+        }
+
         const date = new Date(rawTime);
         const hours = date.getHours().toString().padStart(2, '0');
         const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -143,37 +82,89 @@ const Calendar = ({full}) => {
     };
 
     const handleNewAppointmentSave = async () => {
+        if (selectedDays.length === 0) {
+            toast.error("Please select at least one day.", {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            return;
+        }
+
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        for (const day of selectedDays) {
+            const appointmentDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+            if (appointmentDate < today) {
+                toast.error("Selected days must be today or in the future.", {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+                return;
+            }
+        }
+
+        if (!newAppointmentData.cost || !newAppointmentData.duration || !newAppointmentData.procedure || !newAppointmentData.startTime || !newAppointmentData.breakTime || !newAppointmentData.sessionCount) {
+            toast.error("All fields must be filled.", {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            return;
+        }
+
         const newAppointments = [];
         for (const day of selectedDays) {
             const startTime = newAppointmentData.startTime;
             for (let i = 0; i < newAppointmentData.sessionCount; i++) {
                 const newStartTime = addMinutes(startTime, i * (parseInt(newAppointmentData.duration) + parseInt(newAppointmentData.breakTime)));
-
-                // Format date and duration
                 const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day, ...newStartTime.split(':'));
-
-                // Explicitly set the timezone offset
                 startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset());
-
                 const durationInMinutes = parseInt(newAppointmentData.duration);
                 const endDate = new Date(startDate.getTime() + durationInMinutes * 60000);
+
+                const overlap = appointmentsData.some(appointment => {
+                    const existingStart = new Date(appointment.starDate);
+                    const existingEnd = new Date(appointment.duration);
+                    return (startDate < existingEnd && endDate > existingStart);
+                });
+
+                if (overlap) {
+                    toast.error("Appointment time overlaps with an existing appointment.", {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                    });
+                    return;
+                }
+
                 const appointmentData = {
                     executorServiceId: newAppointmentData.procedure,
                     starDate: startDate.toISOString(),
                     duration: endDate.toISOString(),
-                    executorComment: "string",
-                    price: parseFloat(newAppointmentData.cost), // convert cost to float
+                    executorComment: newAppointmentData.executorComment,
+                    price: parseFloat(newAppointmentData.cost),
                 };
                 newAppointments.push(appointmentData);
             }
         }
 
         try {
-            // Send a POST request to the backend endpoint
-            const response = await axios.post('http://localhost:5155/order/add', newAppointments);
-
-            // Handle the response, e.g., show a success message
-            console.log('Data saved successfully', response.data);
+            await addOrder(navigate, newAppointments);
             await fetchData();
         } catch (error) {
             if (!toast.isActive(error.message)) {
@@ -201,17 +192,10 @@ const Calendar = ({full}) => {
 
     const handleDeleteClick = async (appointment) => {
         try {
-            // Send a DELETE request to the backend endpoint
-            await axios.delete(`http://localhost:5155/order/remove/${appointment.id}`);
-
-            // Handle the response, e.g., show a success message
-            console.log('Data deleted successfully');
-
-            // Remove the deleted appointment from the local state
+            await deleteOrder(navigate, appointment.id);
             const updatedAppointmentsData = appointmentsData.filter((item) => item.id !== appointment.id);
             setAppointmentsData(updatedAppointmentsData);
 
-            // Clear the editing state
             setEditingAppointmentId(null);
             setEditedAppointments({});
         } catch (error) {
@@ -244,12 +228,18 @@ const Calendar = ({full}) => {
 
             try {
                 const updatedAppointment = updatedAppointmentsData.find(appointment => appointment.id === editingAppointmentId);
-
-                // Send a PUT or PATCH request to update the appointment on the server
-                await axios.put(`http://localhost:5155/order/update`, updatedAppointment);
-
-                // Handle the response, e.g., show a success message
-                console.log('Data updated successfully');
+                if (!updatedAppointment.price || !updatedAppointment.duration || !updatedAppointment.starDate || !updatedAppointment.executorServiceId) {
+                    toast.error("All fields must be filled.", {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                    });
+                    return;
+                }
+                await updateOrder(navigate, updatedAppointment);
             } catch (error) {
                 if (!toast.isActive(error.message)) {
                     toast.error(error.message, {
@@ -271,6 +261,10 @@ const Calendar = ({full}) => {
         setIsNewAppointment(false);
     };
 
+    const handleCancelClick = async () => {
+        setEditingAppointmentId(null);
+        setIsNewAppointment(false);
+    };
 
     const handleDayClick = (day) => {
         if (isNewAppointment) {
@@ -365,6 +359,7 @@ const Calendar = ({full}) => {
             breakTime: "15",
             duration: "60",
             cost: "",
+            executorComment: "",
         });
     };
 
@@ -406,7 +401,7 @@ const Calendar = ({full}) => {
                             }
                         </div>
                         <div className="add-element">
-                            Время начала:{" "}
+                            {translations[language]['StartTime']}:{" "}
                             {
                                 <input
                                     type="time"
@@ -420,7 +415,7 @@ const Calendar = ({full}) => {
                             }
                         </div>
                         <div className="add-element">
-                            Количество сеансов:{" "}
+                            {translations[language]['NumberOfSessions']}:{" "}
                             {
                                 <input
                                     type="number"
@@ -434,7 +429,7 @@ const Calendar = ({full}) => {
                             }
                         </div>
                         <div className="add-element">
-                            Время перерыва:{" "}
+                            {translations[language]['BreakTime']}:{" "}
                             {
                                 <input
                                     type="number"
@@ -449,7 +444,7 @@ const Calendar = ({full}) => {
                             {" "}мин
                         </div>
                         <div className="add-element">
-                            Продолжительность:{" "}
+                            {translations[language]['Duration']}:{" "}
                             {
                                 <input
                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
@@ -464,7 +459,7 @@ const Calendar = ({full}) => {
                             {" "}мин
                         </div>
                         <div className="add-element">
-                            Стоимость:{" "}
+                            {translations[language]['Cost']}:{" "}
                             {
                                 <input
                                     type="number"
@@ -476,13 +471,28 @@ const Calendar = ({full}) => {
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, cost: e.target.value })}
                                 />
                             }
-                            {" "}б.р.
+                            {" "} б.р.
+                        </div>
+                        <div className="add-element">
+                            {translations[language]['ExecutorComment']}:{" "}
+                            {
+                                <input
+                                    type="text"
+                                    name="executorComment"
+                                    style={{width: "18ch"}}
+                                    placeholder={translations[language]['ExecutorComment']}
+                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                    value={newAppointmentData.executorComment}
+                                    onChange={(e) => setNewAppointmentData({ ...newAppointmentData, executorComment: e.target.value })}
+                                />
+                            }
+                            {" "} б.р.
                         </div>
                     </div>
                     {
-                        <div>
+                        <div className='edit-appointment-div'>
                             <button className="save" onClick={handleNewAppointmentSave}>{translations[language]['Save']}</button>
-                            <button className="cancel" onClick={handleNewAppointmentCancel}>{translations[language]['Cancel']}</button>
+                            <button className="delete" onClick={handleNewAppointmentCancel}>{translations[language]['Cancel']}</button>
                         </div>
                     }
                 </div>
@@ -494,6 +504,10 @@ const Calendar = ({full}) => {
                 {translations[language]['Add']}
             </button>
         );
+    };
+
+    const enrollButtonClick = (id) => {
+        enrollCalendar(id);
     };
 
     const renderAppointments = () => {
@@ -512,7 +526,7 @@ const Calendar = ({full}) => {
                                                 <select
                                                     name="procedure"
                                                     className={`select ${theme === 'dark' ? 'dark' : ''}`}
-                                                    value={appointment.executorServiceId}
+                                                    value={editedAppointments[appointment.id].executorServiceId}
                                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, procedure: e.target.value })}
                                                 >
                                                     <option value="">Выберите услугу</option>
@@ -530,9 +544,12 @@ const Calendar = ({full}) => {
                                             {translations[language]['StartTime']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
-                                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                                    type="time"
                                                     name="starDate"
-                                                    value={editedAppointments[appointment.id]?.starDate || ""}
+                                                    placeholder={translations[language]['StartTime']}
+                                                    style={{width: "auto"}}
+                                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                                    value={editedAppointments[appointment.id] != null ? formatTime(editedAppointments[appointment.id].starDate) : ""}
                                                     onChange={(e) => handleInputChange(e, appointment.id)}
                                                 />
                                             ) : (
@@ -543,9 +560,14 @@ const Calendar = ({full}) => {
                                             {translations[language]['Duration']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
+                                                    type="time"
+                                                    placeholder={translations[language]['Duration']}
+                                                    style={{width: "auto"}}
                                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                                     name="duration"
-                                                    value={editedAppointments[appointment.id]?.duration || ""}
+                                                    value={editedAppointments[appointment.id] != null
+                                                        ? formatTime(editedAppointments[appointment.id].duration)
+                                                        : ""}
                                                     onChange={(e) => handleInputChange(e, appointment.id)}
                                                 />
                                             ) : (
@@ -556,6 +578,9 @@ const Calendar = ({full}) => {
                                             {translations[language]['Cost']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
+                                                    type="number"
+                                                    style={{width: "8ch"}}
+                                                    placeholder={translations[language]['Cost']}
                                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                                     name="price"
                                                     value={editedAppointments[appointment.id]?.price || ""}
@@ -565,16 +590,59 @@ const Calendar = ({full}) => {
                                                 <strong>{appointment.price} byn</strong>
                                             )}
                                         </div>
+                                        <div style={theme === 'dark' ? { color: "white"} : {}}>
+                                            {translations[language]['ExecutorComment']}:{" "}
+                                            {editingAppointmentId === appointment.id ? (
+                                                <input
+                                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                                    name="executorComment"
+                                                    value={editedAppointments[appointment.id]?.executorComment || ""}
+                                                    onChange={(e) => handleInputChange(e, appointment.id)}
+                                                />
+                                            ) : (
+                                                <strong>{appointment.executorComment === null || appointment.executorComment === "" ? '-' : appointment.executorComment}</strong>
+                                            )}
+                                        </div>
+                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientName']}: <strong>{appointment.clientName === null || appointment.clientName === "" ? '-' : appointment.clientName}</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientComment']}: <strong>{appointment.clientComment === null || appointment.clientComment === "" ? '-' : appointment.clientComment}</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorApprove']}: <strong>{appointment.executorApprove?
+                                            <FontAwesomeIcon
+                                                icon={faCheck}
+                                                style={{ color: "lightgreen", backgroundColor: "transparent" }}
+                                            />
+                                            :
+                                            <FontAwesomeIcon
+                                                icon={faClose}
+                                                style={{ color: "red", backgroundColor: "transparent" }}
+                                            />} </strong></div>
+                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientApprove']}: <strong>{appointment.clientApprove ?
+                                            <FontAwesomeIcon
+                                                icon={faCheck}
+                                                style={{ color: "lightgreen", backgroundColor: "transparent" }}
+                                            />
+                                            :
+                                            <FontAwesomeIcon
+                                                icon={faClose}
+                                                style={{ color: "red", backgroundColor: "transparent" }}
+                                            />} </strong></div>
                                     </div>
                                     {editingAppointmentId === appointment.id ? (
-                                        <button className="save" onClick={handleSaveClick}>{translations[language]['Save']}</button>
+                                        <div className='edit-appointment-div'>
+                                            <button className="save" onClick={handleSaveClick}>{translations[language]['Save']}</button>
+                                            <button className="delete" onClick={handleCancelClick}>{translations[language]['Cancel']}</button>
+                                        </div>
                                     ) : (
                                         <div>
                                             {appointment.clientId == null &&
-                                                <div>
+                                                <div className='edit-appointment-div'>
                                                     <button className="edit" onClick={() => handleEditClick(appointment)}>{translations[language]['Edit']}</button>
                                                     <button className="delete" onClick={() => handleDeleteClick(appointment)}>{translations[language]['Delete']}</button>
                                                 </div>
+                                            }
+                                            {appointment.clientId != null && appointment.clientApprove
+                                                && !appointment.executorApprove && new Date(appointment.starDate) > new Date() &&
+                                                        <button style={{ backgroundColor: "transparent" }} onClick={() => enrollButtonClick(appointment.id)}>{translations[language]['MakeAnAppointment']}</button>
+
                                             }
                                         </div>
                                     )}
@@ -587,8 +655,6 @@ const Calendar = ({full}) => {
         }
         return null;
     };
-
-
 
     return (
         <div>

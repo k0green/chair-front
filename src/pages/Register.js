@@ -3,7 +3,7 @@ import "../styles/Main.css";
 import Register from '../components/Register';
 import {ThemeContext} from "../components/ThemeContext";
 
-const RegisterPage = ({ user, onLogout }) => {
+const RegisterPage = () => {
     const { theme } = useContext(ThemeContext);
 
     return (

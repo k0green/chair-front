@@ -19,6 +19,13 @@ const AddServiceCardPage = () => {
             name: 'Service 1',
             duration: '0001-01-01T01:00:00',
             serviceTypeId: "36dc8d14-c955-4d33-9b2b-cf2ea432da3c",
+            place: {
+                address: "",
+                position: {
+                    lat: "",
+                    lng: "",
+                }
+            },
             photos:  [{
                 id: 'default',
                 url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn',

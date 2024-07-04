@@ -19,6 +19,7 @@ import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
 import MapModal from "./MapModal";
+import {addServiceCard, getAllServiceTypes, updateServiceCard, uploadMinioPhoto} from "./api";
 
 const ServiceCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
@@ -36,7 +37,7 @@ const ServiceCard = ({ service, isNew, id }) => {
     const [editedServiceTypeId, setEditedServiceTypeId] = useState(service.serviceTypeId);
     const [editedDuration, setEditedDuration] = useState(formatTime(service.duration));
     const [editedPrice, setEditedPrice] = useState(service.price);
-    const [editedAddress, setEditedAddress] = useState(service.address);
+    const [editedAddress, setEditedAddress] = useState(service.place.address);
     const [editedPhotos, setEditedPhotos] = useState([...service.photos]);
     const [servicesLookupData, setServicesLookupData] = useState([]);
     const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
@@ -54,32 +55,26 @@ const ServiceCard = ({ service, isNew, id }) => {
     };
 
     useEffect(() => {
-        const token = Cookies.get('token');
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            axios.get('http://localhost:5155/service-types/get-all')
-                .then(response => {
-                    const serverData = response.data.map(item => ({
-                        id: item.id,
-                        name: item.name
-                    }));
-                    setServicesLookupData(serverData);
-                })
-                .catch(error => {
-                    if (!toast.isActive(error.message)) {
-                        toast.error(error.message, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: error.message,
-                        });
-                    }
-                    console.error('Error fetching data:', error);
-                });
+        getAllServiceTypes().then(newData => {
+            setServicesLookupData(newData);
+        })
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: errorMessage,
+                    });
+                }
+                console.error('Error fetching data:', error);
+            });
 
-        }, []);
+    }, []);
 
     const handleEditSave = () => {
         const updatedServiceData = {
@@ -92,36 +87,40 @@ const ServiceCard = ({ service, isNew, id }) => {
             price: editedPrice,
             photos: editedPhotos.map(photo => photo),
         };
-        const token = Cookies.get('token');
-        if(!token)
-            navigate("/login");
-        else {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            axios.put('http://localhost:5155/executor-service/update', updatedServiceData)
-                .then(response => {
-                    navigate(`/profile`);
-                })
-                .catch(error => {
-                    if (!toast.isActive(error.message)) {
-                        toast.error(error.message, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: error.message,
-                        });
-                    }
-                    console.error('Error saving data:', error);
-                });
+
+        if (!updatedServiceData.serviceTypeId) {
+            toast.error("Service type must be filled.", {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            return;
         }
+
+        updateServiceCard(updatedServiceData, navigate)
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: errorMessage,
+                    });
+                }
+                console.error('Error fetching data:', error);
+            });
     };
 
     const handleAddSave = () => {
         const date = new Date(2023,1,1,20, 50,0, 0);
         date.setHours(date.getHours()+3);
-        console.log(date);
         const updatedServiceData = {
             serviceTypeId: editedServiceTypeId.serviceTypeId,
             executorId: id,
@@ -132,23 +131,33 @@ const ServiceCard = ({ service, isNew, id }) => {
             photos: editedPhotos.map(photo => photo),
         };
 
-        axios.post('http://localhost:5155/executor-service/add', updatedServiceData)
-            .then(response => {
-                navigate("/profile")
-            })
+        if (!updatedServiceData.serviceTypeId) {
+            toast.error("Service type must be filled.", {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            return;
+        }
+
+        addServiceCard(updatedServiceData, navigate)
             .catch(error => {
-                if (!toast.isActive(error.message)) {
-                    toast.error(error.message, {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
                         position: "top-center",
                         autoClose: 5000,
                         hideProgressBar: false,
                         closeOnClick: true,
                         pauseOnHover: true,
                         draggable: true,
-                        toastId: error.message,
+                        toastId: errorMessage,
                     });
                 }
-                console.error('Error saving data:', error);
+                console.error('Error fetching data:', error);
             });
     };
 
@@ -199,16 +208,31 @@ const ServiceCard = ({ service, isNew, id }) => {
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await axios.post('http://localhost:5155/minio/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            let response = null;
+            uploadMinioPhoto(navigate, formData)
+                .then(serverData => {
+                    response = serverData.data.url;
+                })
+                .catch(error => {
+                    const errorMessage = error.message || 'Failed to fetch data';
+                    if (!toast.isActive(errorMessage)) {
+                        toast.error(errorMessage, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: errorMessage,
+                        });
+                    }
+                    console.error('Error fetching data:', error);
+                });
 
             setEditedPhotos(prevState => [...prevState, ...response.data]);
         }
 
-        setFiles([]); // очистите files
+        setFiles([]);
         setUploadPhotoModal(false);
     };
 
@@ -236,7 +260,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                         <select
                             name="procedure"
                             className={`select ${theme === 'dark' ? 'dark' : ''}`}
-                            value={editedServiceTypeId.serviceTypeId}
+                            value={editedServiceTypeId.serviceTypeId || service.serviceTypeId}
                             onChange={(e) => setEditedServiceTypeId({ ...editedServiceTypeId, serviceTypeId: e.target.value })}
                         >
                             <option value="">Выберите услугу</option>
@@ -247,17 +271,6 @@ const ServiceCard = ({ service, isNew, id }) => {
                             ))}
                         </select>
                         <h4>{service.rating} <FontAwesomeIcon icon={faStar} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`} /></h4>
-                    </div>
-                    <div className="service-description">
-                        <input
-                            placeholder={translations[language]['Address']}
-                            className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
-                            type="text"
-                            value={editedAddress || service.place.address}
-                            onChange={(e) => setEditedAddress(e.target.value)}
-                        />
-                        <br/>
-                        <br/>
                     </div>
                     <div className="service-description">
                         <input

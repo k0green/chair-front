@@ -4,7 +4,7 @@ import Messages from '../components/Messages';
 import {useParams} from "react-router-dom";
 import {ThemeContext} from "../components/ThemeContext";
 
-const MessagesPage = ({ user, onLogout }) => {
+const MessagesPage = () => {
     const { theme } = useContext(ThemeContext);
 
     let { id } = useParams();

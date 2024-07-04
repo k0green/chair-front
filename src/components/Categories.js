@@ -1,4 +1,4 @@
-import React, {useState, useContext } from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import { ThemeContext } from "./ThemeContext";
 import CategoryItem from './CategoryItem';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -6,9 +6,23 @@ import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
 import "../styles/CategoryItem.css";
 
 const CategoryList = ({categories}) => {
+    const [itemsPerPage, setItemsPerPage] = useState(8);
+
+    useEffect(() => {
+        const updateItemsPerPage = () => {
+            const maxItems = Math.floor(window.innerWidth / 150);
+            setItemsPerPage(maxItems);
+        };
+
+        updateItemsPerPage();
+        window.addEventListener('resize', updateItemsPerPage);
+
+        return () => {
+            window.removeEventListener('resize', updateItemsPerPage);
+        };
+    }, []);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 6;
     const { theme } = useContext(ThemeContext);
 
     const totalPages = Math.ceil(categories.length / itemsPerPage);

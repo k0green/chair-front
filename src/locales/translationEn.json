@@ -65,5 +65,10 @@
   "From": "From",
   "To": "To",
   "Clear": "Clear",
-  "SortBy": " Sort by"
+  "SortBy": " Sort by",
+  "ExecutorComment": "Executor's comment",
+  "ExecutorApprove": "Executor's approve",
+  "ClientName": "Client's name",
+  "ClientComment": "Client's comment",
+  "ClientApprove": "Client's approve"
 }

@@ -181,6 +181,28 @@
     border-radius: 5px;
 }
 
+.appointmentAdd button.edit {
+    border: 2px solid #17a2b8;
+    color: #17a2b8;
+    background-color: transparent;
+    border-radius: 5px;
+}
+
+.appointmentAdd button.delete {
+    border: 2px solid red;
+    color: red;
+    background-color: transparent;
+    border-radius: 5px;
+    margin-left: 5px;
+}
+
+.appointmentAdd button.save {
+    border: 2px solid #28a745;
+    color: #28a745;
+    background-color: transparent;
+    border-radius: 5px;
+}
+
 .newAppointmentContainer {
     display: flex;
     justify-content: flex-end;
@@ -196,7 +218,7 @@
     background-color: transparent;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
-    margin-right: 10px;
+    margin-right: 1%;
     margin-top: 10px;
 }
 
@@ -267,23 +289,6 @@
     align-items: center;
 }
 
-.appointmentAdd button.save {
-    border: 2px solid #28a745;
-    color: #28a745;
-    background-color: transparent;
-    font-size: 18px;
-    border-radius: 10px;
-}
-
-.appointmentAdd button.cancel {
-    border: 2px solid red;
-    color: red;
-    background-color: transparent;
-    font-size: 18px;
-    border-radius: 10px;
-    margin-left: 5px;
-}
-
 .small-input {
     width: 60px; /* You can adjust the width as needed */
     padding: 4px;
@@ -306,7 +311,6 @@
     color: white;
 }
 
-/* Add styles for the up and down arrows indicating tab state */
 .tab-up {
     transform: rotate(180deg);
 }
@@ -330,6 +334,78 @@
     color: black;
 }
 
-.save{
+.edit-appointment-div {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.edit-appointment-div button {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.edit-appointment-div button:last-child {
+    margin-right: 0;
+}
+
+@media (max-width: 1000px) {
+    .calendar {
+        width: 90%;
+    }
+
+    .newAppointmentButton {
+        margin-right: 3.5%;
+    }
+
+    .appointment {
+        flex-direction: column;
+        /*align-items: flex-start;*/
+        width: 92%;
+    }
+
+    .appointmentAdd {
+        flex-direction: column;
+        /*align-items: flex-start;*/
+        width: 92%;
+    }
+
+    .appointment-details {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .appointmentAdd-details {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .appointment-details > div {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .appointment button {
+        align-self: stretch;
+        margin-top: 10px;
+        font-size: 20px;
+    }
+
+    .appointmentAdd-details > div {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .appointmentAdd button {
+        align-self: stretch;
+        margin-top: 10px;
+        font-size: 24px;
+    }
+
+    .edit-appointment-div button {
+        width: calc(50% - 5px); /* Каждая кнопка занимает половину ширины, с отступом между ними */
+    }
 
 }

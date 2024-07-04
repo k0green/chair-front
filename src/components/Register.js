@@ -1,20 +1,12 @@
 import React, {Fragment, useContext, useState} from 'react';
-import Select from 'react-select';
-import axios from 'axios';
-
 import '../styles/Register.css';
 import {Link, useNavigate} from "react-router-dom";
-import Cookies from "js-cookie";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
+import {registerQuery} from "./api";
 
 function Register() {
-    const options = [
-        {value: 'someId1', label: 'admin'},
-        {value: 'someId2', label: 'user'},
-    ];
-
     const navigate = useNavigate();
     const { theme } = useContext(ThemeContext);
     const { language, translations } = useContext(LanguageContext);
@@ -23,7 +15,6 @@ function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [role, setRole] = useState('');
     const [phone, setPhone] = useState('');
 
 
@@ -61,7 +52,6 @@ function Register() {
         }
     };
 
-
     const handleConfirmPasswordChange = (value) => {
         setConfirmPassword(value);
         if (value !== password) {
@@ -69,10 +59,6 @@ function Register() {
         } else {
             setConfirmPasswordError("");
         }
-    };
-
-    const handleRoleChange = (value) => {
-        setRole(value);
     };
 
     const handleEmailChange = (value) => {
@@ -113,46 +99,29 @@ function Register() {
             Phone: phone,
         };
 
-        const url = "http://localhost:5155/account/register"; // Update the URL to the registration endpoint
-
-        axios
-            .post(url, data)
-            .then((result) => {
-                Cookies.set('token', result.data, { expires: 1 });
-                axios.get(`http://localhost:5155/account/user-info?email=`+data.Email)
-                    .then(response => {
-                        const serverData = {
-                            id: response.data.id,
-                            name: response.data.name,
-                            email: response.data.email,
-                            role: response.data.role
-                        }
-                        console.log(serverData)
-                        localStorage.setItem('userName', serverData.name);
-                        localStorage.setItem('userId', serverData.id);
-                        localStorage.setItem('userEmail', serverData.email);
-                        localStorage.setItem('userRole', serverData.role);
-                    })
-                    .catch(error => {
-                        // Handle error
-                        console.error('Error fetching data:', error);
-                    });
+        registerQuery(navigate, data)
+            .then(serverData => {
+                localStorage.setItem('userName', serverData.name);
+                localStorage.setItem('userId', serverData.id);
+                localStorage.setItem('userEmail', serverData.email);
+                localStorage.setItem('userRole', serverData.role);
                 navigate("/")
                 window.location.reload()
             })
-            .catch((error) => {
-                if (!toast.isActive(error.message)) {
-                    toast.error(error.message, {
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
                         position: "top-center",
                         autoClose: 5000,
                         hideProgressBar: false,
                         closeOnClick: true,
                         pauseOnHover: true,
                         draggable: true,
-                        toastId: error.message,
+                        toastId: errorMessage,
                     });
                 }
-                alert(error);
+                console.error('Error fetching data:', error);
             });
     };
 

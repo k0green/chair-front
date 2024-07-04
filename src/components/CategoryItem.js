@@ -1,7 +1,6 @@
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import "../styles/CategoryItem.css";
 import { useNavigate } from "react-router-dom";
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import IconComponent from "./IconComponent";
 import { ThemeContext } from "./ThemeContext";
 
@@ -10,7 +9,6 @@ const CategoryItem = ({ id, name, icon }) => {
 
     const { theme } = useContext(ThemeContext);
     const navigate = useNavigate();
-    const [darkTheme, setDarkTheme] = useState(false);
 
     const handleCategoryClick = () => {
         navigate('/collection/category/'+id);

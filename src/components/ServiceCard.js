@@ -1,38 +1,49 @@
-import React, {useContext, useState} from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import '../styles/ServiceCard.css';
 import {
-    faBoltLightning, faChevronLeft, faChevronRight,
-    faClock,
-    faHouse,
-    faLightbulb, faPencil,
-    faStar,
-    faTimes,
-    faTimesCircle, faTrash
+    faBoltLightning, faClock,
+    faPencil, faStar, faTrash
 } from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"; // Подключаем файл стилей
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PhotoList from "../components/PhotoList";
-import {useNavigate} from "react-router-dom";
-import {ThemeContext} from "./ThemeContext";
-import {LanguageContext} from "./LanguageContext";
-import MapModal from "./MapModal";
+import { useNavigate } from "react-router-dom";
+import { ThemeContext } from "./ThemeContext";
+import { LanguageContext } from "./LanguageContext";
+import {faHouse} from "@fortawesome/free-solid-svg-icons/faHouse";
+import {toast} from "react-toastify";
+import {deleteServiceCard} from "./api";
 
 const ServiceCard = ({ service, isProfile }) => {
     const navigate = useNavigate();
-    const { theme, toggleTheme } = useContext(ThemeContext);
-    const { id, name, masters } = service;
+    const { theme } = useContext(ThemeContext);
     const { language, translations } = useContext(LanguageContext);
     const [selectedPlace, setSelectedPlace] = useState({ position: null, address: '' });
+    const [itemsPerPage, setItemsPerPage] = useState(4);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
+    useEffect(() => {
+        const updateItemsPerPage = () => {
+            const maxItems = Math.floor(window.innerWidth / 500);
+            setItemsPerPage(maxItems);
+        };
+
+        updateItemsPerPage();
+        window.addEventListener('resize', updateItemsPerPage);
+
+        return () => {
+            window.removeEventListener('resize', updateItemsPerPage);
+        };
+    }, []);
 
     const handleOrderClick = (executorServiceId) => {
-        navigate("/calendar/"+ executorServiceId);
+        navigate("/calendar/" + executorServiceId);
     };
 
     const handleReviewClick = (executorServiceId) => {
-        navigate("/reviews/"+ executorServiceId);
+        navigate("/reviews/" + executorServiceId);
     };
 
-    let handleMasterNameClickClick = (masterId) => {
+    const handleMasterNameClickClick = (masterId) => {
         navigate("/profile/" + masterId);
     };
 
@@ -41,142 +52,102 @@ const ServiceCard = ({ service, isProfile }) => {
     };
 
     const handleRemoveClick = (id) => {
-        navigate("/service-card/remove/" + id);
-    };
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 4;
-
-    const totalPages = Math.ceil(masters.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-
-    const visibleCategories = masters.slice(startIndex, endIndex);
-
-    const goToPreviousPage = () => {
-        setCurrentPage((prevPage) => {
-            if (prevPage === 1) {
-                return totalPages;
-            } else {
-                return prevPage - 1;
+        deleteServiceCard(id, navigate).then(newData => {
+            const successMessage = "Success"
+            if (!toast.isActive(successMessage)) {
+                toast.success(successMessage, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: successMessage,
+                });
             }
-        });
+        })
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: errorMessage,
+                    });
+                }
+                console.error('Error fetching data:', error);
+            });
+/*        window.location.reload();*/
     };
-
-    const goToNextPage = () => {
-        setCurrentPage((prevPage) => {
-            if (prevPage === totalPages) {
-                return 1;
-            } else {
-                return prevPage + 1;
-            }
-        });
-    };
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleAddressClick = (lat, lng, address) => {
-        console.log('Lat:', lat, 'Lng:', lng, 'Address:', address); // Add this line
-        console.log(service); // Add this line
+        console.log('Lat:', lat, 'Lng:', lng, 'Address:', address);
+        console.log(service);
         setSelectedPlace({
-            position: {
-                lat: lat,
-                lng: lng,
-            },
+            position: { lat, lng },
             address: address,
         });
         setIsModalOpen(true);
     };
 
-
     return (
-        <div className="category-container">
-            <div className="pagination-arrow-container">
-                <FontAwesomeIcon
-                    icon={faChevronLeft}
-                    className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
-                    onClick={goToPreviousPage}
-                />
-            </div>
             <div className="card-list">
-                {visibleCategories.map((master) => (
-                    <div className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
-                        <div key={master.id} className="master-card">
+                    <div key={service.id} className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
+                        <div className="master-card">
                             <div className="photos">
-                                {/*{master.photos ? <PhotoList photos={master.photos}/> : null}*/}
-                                {master.photos ? <PhotoList photos={master.photos}/> :     <img
-                                    key={id}
-                                    src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
-                                    /*//alt={id}*/
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'; // Замените на вашу альтернативную ссылку
-                                    }}/>}
+                                {service.photos ? <PhotoList photos={service.photos} /> :
+                                    <img
+                                        src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
+                                        }}
+                                    />}
                             </div>
                             <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
-                                <h4 onClick={() => handleMasterNameClickClick(master.executorId)}>{master.name}</h4>
-                                <h4 style={{cursor: "pointer"}} onClick={()=>handleReviewClick(master.id)}>{master.rating} <FontAwesomeIcon icon={faStar} className = 'item-icon'/></h4>
+                                <h4 style={{ cursor: "pointer" }} onClick={() => handleMasterNameClickClick(service.executorId)}>{service.name}</h4>
+                                <h4 style={{ cursor: "pointer" }} onClick={() => handleReviewClick(service.id)}>
+                                    {service.rating} <FontAwesomeIcon icon={faStar} className='item-icon' />
+                                </h4>
                             </div>
-{/*                            <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
-                                <p>{master.description}</p>
-                                <p><FontAwesomeIcon icon={faHouse} className = 'item-icon'/>{master.address}</p>
-                                <p>{translations[language]['AvailableSlots']}: {master.availableSlots}</p>
-                            </div>*/}
                             <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
-                                <p>{master.description}</p>
-                                <p onClick={()=> handleAddressClick(master.place.position.lat, master.place.position.lng, master.place.address)} style={{ cursor: 'pointer' }}>
+                                <p>{service.description}</p>
+                                <p onClick={() => handleAddressClick(service.place.position.lat, service.place.position.lng, service.place.address)} style={{ cursor: 'pointer' }}>
                                     <FontAwesomeIcon icon={faHouse} className='item-icon' />
-                                    {master.place.address}
+                                    {service.place.address}
                                 </p>
-                                <p>{translations[language]['AvailableSlots']}: {master.availableSlots}</p>
+                                <p>{translations[language]['AvailableSlots']}: {service.availableSlots}</p>
                             </div>
                             <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
-                                <h4><FontAwesomeIcon icon={faClock} className = 'item-icon'/> {master.duration}</h4>
-                                <h4>{master.price} Byn</h4>
+                                <h4><FontAwesomeIcon icon={faClock} className='item-icon' /> {service.duration}</h4>
+                                <h4>{service.price} Byn</h4>
                             </div>
                             <div>
                                 {isProfile ?
                                     <div>
-                                        <button className="order-button" onClick={()=>handleIsProfileClick(service.id)}>
-                                            <p className="order-text"><FontAwesomeIcon icon={faPencil} />    {translations[language]['Edit']}</p>
+                                        <button className="order-button" onClick={() => handleIsProfileClick(service.id)}>
+                                            <p className="order-text"><FontAwesomeIcon icon={faPencil} /> {translations[language]['Edit']}</p>
                                         </button>
-                                        <br/>
-                                        <br/>
-                                        <button className="order-button" onClick={()=>handleRemoveClick(service.id)}>
-                                            <p className="order-text"><FontAwesomeIcon icon={faTrash} />    {translations[language]['Delete']}</p>
+                                        <br />
+                                        <br />
+                                        <button className="order-button" onClick={() => handleRemoveClick(service.id)}>
+                                            <p className="order-text"><FontAwesomeIcon icon={faTrash} /> {translations[language]['Delete']}</p>
                                         </button>
                                     </div>
                                     :
-                                    <button className="order-button" onClick={()=>handleOrderClick(master.id)}>
-                                        <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} />    {translations[language]['MakeAnAppointment']}</p>
+                                    <button className="order-button" onClick={() => handleOrderClick(service.id)}>
+                                        <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['MakeAnAppointment']}</p>
                                     </button>
                                 }
                             </div>
                         </div>
                     </div>
-                ))}
             </div>
-            <div className="pagination-arrow-container">
-                <FontAwesomeIcon
-                    icon={faChevronRight}
-                    className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
-                    onClick={goToNextPage}
-                />
-            </div>
-            <MapModal
-                isOpen={isModalOpen}
-                onRequestClose={() => setIsModalOpen(false)}
-                initialPosition={selectedPlace.position}
-                initialAddress={selectedPlace.address}
-            />
-        </div>
     );
 };
 
 export default ServiceCard;
-
-
-
-
-
-

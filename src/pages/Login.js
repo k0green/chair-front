@@ -3,7 +3,7 @@ import { ThemeContext } from '../components/ThemeContext';
 import "../styles/Main.css";
 import Login from '../components/Login';
 
-const LoginPage = ({ user, onLogout }) => {
+const LoginPage = () => {
     const { theme } = useContext(ThemeContext);
 
     return (
