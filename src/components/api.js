@@ -2,7 +2,7 @@ import axios from 'axios';
 import {toast} from "react-toastify";
 import Cookies from "js-cookie";
 
-export const BASE_URL = 'http://chairback.somee.com';
+export const BASE_URL = 'https://chairapp-001-site1.etempurl.com';
 const token = Cookies.get('token');
 
 export const getPopularServiceTypes = async (filterModel) => {
@@ -27,7 +27,7 @@ export const getPopularServiceTypes = async (filterModel) => {
             });
         }
         console.error('Error fetching data:', error);
-        throw error; // Пробрасываете ошибку для дальнейшей обработки
+        throw error;
     }
 };
 
