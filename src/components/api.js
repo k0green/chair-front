@@ -2,7 +2,7 @@ import axios from 'axios';
 import {toast} from "react-toastify";
 import Cookies from "js-cookie";
 
-export const BASE_URL = 'https://chairapp-001-site1.etempurl.com';
+export const BASE_URL = '/api';
 const token = Cookies.get('token');
 
 export const getPopularServiceTypes = async (filterModel) => {
