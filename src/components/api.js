@@ -2,7 +2,7 @@ import axios from 'axios';
 import {toast} from "react-toastify";
 import Cookies from "js-cookie";
 
-export const BASE_URL = 'http://localhost:5155';
+export const BASE_URL = 'http://chairback.somee.com';
 const token = Cookies.get('token');
 
 export const getPopularServiceTypes = async (filterModel) => {
