@@ -2,7 +2,8 @@ import React, {useContext, useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import {ThemeContext} from "./ThemeContext";
 import {toast} from "react-toastify";
-import {getAllChats} from "./api";
+import {getAllChats, getOrdersByRole} from "./api";
+import Cookies from "js-cookie";
 
 function ChatList() {
     const navigate = useNavigate();
@@ -13,26 +14,17 @@ function ChatList() {
 
     useEffect(() => {
         const userId = localStorage.getItem('userId');
-        getAllChats( navigate, userId)
-            .then(response => {
+        const fetchData = async () => {
+            const token = Cookies.get('token');
+            if (!token) {
+                navigate('/login');
+            } else {
+                const response = await getAllChats( navigate, userId);
                 setMessages(response.messages);
                 setChatData(response);
-            })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
-            });
+            }
+        };
+        fetchData();
     }, []);
 
     const handleChatClick = (id) => {

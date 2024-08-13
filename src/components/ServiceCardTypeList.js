@@ -264,12 +264,14 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
         const requestBody = {
             take: itemsPerPage,
             skip: (currentPage - 1) * itemsPerPage,
-            sortData,
-            filterValuesData,
+            sort,
+            filter,
             dates: selectedDates,
             times: timeRanges.map((timeRange) => ({
-                startTime: timeRange.startTime ? new Date(`2023-11-02T${timeRange.startTime}:00.000Z`).toISOString() : null,
-                endTime: timeRange.endTime ? new Date(`2023-11-02T${timeRange.endTime}:00.000Z`).toISOString() : null,
+                startTime: timeRange.startTime ? new Date(`2023-11-02T${timeRange.startTime}:00.000Z`).toISOString()
+                    : new Date(`2023-11-02T${"00:00"}:00.000Z`).toISOString(),
+                endTime: timeRange.endTime ? new Date(`2023-11-02T${timeRange.endTime}:00.000Z`).toISOString()
+                    : new Date(`2023-11-02T${"23:59"}:00.000Z`).toISOString(),
             })),
         };
         fetchData(requestBody);
@@ -404,8 +406,7 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
         }
     };
 
-    const handleOptimizeServiceClick = () => {
-        console.log('id = '+id)
+    const handleOptimizeServiceClick = async () => {
         const requestBody = {
             filterModel: {},
             serviceTypeId: id,
@@ -416,28 +417,10 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
                 {column: 4, value: durationSwitch, lambda: 0.1},
             ],
         };
-
-        getOptimalServiceCard(requestBody).then(newData => {
-            setOprData(newData);
-        })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
-            });
-
+        const response = await getOptimalServiceCard(requestBody);
+        setOprData(response);
         setOptimizeServiceModal(true);
-        if (oprData){
+        if (response){
             setShowOprResModal(true);
         }
     };
@@ -465,7 +448,7 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
             if (field === "executorName")
                 return {
                     ...prevSortOptions,
-                    masterName: null,
+                    executorName: null,
                 };
             else if (field === "price")
                 return {
@@ -741,7 +724,7 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
                             <div className="service-card">
                                 <div key={oprData.id} className="master-card">
                                     <div className="photos">
-                                        <PhotoList photos={oprData.photos}/>
+                                        <PhotoList photos={oprData.photos} canDelete={false}/>
                                     </div>
                                     <div className="master-info">
                                         <h4 onClick={() => handleMasterNameClickClick(oprData.executorId)}>{oprData.name}</h4>
@@ -790,15 +773,17 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
                                     <label>Time Range {index + 1}:</label>
                                     <input
                                         type="time"
-                                        style={{width: '15%'}}
-                                        value={timeRange.startTime || ''}
+                                        value={timeRange.startTime || '00:00'}
+                                        style={{width: "auto"}}
+                                        className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                         onChange={(e) => handleTimeChange(index, 'startTime', e.target.value)}
                                     />
                                     <span> - </span>
                                     <input
                                         type="time"
-                                        style={{width: '15%'}}
-                                        value={timeRange.endTime || ''}
+                                        style={{width: "auto"}}
+                                        className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                        value={timeRange.endTime || '23:59'}
                                         onChange={(e) => handleTimeChange(index, 'endTime', e.target.value)}
                                     />
                                     {index > -1 && (

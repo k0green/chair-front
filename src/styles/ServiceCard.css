@@ -245,11 +245,11 @@ input[type="text"] {
     justify-content: space-between;
 }
 
-.card-list{
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-/*        margin-top: 20px;*/
+.card-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: stretch; /* Добавлено */
     background-color: transparent;
 }
 
@@ -291,7 +291,7 @@ input[type="text"] {
 .dropzone-centrize{
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Центрирование по горизонтали */
+    justify-content: center;
     align-items: center;
 }
 
@@ -300,9 +300,7 @@ input[type="text"] {
     border-radius: 10px;
     border-color: #3333ff;
     background-color: white;
-    margin-bottom: -40px;
     margin-top: 10px;
-    padding: -8px -12px;
 }
 
 .photos-edit {
@@ -341,6 +339,13 @@ input[type="text"] {
     background-color: #2d2828;
 }
 
+.dropzoneBorder{
+    border: 2px solid blue;
+    padding: 20px;
+    width: 400px;
+    height: 400px;
+}
+
 @media (orientation: portrait) {
     .F {
         flex-direction: column;
@@ -363,5 +368,12 @@ input[type="text"] {
     .photos-edit {
         min-width: 300px;
         min-height: 320px;
+    }
+
+    .dropzoneBorder{
+        border: 2px solid blue;
+        padding: 20px;
+        width: 340px;
+        height: 340px;
     }
 }

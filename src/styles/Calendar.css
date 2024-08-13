@@ -247,6 +247,22 @@
     color: #adadad;
 }
 
+.newAppointmentForm1-input {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 0;
+    padding: 0;
+}
+
+.newAppointmentForm1-input.dark{
+    background-color: #695b5b;
+    color: white;
+}
+
+.newAppointmentForm1-input.dark::placeholder{
+    color: #adadad;
+}
+
 .newAppointmentForm button {
     border: 2px solid #007bff;
     border-radius: 4px;

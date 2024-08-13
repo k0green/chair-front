@@ -28,9 +28,9 @@ function Register() {
         const userId = localStorage.getItem('userId');
         getUserInfoForEdit( navigate, userId)
             .then(response => {
-                setUserData(userData);
-                setEmail(userData.email);
-                setName(userData.name);
+                setUserData(response);
+                setEmail(response.email);
+                setName(response.name);
             })
             .catch(error => {
                 const errorMessage = error.message || 'Failed to fetch data';
@@ -54,7 +54,7 @@ function Register() {
         if (value.trim() === '') {
             setNameError('Name cannot be empty');
         } else {
-            const nameRegex = /^[А-Яа-яA-Za-z@$_ ]+$/;
+            const nameRegex = /^[A-Za-zА-Яа-я@$_\d ]+$/;
             if (!nameRegex.test(value)) {
                 setNameError('Name can only contain letters and @ $ _');
             } else {
@@ -116,13 +116,37 @@ function Register() {
             NewPassword: newPassword,
         };
 
+        if(name === null | email === null | oldPassword === null | newPassword === null
+            | name === "" | email === '' | oldPassword === "" | newPassword === ""){
+            return(
+                toast.error("Fields are empty", {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: "Fields are empty",
+                })
+            );
+        }
+
         getEditUserInfo( navigate, data)
             .then(serverData => {
                 localStorage.setItem('userName', serverData.name);
                 localStorage.setItem('userId', serverData.id);
                 localStorage.setItem('userEmail', serverData.email);
                 localStorage.setItem('userRole', serverData.role);
-                navigate("/")
+                toast.success(translations[language]['Success'], {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: 'Success',
+                });
+                navigate('/');
             })
             .catch(error => {
                 const errorMessage = error.message || 'Failed to fetch data';
@@ -142,10 +166,9 @@ function Register() {
     };
 
     return (
-        <Fragment>
             <div className="register-container">
-                <form className="register-form">
-                    <div className={`register-header ${theme === 'dark' ? 'dark' : ''}`}>{translations[language]['Register']}</div>
+                <div className="register-form">
+                    <div className={`register-header ${theme === 'dark' ? 'dark' : ''}`}>{translations[language]['EditUserData']}</div>
                     <label className={`register-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtName">{translations[language]['Name']}</label>
                     <input
                         className={`register-input ${theme === 'dark' ? 'dark' : ''}`}
@@ -186,14 +209,13 @@ function Register() {
                     {confirmPasswordError && <div className="register-error">{confirmPasswordError}</div>}
                     <button
                         className={`register-button ${nameError || emailError || passwordError || confirmPasswordError ? "" : "active"}`}
-                        onClick={() => handleSave()}
+                        onClick={handleSave}
                         //disabled={!name || !email || !password || !confirmPassword || !role ||nameError || emailError || passwordError || confirmPasswordError}
                     >
                         {translations[language]['Save']}
                     </button>
-                </form>
+                </div>
             </div>
-        </Fragment>
     );
 }
 export default Register;

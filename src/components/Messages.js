@@ -151,20 +151,6 @@ const MessageComponent = ({ id }) => {
             .then(response => {
                 setMessages(response.messages);
                 setChatData(response);
-            })
-            .catch(error => {
-                console.error('Error saving data:', error);
-                if (!toast.isActive(error.message)) {
-                    toast.error(error.message, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: error.message,
-                    });
-                }
             });
 
         connection.on("ReceiveMessage", (message) => {

@@ -8,12 +8,11 @@ const token = Cookies.get('token');
 export const getPopularServiceTypes = async (filterModel) => {
     try {
         const response = await axios.post(`${BASE_URL}/service-types/popular`, filterModel);
-        const data = response.data.map(type => ({
+        return response.data.map(type => ({
             id: type.id,
             name: type.name,
             icon: type.icon
         }));
-        return data;
     } catch (error) {
         if (!toast.isActive(error.message)) {
             toast.error(error.message, {
@@ -55,12 +54,11 @@ export const getAllServiceTypes = async () => {
 export const getServiceTypeById = async (id) => {
     try {
         const response = await axios.get(`${BASE_URL}/service-types/get-by-id/${id}`);
-        const data = {
+        return {
             id: response.data.id,
             name: response.data.name,
             icon: response.data.icon
         };
-        return data;
     } catch (error) {
         if (!toast.isActive(error.message)) {
             toast.error(error.message, {
@@ -102,6 +100,7 @@ export const getServiceCardByTypeId = async (id, filter) => {
                     }
                 },
                 executorId: service.executorId,
+                userId: service.userId,
                 photos: service.photos.length > 0 ? service.photos.map(photo => ({
                     id: photo.id,
                     url: photo.url,
@@ -129,43 +128,6 @@ export const getServiceCardByTypeId = async (id, filter) => {
             });
         }
         console.error('Error fetching data:', error);
-        throw error;
-    }
-};
-
-export const getServiceCardsAll = async (requestBody) => {
-    try {
-        const response = await axios.post(`${BASE_URL}/executor-service/all`, requestBody);
-        return response.data.map(serviceType => ({
-            id: serviceType.id,
-            name: serviceType.serviceTypeName,
-            masters: serviceType.services.map(service => ({
-                id: service.id,
-                name: service.executorName,
-                description: service.description,
-                price: service.price,
-                availableSlots: service.availableSlots,
-                duration: formatTime(service.duration),
-                rating: service.rating,
-                place: {
-                    address: service.place.address,
-                    position: {
-                        lat: service.place.position.lat,
-                        lng: service.place.position.lng,
-                    }
-                },
-                executorId: service.executorId,
-                photos: service.photos.length > 0 ? service.photos.map(photo => ({
-                    id: photo.id,
-                    url: photo.url,
-                })) : [{
-                    id: 'default',
-                    url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Fallback URL
-                }],
-            })),
-        }));
-    } catch (error) {
-        console.error('Error fetching service cards:', error);
         throw error;
     }
 };
@@ -215,44 +177,44 @@ export const getProfileById = async (id, navigate) => {
             if(!id)
             {
                 const response = await axios.get(`${BASE_URL}/executor-profile/get`)
-                    var userData= {
-                            id: response.data.id,
-                            name: response.data.name,
-                            imageUrl: response.data.imageUrl,
-                            description: response.data.description,
-                            userId: response.data.userId,
-                            contacts: response.data.contacts.map(contact => ({
-                                id: contact.id,
-                                name: contact.name,
-                                type: contact.type,
-                                executorProfileId: contact.executorProfileId,
-                            })),
-                            services: response.data.services.map(service => ({
-                                id: service.id,
-                                executorId: service.executorId,
-                                name: service.executorName || 'Unknown Master',
-                                description: service.description,
-                                price: service.price,
-                                availableSlots: service.availableSlots,
-                                duration: formatTime(service.duration),
-                                rating: service.rating,
-                                address: service.place.address,
-                                place: {
-                                    address: service.place.address,
-                                    position: {
-                                        lat: service.place.position.lat,
-                                        lng: service.place.position.lng,
-                                    }
-                                },
-                                photos: service.photos.length > 0 ? service.photos.map(photo => ({
-                                    id: photo.id,
-                                    url: photo.url,
-                                })) : [{
-                                    id: 'default',
-                                    url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
-                                }],
-                            })),
-                        };
+                const userData = {
+                    id: response.data.id,
+                    name: response.data.name,
+                    imageUrl: response.data.imageUrl,
+                    description: response.data.description,
+                    userId: response.data.userId,
+                    contacts: response.data.contacts.map(contact => ({
+                        id: contact.id,
+                        name: contact.name,
+                        type: contact.type,
+                        executorProfileId: contact.executorProfileId,
+                    })),
+                    services: response.data.services.map(service => ({
+                        id: service.id,
+                        executorId: service.executorId,
+                        name: service.executorName || 'Unknown Master',
+                        description: service.description,
+                        price: service.price,
+                        availableSlots: service.availableSlots,
+                        duration: formatTime(service.duration),
+                        rating: service.rating,
+                        address: service.place.address,
+                        place: {
+                            address: service.place.address,
+                            position: {
+                                lat: service.place.position.lat,
+                                lng: service.place.position.lng,
+                            }
+                        },
+                        photos: service.photos.length > 0 ? service.photos.map(photo => ({
+                            id: photo.id,
+                            url: photo.url,
+                        })) : [{
+                            id: 'default',
+                            url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+                        }],
+                    })),
+                };
                 return {
                     services: userData.services,
                     userData: userData,
@@ -299,7 +261,7 @@ export const getProfileById = async (id, navigate) => {
                     contacts: userData.contacts
                 }
             }
-        };
+        }
     } catch (error) {
         if (!toast.isActive(error.message)) {
             toast.error(error.message, {
@@ -328,12 +290,13 @@ export const getProfileById = async (id, navigate) => {
 
 export const getExecutorServiceById = async (id, navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             const response = await axios.get(`${BASE_URL}/executor-service/get-by-id/${id}`);
-            const formattedData = {
+            return {
                 id: response.data.id,
                 name: response.data.executorName || 'Unknown Master',
                 serviceTypeId: response.data.serviceTypeId,
@@ -361,7 +324,6 @@ export const getExecutorServiceById = async (id, navigate) => {
                     url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
                 }],
             };
-            return formattedData;
         }
     } catch (error) {
         if (!toast.isActive(error.message)) {
@@ -381,6 +343,7 @@ export const getExecutorServiceById = async (id, navigate) => {
 
 export const updateProfile = async (editedUser, editedContacts, navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -411,6 +374,7 @@ export const updateProfile = async (editedUser, editedContacts, navigate) => {
 
 export const updateServiceCard = async (updatedServiceData, navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -436,6 +400,7 @@ export const updateServiceCard = async (updatedServiceData, navigate) => {
 
 export const addServiceCard = async (updatedServiceData, navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -461,12 +426,13 @@ export const addServiceCard = async (updatedServiceData, navigate) => {
 
 export const deleteServiceCard = async (id, navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            await axios.post(`${BASE_URL}/executor-service/remove/${id}`);
-            navigate(`/profile`);
+            await axios.delete(`${BASE_URL}/executor-service/remove/${id}`);
+            window.location.reload();
         }
     } catch (error) {
         if (!toast.isActive(error.message)) {
@@ -484,13 +450,14 @@ export const deleteServiceCard = async (id, navigate) => {
     }
 };
 
-export const accountExit = async (id, navigate) => {
+export const accountExit = async (navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            await axios.post(`${BASE_URL}//account/logout`);
+            await axios.post(`${BASE_URL}/account/logout`);
         }
     } catch (error) {
         if (!toast.isActive(error.message)) {
@@ -510,6 +477,7 @@ export const accountExit = async (id, navigate) => {
 
 export const getReviewsByServiceCardId = async (id, navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -543,6 +511,7 @@ export const getReviewsByServiceCardId = async (id, navigate) => {
 
 export const updateReview = async (updatedReviewData, navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -567,6 +536,7 @@ export const updateReview = async (updatedReviewData, navigate) => {
 
 export const addReview = async (updatedReviewData, navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -591,6 +561,7 @@ export const addReview = async (updatedReviewData, navigate) => {
 
 export const getAllChats = async (navigate, userId) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -634,6 +605,7 @@ export const getAllChats = async (navigate, userId) => {
 
 export const getUserInfoForEdit = async (navigate, userId) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -663,6 +635,7 @@ export const getUserInfoForEdit = async (navigate, userId) => {
 
 export const getEditUserInfo = async (navigate, data) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -705,14 +678,17 @@ export const login = async (navigate, data) => {
         };
     } catch (error) {
         if (!toast.isActive(error.message)) {
-            toast.error(error.message, {
+            if (error.response && error.response.status === 400) {
+                console.error('Server response:', error.response.data);
+            }
+            toast.error(error.response.data[0].message, {
                 position: "top-center",
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                toastId: error.message,
+                toastId: error.response.data,
             });
         }
         console.error('Error fetching data:', error);
@@ -748,6 +724,7 @@ export const registerQuery = async (navigate, data) => {
 
 export const getOrders = async (navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -821,6 +798,7 @@ export const getOrders = async (navigate) => {
 
 export const approveOrder = async (navigate, id, isExecutor) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -846,6 +824,7 @@ export const approveOrder = async (navigate, id, isExecutor) => {
 
 export const uploadMinioPhoto = async (navigate, formData) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -875,6 +854,7 @@ export const uploadMinioPhoto = async (navigate, formData) => {
 
 export const addMessage = async (navigate, messageData) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -900,6 +880,7 @@ export const addMessage = async (navigate, messageData) => {
 
 export const markAsReadMessage = async (navigate, id) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -925,6 +906,7 @@ export const markAsReadMessage = async (navigate, id) => {
 
 export const getChatById = async (navigate, id) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -974,6 +956,7 @@ export const getChatById = async (navigate, id) => {
 
 export const deleteMessage = async (navigate, selectedMessageId) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -997,6 +980,7 @@ export const deleteMessage = async (navigate, selectedMessageId) => {
 
 export const editMessageText = async (navigate, selectedMessageId, newMessage) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -1020,6 +1004,7 @@ export const editMessageText = async (navigate, selectedMessageId, newMessage) =
 
 export const enrollCalendar = async (navigate, id) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -1043,6 +1028,7 @@ export const enrollCalendar = async (navigate, id) => {
 
 export const getOrdersByRole = async (navigate, full, currentMonth, id) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -1052,7 +1038,7 @@ export const getOrdersByRole = async (navigate, full, currentMonth, id) => {
             const fetchData = async (url) => {
                 const response = await axios.get(url, { withCredentials: true });
                 try{
-                    const serverData = response.data.map(item => ({
+                    return response.data.map(item => ({
                         executorServiceId: item.executorServiceId,
                         executorProfileName: item.executorProfileName,
                         executorName: item.executorName,
@@ -1070,7 +1056,6 @@ export const getOrdersByRole = async (navigate, full, currentMonth, id) => {
                         serviceTypeName: item.serviceTypeName,
                         id: item.id
                     }));
-                    return serverData;
                 }
                 catch (error){
                     if (!toast.isActive(error.message)) {
@@ -1114,6 +1099,7 @@ export const getOrdersByRole = async (navigate, full, currentMonth, id) => {
 
 export const updateOrder = async (navigate, updatedAppointment) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -1149,6 +1135,7 @@ export const updateOrder = async (navigate, updatedAppointment) => {
 
 export const deleteOrder = async (navigate, id) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -1172,6 +1159,7 @@ export const deleteOrder = async (navigate, id) => {
 
 export const addOrder = async (navigate, newAppointments) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -1195,6 +1183,7 @@ export const addOrder = async (navigate, newAppointments) => {
 
 export const getExecutorServicesLookup = async (navigate) => {
     try {
+        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
@@ -1228,8 +1217,14 @@ const formatTime = (rawTime) => {
 };
 
 const reverseFormatTime = (time, date) => {
-    const [hours, minutes] = time.split(':').map(Number);
-    const newDate = new Date(date);
-    newDate.setHours(hours + 3, minutes, 0, 0);
-    return newDate.toISOString();
+    const timeFormat = /^\d{2}:\d{2}$/;
+
+    if (timeFormat.test(time)) {
+        const [hours, minutes] = time.split(':').map(Number);
+        const newDate = new Date(date);
+        newDate.setHours(hours + 3, minutes, 0, 0);
+        return newDate.toISOString();
+    } else {
+        return time;
+    }
 };

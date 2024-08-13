@@ -149,27 +149,14 @@ const Profile = ({user, services, contacts, current}) => {
 
     const handleUpload = async () => {
         if (file) {
+
             const formData = new FormData();
             formData.append('file', file);
-            uploadMinioPhoto(navigate, formData)
-                .then(serverData => {
-                    editedUser.imageUrl = serverData.data.url;
-                })
-                .catch(error => {
-                    const errorMessage = error.message || 'Failed to fetch data';
-                    if (!toast.isActive(errorMessage)) {
-                        toast.error(errorMessage, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: errorMessage,
-                        });
-                    }
-                    console.error('Error fetching data:', error);
-                });
+
+            const response = await uploadMinioPhoto(navigate, formData);
+            const uploadedPhoto = response.data;
+            editedUser.imageId = uploadedPhoto.id;
+            editedUser.imageUrl = uploadedPhoto.url;
         }
 
         setFile(null);
@@ -205,7 +192,7 @@ const Profile = ({user, services, contacts, current}) => {
                 <div className="profile-avatar">
                     {isEditing ? (
                         <>
-                            <img onClick={handleAddPhoto} src={user.imageUrl} alt="" className="avatar-image"/>
+                            <img onClick={handleAddPhoto} src={editedUser.imageUrl} alt="" className="avatar-image"/>
                         </>
                     ) : (
                         <>
@@ -227,7 +214,7 @@ const Profile = ({user, services, contacts, current}) => {
                             <input
                                 className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                                 type="text"
-                                name="bio"
+                                name="description"
                                 value={editedUser.description}
                                 onChange={handleInputChange}
                                 placeholder={translations[language]['Description']}

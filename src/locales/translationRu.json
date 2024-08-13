@@ -70,5 +70,7 @@
   "ExecutorApprove": "Подтверждение мастера",
   "ClientName": "Имя клиента",
   "ClientComment": "Комментарий клиента",
-  "ClientApprove": "Подтверждение клиента"
+  "ClientApprove": "Подтверждение клиента",
+  "EditUserData": "Изменение данных аккаунта",
+  "Success": "Данные сохранены успешно"
 }

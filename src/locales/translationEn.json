@@ -70,5 +70,7 @@
   "ExecutorApprove": "Executor's approve",
   "ClientName": "Client's name",
   "ClientComment": "Client's comment",
-  "ClientApprove": "Client's approve"
+  "ClientApprove": "Client's approve",
+  "EditUserData": "Edit account data",
+  "Success": "Success"
 }

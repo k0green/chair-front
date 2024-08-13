@@ -4,16 +4,11 @@ import {
     faAdd,
     faBoltLightning,
     faClock, faDollar,
-    faLightbulb,
-    faStar,
-    faTimes,
-    faTimesCircle, faTrash
+    faStar, faTrash
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PhotoList from "../components/PhotoList";
-import {useNavigate, useParams} from "react-router-dom";
-import axios from "axios";
-import Cookies from "js-cookie";
+import {useNavigate} from "react-router-dom";
 import {useDropzone} from "react-dropzone";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
@@ -24,7 +19,7 @@ import {addServiceCard, getAllServiceTypes, updateServiceCard, uploadMinioPhoto}
 const ServiceCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useContext(ThemeContext);
-    const { masters } = service;
+    const [filesToDelete, setFilesToDelete] = useState([]);
 
     const formatTime = (rawTime) => {
         const date = new Date(rawTime);
@@ -37,7 +32,7 @@ const ServiceCard = ({ service, isNew, id }) => {
     const [editedServiceTypeId, setEditedServiceTypeId] = useState(service.serviceTypeId);
     const [editedDuration, setEditedDuration] = useState(formatTime(service.duration));
     const [editedPrice, setEditedPrice] = useState(service.price);
-    const [editedAddress, setEditedAddress] = useState(service.place.address);
+    const [editedAddress, setEditedAddress] = useState(service.place);
     const [editedPhotos, setEditedPhotos] = useState([...service.photos]);
     const [servicesLookupData, setServicesLookupData] = useState([]);
     const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
@@ -47,8 +42,6 @@ const ServiceCard = ({ service, isNew, id }) => {
     const reverseFormatTime = (formattedTime, editedDuration) => {
         const [hours, minutes] = formattedTime.split(':').map(Number);
         const newDate = new Date(editedDuration);
-        console.log("new "+ formattedTime);
-        console.log("old "+ editedDuration);
         newDate.setHours(hours+3);
         newDate.setMinutes(minutes);
         return newDate;
@@ -85,7 +78,8 @@ const ServiceCard = ({ service, isNew, id }) => {
             place: editedAddress,
             duration: reverseFormatTime(editedDuration, service.duration),
             price: editedPrice,
-            photos: editedPhotos.map(photo => photo),
+            photoIds: editedPhotos.map(photo => photo.id),
+            removePhotoIds: filesToDelete,
         };
 
         if (!updatedServiceData.serviceTypeId) {
@@ -128,7 +122,7 @@ const ServiceCard = ({ service, isNew, id }) => {
             place: editedAddress,
             duration: reverseFormatTime(editedDuration, date),
             price: editedPrice,
-            photos: editedPhotos.map(photo => photo),
+            photoIds: editedPhotos.filter(photo => photo.id !== "default").map(photo => photo.id),
         };
 
         if (!updatedServiceData.serviceTypeId) {
@@ -161,12 +155,13 @@ const ServiceCard = ({ service, isNew, id }) => {
             });
     };
 
-    const handleDeletePhoto = (photoId) => {
-        const updatedPhotos = editedPhotos.filter(photo => photo.id !== photoId);
-        setEditedPhotos(updatedPhotos);
-    };
-
     const handleAddPhoto = () => {
+        setFiles([]);
+        setFilesToDelete([]);
+        setFiles(editedPhotos.map(photo => ({
+            preview: photo.url,
+            id: photo.id,
+        })));
         setUploadPhotoModal(true);
     };
 
@@ -185,17 +180,21 @@ const ServiceCard = ({ service, isNew, id }) => {
             <div className="dropzone-centrize" key={file.name}>
                 <img src={file.preview} style={{width: '50%'}} alt="preview" />
                 <button className='trash-icon' onClick={() => {
+                    if (file.id) { // если файл существующий
+                        setFilesToDelete(prev => [...prev, file.id]);
+                        setEditedPhotos(prev => prev.filter(photo => photo.id !== file.id));
+                    }
                     const newFiles = [...files];
                     newFiles.splice(index, 1);
                     setFiles(newFiles);
-                }}><FontAwesomeIcon icon={faTrash} />  Удалить</button>
+                }}><FontAwesomeIcon icon={faTrash} />  {translations[language]['Delete']}</button>
             </div>
         ));
 
         return (
             <div className="dropzone-centrize">
                 {images}
-                <div {...getRootProps({style: {border: '2px solid blue', padding: '20px', width: '400px', height: '400px'}})}>
+                <div {...getRootProps({className:"dropzoneBorder"})}>
                     <input {...getInputProps()} />
                     <p>{translations[language]['DragAndDrop']}</p>
                 </div>
@@ -204,33 +203,18 @@ const ServiceCard = ({ service, isNew, id }) => {
     }
 
     const handleUpload = async () => {
-        for (const file of files) {
+        const newFiles = files.filter(file => !file.id);
+
+        const promises = newFiles.map(file => {
             const formData = new FormData();
             formData.append('file', file);
+            return uploadMinioPhoto(navigate, formData);
+        });
 
-            let response = null;
-            uploadMinioPhoto(navigate, formData)
-                .then(serverData => {
-                    response = serverData.data.url;
-                })
-                .catch(error => {
-                    const errorMessage = error.message || 'Failed to fetch data';
-                    if (!toast.isActive(errorMessage)) {
-                        toast.error(errorMessage, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: errorMessage,
-                        });
-                    }
-                    console.error('Error fetching data:', error);
-                });
+        const uploadedPhotos = await Promise.all(promises);
 
-            setEditedPhotos(prevState => [...prevState, ...response.data]);
-        }
+        const filteredState = editedPhotos.filter(photo => photo.id && photo.id !== 'default');
+        setEditedPhotos([...filteredState, ...uploadedPhotos.map(response => response.data)]);
 
         setFiles([]);
         setUploadPhotoModal(false);
@@ -251,25 +235,30 @@ const ServiceCard = ({ service, isNew, id }) => {
         <div className={`service-card-edit ${theme === 'dark' ? 'dark' : ''}`}>
                 <div key={service.id} className="master-card">
                     <div className="photos-edit">
-                        <PhotoList photos={editedPhotos} onDeletePhoto={handleDeletePhoto} />
+                        <PhotoList photos={editedPhotos} />
                         <button className="add-photo-button-new" onClick={handleAddPhoto}>
                             <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> {translations[language]['AddPhoto']}</p>
                         </button>
                     </div>
                     <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
-                        <select
-                            name="procedure"
-                            className={`select ${theme === 'dark' ? 'dark' : ''}`}
-                            value={editedServiceTypeId.serviceTypeId || service.serviceTypeId}
-                            onChange={(e) => setEditedServiceTypeId({ ...editedServiceTypeId, serviceTypeId: e.target.value })}
-                        >
-                            <option value="">Выберите услугу</option>
-                            {servicesLookupData.map((service) => (
-                                <option key={service.id} value={service.id}>
-                                    {service.name}
-                                </option>
-                            ))}
-                        </select>
+                        {isNew ?
+                            <select
+                                name="procedure"
+                                className={`select ${theme === 'dark' ? 'dark' : ''}`}
+/*
+                                value={editedServiceTypeId.serviceTypeId || service.serviceTypeId}
+*/
+                                onChange={(e) => setEditedServiceTypeId({ ...editedServiceTypeId, serviceTypeId: e.target.value })}
+                            >
+                                <option value="">Выберите услугу</option>
+                                {servicesLookupData.map((service) => (
+                                    <option key={service.id} value={service.id}>
+                                        {service.name}
+                                    </option>
+                                ))}
+                            </select>
+                            : <h4>{service.name}</h4>
+                        }
                         <h4>{service.rating} <FontAwesomeIcon icon={faStar} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`} /></h4>
                     </div>
                     <div className="service-description">
@@ -277,7 +266,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                             placeholder={translations[language]['Address']}
                             className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"
-                            value={editedAddress || service.place.address}
+                            value={editedAddress.address || service.place.address}
                             onClick={handleAddressClick}
                             readOnly
                         />
@@ -330,8 +319,10 @@ const ServiceCard = ({ service, isNew, id }) => {
                     <span className="close" onClick={() => setUploadPhotoModal(false)}>
                         &times;
                     </span>
-                        <Dropzone />
-                        <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p></button>
+                        <div className="dropzone-centrize">
+                            <Dropzone />
+                            <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p></button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -339,6 +330,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                 isOpen={isModalOpen}
                 onRequestClose={() => setIsModalOpen(false)}
                 onSaveAddress={handleSaveAddress}
+                initialPosition={editedAddress.position}
             />
         </div>
     );

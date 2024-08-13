@@ -5,7 +5,12 @@ import Cookies from "js-cookie";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
-import {approveOrder, getOrders, registerQuery} from "./api";
+import {approveOrder, getOrders, registerQuery, updateOrder} from "./api";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
+import {faClose} from "@fortawesome/free-solid-svg-icons/faClose";
+import app from "../App";
+import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
 
 const AppointmentsComponent = () => {
     const [appointmentsData, setAppointmentsData] = useState(null);
@@ -14,6 +19,7 @@ const AppointmentsComponent = () => {
     const isExecutor = localStorage.getItem("userRole") === "executor";
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { language, translations } = useContext(LanguageContext);
+    const [clientComment, setClientComment] = useState();
 
     useEffect(() => {
         const token = Cookies.get('token');
@@ -74,8 +80,13 @@ const AppointmentsComponent = () => {
             });
     };
 
+    const saveClientComment = async () => {
+        await updateOrder(navigate, clientComment);
+    }
+
     const renderAppointments = (filteredAppointments) => {
         if (filteredAppointments !== null && filteredAppointments.length > 0) {
+            const userRole = localStorage.getItem('userRole');
             return (
                 <div>
                     {filteredAppointments.map((appointment, index) => (
@@ -86,8 +97,72 @@ const AppointmentsComponent = () => {
                                     <div style={theme === 'dark' ? { color: "white"} : { color: "black" }}>{translations[language]['StartTime']}: <strong>{formatTime(appointment.starDate)}</strong></div>
                                     <div style={theme === 'dark' ? { color: "white"} : { color: "black" }}>{translations[language]['Duration']}: <strong>{formatTime(appointment.duration)}</strong></div>
                                     <div style={theme === 'dark' ? { color: "white"} : { color: "black" }}>{translations[language]['Cost']}: <strong>{appointment.price} byn</strong></div>
+                                    <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorComment']}: <strong>{appointment.executorComment}</strong></div>
+                                    <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientName']}: <strong>{appointment.clientName}</strong></div>
+                                    {userRole === 'executor' ?
+                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientComment']}: <strong>{appointment.clientComment}</strong></div>
+                                        :
+                                        <div >
+                                            {translations[language]['ExecutorComment']}:{" "}
+                                            {
+                                                <input
+                                                    type="text"
+                                                    name="clientComment"
+                                                    style={{width: "18ch"}}
+                                                    placeholder={translations[language]['ClientComment']}
+                                                    className={`newAppointmentForm1-input ${theme === 'dark' ? 'dark' : ''}`}
+                                                    value={appointment.clientComment}
+                                                    onChange={(e) => setClientComment({ ...appointment, clientComment: e.target.value })}
+                                                />
+                                            }
+                                                <button onClick={() => saveClientComment()}>
+                                                    <FontAwesomeIcon
+                                                        icon={faSave}
+                                                        style={{ color: "lightgreen", backgroundColor: "transparent" }}
+                                                    />
+                                                </button>
+                                        </div>
+                                    }                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorApprove']}: <strong>{appointment.executorApprove?
+                                        <FontAwesomeIcon
+                                            icon={faCheck}
+                                            style={{ color: "lightgreen", backgroundColor: "transparent" }}
+                                        />
+                                        :
+                                        <FontAwesomeIcon
+                                            icon={faClose}
+                                            style={{ color: "red", backgroundColor: "transparent" }}
+                                        />} </strong></div>
+                                    <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientApprove']}: <strong>{appointment.clientApprove ?
+                                        <FontAwesomeIcon
+                                            icon={faCheck}
+                                            style={{ color: "lightgreen", backgroundColor: "transparent" }}
+                                        />
+                                        :
+                                        <FontAwesomeIcon
+                                            icon={faClose}
+                                            style={{ color: "red", backgroundColor: "transparent" }}
+                                        />} </strong></div>
                                 </div>
-                                <button onClick={() => handleApproveClick(appointment.id)} disabled={isExecutor ? !appointment.clientId : !appointment.executorApprove}>{translations[language]['ApproveOrder']}</button>
+                                {appointment.clientId && (
+                                    isExecutor ? (
+                                        !appointment.executorApprove && (
+                                            <button
+                                                onClick={() => handleApproveClick(appointment.id)}
+                                                disabled={!appointment.clientId}>
+                                                {translations[language]['ApproveOrder']}
+                                            </button>
+                                        )
+                                    ) : (
+                                        !appointment.clientApprove && appointment.executorApprove && (
+                                            <button
+                                                onClick={() => handleApproveClick(appointment.id)}
+                                                disabled={!appointment.clientId}>
+                                                {translations[language]['ApproveOrder']}
+                                            </button>
+                                        )
+                                    )
+                                )}
+
                             </div>
                         </div>
                     ))}

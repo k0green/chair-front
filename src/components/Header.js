@@ -45,7 +45,7 @@ const Header = ({ user, onLogout }) => {
         const role = localStorage.getItem('userRole');
         if(token === null || token === "")
             navigate("/login");
-        if(role === "executor")
+        else if(role === "executor")
             navigate("/calendar/full/edit");
         else
             navigate("/calendar/full")
@@ -59,32 +59,32 @@ const Header = ({ user, onLogout }) => {
         navigate("/edit-user");
     };
 
-    const handleExitClick = () => {
+    const handleExitClick = async () => {
 
-        accountExit(navigate).then(newData => {
+        try {
+            await accountExit(navigate);
             localStorage.removeItem('userName');
             localStorage.removeItem('userId');
             localStorage.removeItem('userEmail');
             localStorage.removeItem('userRole');
             Cookies.remove('token');
+            window.location.reload();
             navigate("/");
-            window.location.reload()
-        })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
-            });
+        } catch (error){
+            const errorMessage = error.message || 'Failed to fetch data';
+            if (!toast.isActive(errorMessage)) {
+                toast.error(errorMessage, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: errorMessage,
+                });
+            }
+            console.error('Error fetching data:', error);
+        }
     }
 
     return (

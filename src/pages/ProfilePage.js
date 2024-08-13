@@ -18,25 +18,10 @@ const ProfilePage = () => {
 
     useEffect(() => {
         getProfileById(id, navigate).then(newData => {
-            setServicesData(newData.services);
+            setServicesData(newData.services.filter(service => service.isDeleted !== true));
             setUserData(newData.userData);
             setContactData(newData.contacts);
-        })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
-            });
+        });
     }, [id]);
 
     return (

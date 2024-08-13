@@ -1,60 +1,35 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import '../styles/Calendar.css';
-import {
-    faChevronCircleLeft,
-    faChevronCircleRight,
-} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useNavigate, useParams} from "react-router-dom";
-import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronCircleLeft, faChevronCircleRight, faCheck, faClose, faSave } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate, useParams } from "react-router-dom";
 import Cookies from "js-cookie";
-import {ThemeContext} from "./ThemeContext";
-import {LanguageContext} from "./LanguageContext";
-import {toast} from "react-toastify";
-import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
-import {faCancel} from "@fortawesome/free-solid-svg-icons/faCancel";
-import {faClose} from "@fortawesome/free-solid-svg-icons/faClose";
-import {enrollCalendar, getOrders, getOrdersByRole} from "./api";
+import { ThemeContext } from "./ThemeContext";
+import { LanguageContext } from "./LanguageContext";
+import { enrollCalendar, getOrdersByRole, updateOrder } from "./api";
 
-const Calendar = ({full}) => {
+const Calendar = ({ full }) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [currentYear, setCurrentYear] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
     const [appointmentsData, setAppointmentsData] = useState([]);
     const { theme, toggleTheme } = useContext(ThemeContext);
     let { id } = useParams();
     const navigate = useNavigate();
     const { language, translations } = useContext(LanguageContext);
+    const [clientComment, setClientComment] = useState();
 
     useEffect(() => {
-        const token = Cookies.get('token');
-        if (!token) {
-            navigate('/login');
-        }
-        fetchData();
-    }, [currentMonth]);
-
-    const fetchData = async () => {
-        getOrdersByRole(navigate, full, currentMonth, id)
-            .then(serverData => {
+        const fetchData = async () => {
+            const token = Cookies.get('token');
+            if (!token) {
+                navigate('/login');
+            } else {
+                const serverData = await getOrdersByRole(navigate, full, currentMonth, id);
                 setAppointmentsData(serverData);
-            })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
-            });
-    };
+            }
+        };
+        fetchData();
+    }, [currentMonth, navigate, full, id]);
 
     const formatTime = (rawTime) => {
         const date = new Date(rawTime);
@@ -67,8 +42,11 @@ const Calendar = ({full}) => {
         setSelectedDay(day);
     };
 
-    const enrollButtonClick = (id) => {
-        enrollCalendar(id);
+    const enrollButtonClick = async (appointment) => {
+        await enrollCalendar(navigate, appointment.id);
+        await updateOrder(navigate, clientComment);
+        const serverData = await getOrdersByRole(navigate, full, currentMonth, id);
+        setAppointmentsData(serverData);
     };
 
     const getDaysInMonth = (date) => {
@@ -79,8 +57,15 @@ const Calendar = ({full}) => {
     };
 
     const renderDaysOfWeek = () => {
-        //const daysOfWeek = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-        const daysOfWeek = [translations[language]['sun'], translations[language]['mon'], translations[language]['tue'], translations[language]['wed'], translations[language]['thu'], translations[language]['fri'], translations[language]['sat']];
+        const daysOfWeek = [
+            translations[language]['sun'],
+            translations[language]['mon'],
+            translations[language]['tue'],
+            translations[language]['wed'],
+            translations[language]['thu'],
+            translations[language]['fri'],
+            translations[language]['sat']
+        ];
         return daysOfWeek.map((day, index) => (
             <div key={index} className={`dayOfWeek ${theme === 'dark' ? 'dark' : ''}`}>{day}</div>
         ));
@@ -130,10 +115,15 @@ const Calendar = ({full}) => {
         );
     };
 
+    const saveClientComment = async () => {
+        await updateOrder(navigate, clientComment);
+    }
+
     const renderAppointments = () => {
         if (selectedDay !== null) {
             const appointments = appointmentsData.filter(appointment => appointment.day === selectedDay);
             if (appointments.length > 0) {
+                const userRole = localStorage.getItem('userRole');
                 return (
                     <div>
                         {appointments.map((appointment, index) => (
@@ -146,8 +136,31 @@ const Calendar = ({full}) => {
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['Cost']}: <strong>{appointment.price} byn</strong></div>
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorComment']}: <strong>{appointment.executorComment}</strong></div>
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientName']}: <strong>{appointment.clientName}</strong></div>
-                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientComment']}: <strong>{appointment.clientComment}</strong></div>
-                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorApprove']}: <strong>{appointment.executorApprove?
+                                        {userRole === 'executor' ?
+                                            <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientComment']}: <strong>{appointment.clientComment}</strong></div>
+                                            :
+                                            <div>
+                                                {translations[language]['ExecutorComment']}:{" "}
+                                                <input
+                                                    type="text"
+                                                    name="clientComment"
+                                                    style={{ width: "18ch" }}
+                                                    placeholder={translations[language]['ClientComment']}
+                                                    className={`newAppointmentForm1-input ${theme === 'dark' ? 'dark' : ''}`}
+                                                    value={appointment.clientComment}
+                                                    onChange={(e) => setClientComment({ ...appointment, clientComment: e.target.value })}
+                                                />
+                                                {full ?
+                                                    <button onClick={() => saveClientComment()}>
+                                                        <FontAwesomeIcon
+                                                            icon={faSave}
+                                                            style={{ color: "lightgreen", backgroundColor: "transparent" }}
+                                                        />
+                                                    </button>
+                                                    : <></>}
+                                            </div>
+                                        }
+                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorApprove']}: <strong>{appointment.executorApprove ?
                                             <FontAwesomeIcon
                                                 icon={faCheck}
                                                 style={{ color: "lightgreen", backgroundColor: "transparent" }}
@@ -161,15 +174,15 @@ const Calendar = ({full}) => {
                                             <FontAwesomeIcon
                                                 icon={faCheck}
                                                 style={{ color: "lightgreen", backgroundColor: "transparent" }}
-                                        />
-                                        :
+                                            />
+                                            :
                                             <FontAwesomeIcon
                                                 icon={faClose}
                                                 style={{ color: "red", backgroundColor: "transparent" }}
                                             />} </strong></div>
                                     </div>
-                                    {new Date(appointment.starDate) > new Date() &&
-                                        <button style={{ backgroundColor: "transparent" }} onClick={() => enrollButtonClick(appointment.id)}>{translations[language]['MakeAnAppointment']}</button>
+                                    {new Date(appointment.starDate) > new Date() && !full &&
+                                        <button style={{ backgroundColor: "transparent" }} onClick={() => enrollButtonClick(appointment)}>{translations[language]['MakeAnAppointment']}</button>
                                     }
                                 </div>
                             </div>

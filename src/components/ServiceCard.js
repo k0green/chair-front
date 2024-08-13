@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, {useContext, useState, useEffect, useRef} from 'react';
 import '../styles/ServiceCard.css';
 import {
     faBoltLightning, faClock,
@@ -12,6 +12,7 @@ import { LanguageContext } from "./LanguageContext";
 import {faHouse} from "@fortawesome/free-solid-svg-icons/faHouse";
 import {toast} from "react-toastify";
 import {deleteServiceCard} from "./api";
+import MapModal from "./MapModal";
 
 const ServiceCard = ({ service, isProfile }) => {
     const navigate = useNavigate();
@@ -36,7 +37,12 @@ const ServiceCard = ({ service, isProfile }) => {
     }, []);
 
     const handleOrderClick = (executorServiceId) => {
-        navigate("/calendar/" + executorServiceId);
+        const userRole = localStorage.getItem('userRole');
+        const userId = localStorage.getItem('userId');
+        if(userRole === 'executor' && userId === service.userId)
+            navigate("/calendar/full/edit");
+        else
+            navigate("/calendar/" + executorServiceId);
     };
 
     const handleReviewClick = (executorServiceId) => {
@@ -84,14 +90,39 @@ const ServiceCard = ({ service, isProfile }) => {
 /*        window.location.reload();*/
     };
 
-    const handleAddressClick = (lat, lng, address) => {
-        console.log('Lat:', lat, 'Lng:', lng, 'Address:', address);
-        console.log(service);
-        setSelectedPlace({
-            position: { lat, lng },
-            address: address,
-        });
+    const handleAddressClick = () => {
         setIsModalOpen(true);
+    };
+
+    const TruncatedText = ({ text, maxWidth, handleAddressClick, service }) => {
+        const textRef = useRef(null);
+        const [isTruncated, setIsTruncated] = useState(false);
+        const [truncatedText, setTruncatedText] = useState(text);
+
+        useEffect(() => {
+            const span = textRef.current;
+            let newText = text;
+
+            while (span.scrollWidth > maxWidth && newText.length > 0) {
+                newText = newText.slice(0, -5);
+                span.innerText = newText + '...';
+            }
+
+            setTruncatedText(newText + '...');
+            setIsTruncated(span.scrollWidth > maxWidth);
+        }, [text, maxWidth]);
+
+        return (
+            <p
+                onClick={handleAddressClick}
+                style={{ cursor: 'pointer', maxWidth: `${maxWidth}px`, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center' }}
+            >
+                <FontAwesomeIcon icon={faHouse} className='item-icon' />
+                <span ref={textRef}>
+                {isTruncated ? truncatedText : text}
+            </span>
+            </p>
+        );
     };
 
     return (
@@ -99,7 +130,7 @@ const ServiceCard = ({ service, isProfile }) => {
                     <div key={service.id} className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
                         <div className="master-card">
                             <div className="photos">
-                                {service.photos ? <PhotoList photos={service.photos} /> :
+                                {service.photos ? <PhotoList photos={service.photos} canDelete={false} /> :
                                     <img
                                         src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
                                         onError={(e) => {
@@ -116,10 +147,7 @@ const ServiceCard = ({ service, isProfile }) => {
                             </div>
                             <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
                                 <p>{service.description}</p>
-                                <p onClick={() => handleAddressClick(service.place.position.lat, service.place.position.lng, service.place.address)} style={{ cursor: 'pointer' }}>
-                                    <FontAwesomeIcon icon={faHouse} className='item-icon' />
-                                    {service.place.address}
-                                </p>
+                                <TruncatedText text={service.place.address} maxWidth={270} handleAddressClick={handleAddressClick}/>
                                 <p>{translations[language]['AvailableSlots']}: {service.availableSlots}</p>
                             </div>
                             <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
@@ -146,6 +174,11 @@ const ServiceCard = ({ service, isProfile }) => {
                             </div>
                         </div>
                     </div>
+                <MapModal
+                    isOpen={isModalOpen}
+                    onRequestClose={() => setIsModalOpen(false)}
+                    initialPosition={service.place.position}
+                />
             </div>
     );
 };

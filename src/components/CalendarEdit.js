@@ -486,7 +486,6 @@ const Calendar = ({full}) => {
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, executorComment: e.target.value })}
                                 />
                             }
-                            {" "} б.р.
                         </div>
                     </div>
                     {

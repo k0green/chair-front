@@ -29,7 +29,7 @@ function Register() {
         if (value.trim() === '') {
             setNameError('Name cannot be empty');
         } else {
-            const nameRegex = /^[A-Za-z@$_]+$/;
+            const nameRegex = /^[A-Za-zА-Яа-я@$_\d]+$/;
             if (!nameRegex.test(value)) {
                 setNameError('Name can only contain letters and @ $ _');
             } else {
@@ -41,11 +41,11 @@ function Register() {
     const handlePhoneChange = (value) => {
         setPhone(value);
         if (value.trim() === '') {
-            setPhoneError('Name cannot be empty');
+            setPhoneError('Phone cannot be empty');
         } else {
-            const phoneRegex = /^[A-Za-z@$_]+$/;
+            const phoneRegex = /^[@$_+\d]+$/;
             if (!phoneRegex.test(value)) {
-                setPhoneError('Name can only contain letters and @ $ _');
+                setPhoneError('Phone can only contain letters and @ $ _');
             } else {
                 setPhoneError('');
             }
@@ -90,7 +90,7 @@ function Register() {
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const data = {
             Name: name,
             Email: email,
@@ -99,30 +99,38 @@ function Register() {
             Phone: phone,
         };
 
-        registerQuery(navigate, data)
-            .then(serverData => {
-                localStorage.setItem('userName', serverData.name);
-                localStorage.setItem('userId', serverData.id);
-                localStorage.setItem('userEmail', serverData.email);
-                localStorage.setItem('userRole', serverData.role);
-                navigate("/")
-                window.location.reload()
-            })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
+        if(name === null | email === null | password === null | confirmPassword === null
+            | name === "" | email === '' | password === "" | confirmPassword === ""){
+            return(
+                toast.error("Fields are empty", {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: "Fields are empty",
+                })
+            );
+        }
+
+        const response = await registerQuery(navigate, data);
+        if(response){
+            localStorage.setItem('userName', response.name);
+            localStorage.setItem('userId', response.id);
+            localStorage.setItem('userEmail', response.email);
+            localStorage.setItem('userRole', response.role);
+            toast.success(translations[language]['Success'], {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: 'Success',
             });
+            navigate('/login');
+        }
     };
 
     return (
@@ -176,7 +184,7 @@ function Register() {
                         value={phone}
                         onChange={(e) => handlePhoneChange(e.target.value)}
                     />
-                    {nameError && <div className="register-error">{nameError}</div>}
+                    {phoneError && <div className="register-error">{phoneError}</div>}
                     <p className={`${theme === 'dark' ? 'login-redirect-text' : ''}`}>{translations[language]['YouAlreadyHaveAnAccount']}? <Link className={`${theme === 'dark' ? 'login-redirect-link' : ''}`} to="/login">Login here</Link></p>
                     <button
                         className={`register-button ${nameError || emailError || passwordError || confirmPasswordError ? "" : "active"}`}

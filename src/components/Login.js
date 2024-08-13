@@ -46,37 +46,44 @@ function Login() {
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const data = {
             Email: email,
             Password: password,
             RememberMe: true,
         };
 
-        login(navigate, data)
-            .then(serverData => {
-                localStorage.setItem('userName', serverData.name);
-                localStorage.setItem('userId', serverData.id);
-                localStorage.setItem('userEmail', serverData.email);
-                localStorage.setItem('userRole', serverData.role);
-                navigate("/")
-                window.location.reload()
-            })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
+        if(email === null | password === null | email === '' || password === ""){
+            return(
+                toast.error("Fields are empty", {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: "Fields are empty",
+                })
+            );
+        }
+
+        const response = await login(navigate, data);
+        if(response){
+            localStorage.setItem('userName', response.name);
+            localStorage.setItem('userId', response.id);
+            localStorage.setItem('userEmail', response.email);
+            localStorage.setItem('userRole', response.role);
+            toast.success(translations[language]['Success'], {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: 'Success',
             });
+            navigate('/');
+        }
     };
 
     return (

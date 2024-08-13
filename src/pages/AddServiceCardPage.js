@@ -1,12 +1,7 @@
-import React, {useState, useEffect, useContext} from 'react';
-import axios from 'axios';
+import React, {useContext} from 'react';
 import '../styles/ServiceCard.css';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import PhotoList from "../components/PhotoList";
-import { useNavigate, useParams } from "react-router-dom";
-import Header from "../components/Header";
+import { useParams } from "react-router-dom";
 import EditServiceCard from "../components/EditServiceCard";
-import Footer from "../components/Footer";
 import {ThemeContext} from "../components/ThemeContext";
 
 const AddServiceCardPage = () => {
