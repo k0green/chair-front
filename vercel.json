@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "http://chairBack.somee.com"
+      "destination": "http://chairBack.somee.com/$1"
     }
   ]
 }
