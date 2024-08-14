@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "http://chair1426-001-site1.ctempurl.com"
+      "destination": "http://chairBack.somee.com"
     }
   ]
 }
