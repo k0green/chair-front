@@ -78,7 +78,11 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
     const fetchData = async (newFilter) => {
         try {
             const { services, totalCount } = await getServiceCardByTypeId(id, newFilter);
-            setServicesData(services[0].masters);
+            if (services && services[0] && services[0].masters) {
+                setServicesData(services[0].masters);
+            } else {
+                throw new Error('Data format is incorrect');
+            }
             setTotalCount(totalCount);
         } catch (error) {
             const errorMessage = error.message || 'Failed to fetch data';
