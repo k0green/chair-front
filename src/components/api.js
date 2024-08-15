@@ -107,7 +107,7 @@ export const getServiceCardByTypeId = async (id, filter) => {
                     url: photo.url,
                 })) : [{
                     id: 'default',
-                    url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn',
+                    url: 'https://tse4.mm.bing.net/th?id=OIG1.nmRDG1qMLzf0tLH.VWSZ&pid=ImgGn',
                 }],
             })),
         }));
