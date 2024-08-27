@@ -14,11 +14,13 @@ const ProfilePage = () => {
 
     const [userData, setUserData] = useState([]);
     const [servicesData, setServicesData] = useState([]);
+    const [promotionsData, setPromotionsData] = useState([]);
     const [contactData, setContactData] = useState([]);
 
     useEffect(() => {
         getProfileById(id, navigate).then(newData => {
             setServicesData(newData.services.filter(service => service.isDeleted !== true));
+            setPromotionsData(newData.promotions.filter(service => service.isDeleted !== true));
             setUserData(newData.userData);
             setContactData(newData.contacts);
         });
@@ -26,7 +28,7 @@ const ProfilePage = () => {
 
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
-            <Profile user = {userData} services = {servicesData} contacts={contactData} current = {!id}/>
+            <Profile user = {userData} services = {servicesData} promotions={promotionsData} contacts={contactData} current = {!id}/>
         </div>
     );
 };

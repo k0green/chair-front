@@ -71,9 +71,16 @@
     margin-right: 10px;    /* Добавляем немного отступа между иконками и текстом */
 }
 
+.profile-input.light{
+    width: 50ch;
+    background-color: white;
+    color: black;
+}
+
 .profile-input.dark{
     background-color: #695b5b;
     color: white;
+    width: 50ch;
 }
 
 .profile-input.dark::placeholder{
@@ -91,3 +98,71 @@
     border-radius: 4px;
 }
 
+.tab-switcher {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.tab-button {
+    position: relative;
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    outline: none;
+    /*
+    color: transparent; !* Текст невидим *!
+    */
+    font-size: 16px;
+    transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.tab-button::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #007bff;
+    transform: translateX(-50%);
+    transition: width 0.3s ease-in-out;
+}
+
+.tab-button.active {
+    color: #007bff; /* Текст горит синим */
+}
+
+.tab-button.active.dark {
+    color: #007bff; /* Текст горит синим */
+}
+
+.tab-button.active::before {
+    width: 100%; /* Подсветка занимает всю ширину кнопки */
+}
+
+.tab-button:hover::before {
+    width: 100%; /* Подсветка при наведении */
+}
+
+.tab-button:not(.active) {
+    transition: transform 0.3s ease-in-out;
+}
+
+.tab-button:not(.active):hover {
+    transform: translateY(-2px); /* Легкий подъем при наведении */
+}
+
+.tab-button.dark {
+    color: white;
+}
+
+@media (max-width: 800px) {
+    .profile-input.dark{
+        background-color: #695b5b;
+        color: white;
+        width: 15ch;
+    }
+}

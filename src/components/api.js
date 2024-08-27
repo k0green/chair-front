@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {toast} from "react-toastify";
 import Cookies from "js-cookie";
+import React from "react";
 
 /*export const BASE_URL = 'https://localhost:7001';//'/api';5155*/
 export const BASE_URL = '/api';
@@ -102,6 +103,8 @@ export const getServiceCardByTypeId = async (id, filter) => {
                 },
                 executorId: service.executorId,
                 userId: service.userId,
+                hasDiscount: service.hasDiscount,
+                hasPromotions: service.hasPromotions,
                 photos: service.photos.length > 0 ? service.photos.map(photo => ({
                     id: photo.id,
                     url: photo.url,
@@ -145,6 +148,8 @@ export const getOptimalServiceCard = async (requestBody) => {
             duration: formatTime(response.data.duration),
             rating: response.data.rating,
             address: response.data.place.address,
+            hasDiscount: response.hasDiscount,
+            hasPromotions: response.hasPromotions,
             place: {
                 address: response.data.place.address,
                 position: {
@@ -200,6 +205,8 @@ export const getProfileById = async (id, navigate) => {
                         duration: formatTime(service.duration),
                         rating: service.rating,
                         address: service.place.address,
+                        hasDiscount: service.hasDiscount,
+                        hasPromotions: service.hasPromotions,
                         place: {
                             address: service.place.address,
                             position: {
@@ -215,9 +222,23 @@ export const getProfileById = async (id, navigate) => {
                             url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
                         }],
                     })),
+                    promotions: response.data.promotions.map(service => ({
+                        id: service.id,
+                        executorId: service.executorId,
+                        name: service.executorName || 'Unknown Master',
+                        description: service.description,
+                        photos: service.photos.length > 0 ? service.photos.map(photo => ({
+                            id: photo.id,
+                            url: photo.url,
+                        })) : [{
+                            id: 'default',
+                            url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+                        }],
+                    })),
                 };
                 return {
                     services: userData.services,
+                    promotions: userData.promotions,
                     userData: userData,
                     contacts: userData.contacts
                 }
@@ -245,6 +266,8 @@ export const getProfileById = async (id, navigate) => {
                                 duration: formatTime(service.duration),
                                 rating: service.rating,
                                 address: service.place.address,
+                                hasDiscount: service.hasDiscount,
+                                hasPromotions: service.hasPromotions,
                                 place: {
                                     address: service.place.address,
                                     position: {
@@ -308,8 +331,10 @@ export const getExecutorServiceById = async (id, navigate) => {
                 rating: response.data.rating,
                 price: response.data.price,
                 availableSlots: response.data.availableSlots,
-                duration: response.data.duration,
+                duration: formatTime(response.data.duration),
                 address: response.data.place.address,
+                hasDiscount: response.data.hasDiscount,
+                hasPromotions: response.data.hasPromotions,
                 place: {
                     address: response.data.place.address,
                     position: {
@@ -491,7 +516,8 @@ export const getReviewsByServiceCardId = async (id, navigate) => {
                 userName: review.userName,
                 text: review.text,
                 stars: review.stars,
-                createDate: review.createDate
+                createDate: review.createDate,
+                photos: review.photos,
             }));
         }
     } catch (error) {
@@ -750,6 +776,7 @@ export const getOrders = async (navigate) => {
                         executorApprove: item.executorApprove,
                         clientApprove: item.clientApprove,
                         price: item.price,
+                        discountPrice: item.discountPrice,
                         serviceTypeName: item.serviceTypeName,
                         id: item.id
                     }));
@@ -1027,6 +1054,30 @@ export const enrollCalendar = async (navigate, id) => {
     }
 };
 
+export const cancelCalendar = async (navigate, id) => {
+    try {
+        const token = Cookies.get('token');
+        if(!token)
+            navigate("/login");
+        else {
+            await axios.post(`${BASE_URL}/order/cancel/${id}`);
+        }
+    } catch (error) {
+        if (!toast.isActive(error.message)) {
+            toast.error(error.message, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: error.message,
+            });
+        }
+        console.error('Error fetching data:', error);
+    }
+};
+
 export const getOrdersByRole = async (navigate, full, currentMonth, id) => {
     try {
         const token = Cookies.get('token');
@@ -1054,6 +1105,7 @@ export const getOrdersByRole = async (navigate, full, currentMonth, id) => {
                         executorApprove: item.executorApprove,
                         clientApprove: item.clientApprove,
                         price: item.price,
+                        discountPrice: item.discountPrice,
                         serviceTypeName: item.serviceTypeName,
                         id: item.id
                     }));
@@ -1115,7 +1167,8 @@ export const updateOrder = async (navigate, updatedAppointment) => {
                 clientComment: updatedAppointment.clientComment,
                 executorApprove: updatedAppointment.executorApprove,
                 clientApprove: updatedAppointment.clientApprove,
-                price: updatedAppointment.price
+                price: updatedAppointment.price,
+                discountPrice: updatedAppointment.discountPrice
             });
         }
     } catch (error) {
@@ -1209,6 +1262,130 @@ export const getExecutorServicesLookup = async (navigate) => {
         console.error('Error fetching data:', error);
     }
 };
+
+export const updatePromotionCard = async (updatedServiceData, navigate) => {
+    try {
+        const token = Cookies.get('token');
+        if(!token)
+            navigate("/login");
+        else {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            await axios.put(`${BASE_URL}/executor-promotion/update`, updatedServiceData);
+            navigate(`/profile`);
+        }
+    } catch (error) {
+        if (!toast.isActive(error.message)) {
+            toast.error(error.message, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: error.message,
+            });
+        }
+        console.error('Error:', error);
+    }
+};
+
+export const addPromotionCard = async (updatedServiceData, navigate) => {
+    try {
+        const token = Cookies.get('token');
+        if(!token)
+            navigate("/login");
+        else {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            await axios.post(`${BASE_URL}/executor-promotion/add`, updatedServiceData);
+            navigate(`/profile`);
+        }
+    } catch (error) {
+        if (!toast.isActive(error.message)) {
+            toast.error(error.message, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: error.message,
+            });
+        }
+        console.error('Error:', error);
+    }
+};
+
+export const deletePromotionCard = async (id, navigate) => {
+    try {
+        const token = Cookies.get('token');
+        if(!token)
+            navigate("/login");
+        else {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            await axios.delete(`${BASE_URL}/executor-promotion/remove/${id}`);
+            window.location.reload();
+        }
+    } catch (error) {
+        if (!toast.isActive(error.message)) {
+            toast.error(error.message, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: error.message,
+            });
+        }
+        console.error('Error:', error);
+    }
+};
+
+export const getExecutorPromotionById = async (id, navigate) => {
+    try {
+        const token = Cookies.get('token');
+        if(!token)
+            navigate("/login");
+        else {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            const response = await axios.get(`${BASE_URL}/executor-promotion/get-by-id/${id}`);
+            return {
+                id: response.data.id,
+                name: response.data.executorName || 'Unknown Master',
+                executorId: response.data.executorId,
+                executorName: response.data.executorName,
+                description: response.data.description,
+                photos: response.data.photos.length > 0 ? response.data.photos.map(photo => ({
+                    id: photo.id,
+                    url: photo.url,
+                })) : [{
+                    id: 'default',
+                    url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+                }],
+            };
+        }
+    } catch (error) {
+        if (!toast.isActive(error.message)) {
+            toast.error(error.message, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: error.message,
+            });
+        }
+        console.error('Error fetching data:', error);
+    }
+};
+
+export const LoadingAnimation = () => (
+    <div className="spinner">
+        <div className="double-bounce1"></div>
+        <div className="double-bounce2"></div>
+    </div>
+);
 
 const formatTime = (rawTime) => {
     const date = new Date(rawTime);
