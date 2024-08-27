@@ -1,14 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faDoorOpen, faSearch, faUser, faUserEdit} from "@fortawesome/free-solid-svg-icons";
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import "../styles/Header.css";
 import Cookies from "js-cookie";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import moon from '../icons/moon.png';
 import sun from '../icons/sun.png';
-import axios from "axios";
 import {toast} from "react-toastify";
 import {accountExit} from "./api";
 
@@ -16,6 +15,7 @@ const Header = ({ user, onLogout }) => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { language, translations } = useContext(LanguageContext);
+    const [isExit, setIsExit] = useState(false);
 
     const userId = localStorage.getItem('userId');
     const token = Cookies.get('token');
@@ -60,16 +60,16 @@ const Header = ({ user, onLogout }) => {
     };
 
     const handleExitClick = async () => {
-
+        setIsExit(true);
         try {
             await accountExit(navigate);
+            navigate("/");
             localStorage.removeItem('userName');
             localStorage.removeItem('userId');
             localStorage.removeItem('userEmail');
             localStorage.removeItem('userRole');
             Cookies.remove('token');
             window.location.reload();
-            navigate("/");
         } catch (error){
             const errorMessage = error.message || 'Failed to fetch data';
             if (!toast.isActive(errorMessage)) {
@@ -84,6 +84,8 @@ const Header = ({ user, onLogout }) => {
                 });
             }
             console.error('Error fetching data:', error);
+        }finally {
+            setIsExit(false);
         }
     }
 
@@ -123,7 +125,7 @@ const Header = ({ user, onLogout }) => {
                             <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleEditClick}>
                                 <FontAwesomeIcon icon={faUserEdit} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
                             </button>
-                            <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleExitClick}>
+                            <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleExitClick} disabled={isExit}>
                                 <FontAwesomeIcon icon={faDoorOpen} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
                             </button>
                         </div>

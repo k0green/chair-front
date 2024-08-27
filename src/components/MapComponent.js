@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Modal from 'react-modal';
 import '../styles/MapModal.css';
 
-const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, initialAddress, apiKey, canEdit }) => {
+const MapComponent = ({ initialPosition, initialAddress, apiKey, canEdit, onSaveAddress }) => {
     const [position, setPosition] = useState({ lat: 55.751574, lng: 37.573856 });
     const [address, setAddress] = useState(initialAddress || '');
     const [selectedObject, setSelectedObject] = useState(null);
@@ -20,7 +19,7 @@ const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, init
             window.ymaps.ready(() => {
                 const map = new window.ymaps.Map(mapRef.current, {
                     center: [initialPosition.lat, initialPosition.lng],
-                    zoom: 18,
+                    zoom: 16,
                 });
 
                 mapInstanceRef.current = map;
@@ -31,7 +30,7 @@ const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, init
                 }
 
                 const updateAddress = (coords) => {
-                    if(canEdit) {
+                    if (canEdit) {
                         window.ymaps.geocode(coords).then((res) => {
                             const firstGeoObject = res.geoObjects.get(0);
                             const newAddress = firstGeoObject.getAddressLine();
@@ -47,10 +46,10 @@ const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, init
                     { draggable: true }
                 );
 
-                if(canEdit) {
+                if (canEdit) {
                     initialMarker.events.add('dragend', function (e) {
                         const coords = e.get('target').geometry.getCoordinates();
-                        setPosition({lat: coords[0], lng: coords[1]});
+                        setPosition({ lat: coords[0], lng: coords[1] });
                         updateAddress(coords);
                     });
                 }
@@ -60,8 +59,7 @@ const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, init
 
                 let currentMarker = null;
 
-                if(canEdit)
-                {
+                if (canEdit) {
                     map.events.add('click', function (e) {
                         const coords = e.get('coords');
                         setPosition({ lat: coords[0], lng: coords[1] });
@@ -123,10 +121,10 @@ const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, init
                             draggable: true,
                         });
 
-                        if(canEdit) {
+                        if (canEdit) {
                             newMarker.events.add('dragend', function (e) {
                                 const coords = e.get('target').geometry.getCoordinates();
-                                setPosition({lat: coords[0], lng: coords[1]});
+                                setPosition({ lat: coords[0], lng: coords[1] });
                                 updateAddress(coords);
                             });
                         }
@@ -144,16 +142,14 @@ const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, init
             });
         };
 
-        if (isOpen) {
-            if (!window.ymaps) {
-                const script = document.createElement('script');
-                script.src = `https://api-maps.yandex.ru/2.1/?apikey=d2aa6dcc-1f35-4ed7-a13b-fe4064f9904f&lang=ru_RU`;
-                script.onload = loadMap;
-                script.onerror = () => console.error('Failed to load Yandex Maps API');
-                document.body.appendChild(script);
-            } else {
-                loadMap();
-            }
+        if (!window.ymaps) {
+            const script = document.createElement('script');
+            script.src = `https://api-maps.yandex.ru/2.1/?apikey=d2aa6dcc-1f35-4ed7-a13b-fe4064f9904f&lang=ru_RU`;
+            script.onload = loadMap;
+            script.onerror = () => console.error('Failed to load Yandex Maps API');
+            document.body.appendChild(script);
+        } else {
+            loadMap();
         }
 
         return () => {
@@ -171,49 +167,14 @@ const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, init
                 searchRef.current = null;
             }
         };
-    }, [isOpen, initialPosition, initialAddress, apiKey]);
-
-    useEffect(() => {
-        if (!isOpen) {
-            setPosition(null);
-            setAddress('');
-        } else {
-            setPosition(initialPosition);
-            setAddress(initialAddress);
-        }
-    }, [isOpen, initialPosition, initialAddress]);
+    }, [initialPosition, initialAddress, apiKey]);
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onRequestClose={onRequestClose}
-            style={{
-                content: {
-                    height: '80vh',
-                    overflow: 'auto',
-                },
-            }}
-        >
-            <span className="close" onClick={onRequestClose}>
-                &times;
-            </span>
-            {position && address && (
-                <button
-                    onClick={() => {
-                        onSaveAddress({ position, address });
-                        onRequestClose();
-                    }}
-                >
-                    Сохранить адрес
-                </button>
-            )}
-            <div
-                ref={mapRef}
-                style={{ height: '100%', width: '100%' }}
-                key={isOpen ? 'map-container' : 'map-container-hidden'} // Force remount when modal opens
-            />
-        </Modal>
+        <div
+            ref={mapRef}
+            style={{ height: '500px', width: '500px' }} // Adjust the height and width as needed
+        />
     );
 };
 
-export default MapModal;
+export default MapComponent;

@@ -108,6 +108,28 @@ const MobileHeader = ({ user, onLogout }) => {
                             :
                             <img src={sun} style={{ width: '70%', height: '70%', marginRight: "10px" }} />}
                     </button>
+{/*                    <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLoginClick}>
+                        <FontAwesomeIcon icon={faUser} flip="horizontal" style={theme === 'dark' ? { color: "white" } : { color: "#000" }} />
+                    </button>
+                    {userId != null &&
+                        <div>
+                            <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleEditClick}>
+                                <FontAwesomeIcon icon={faUserEdit} flip="horizontal" style={theme === 'dark' ? { color: "white" } : { color: "#000" }} />
+                            </button>
+                            <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleExitClick}>
+                                <FontAwesomeIcon icon={faDoorOpen} flip="horizontal" style={theme === 'dark' ? { color: "white" } : { color: "#000" }} />
+                            </button>
+                        </div>
+                    }*/}
+                    <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleMenuClick}>
+                        {isMenuVisible ? <FontAwesomeIcon icon={faClose} flip="horizontal" style={theme === 'dark' ? { color: "white",  } : { color: "#000" }} />
+                        : <FontAwesomeIcon icon={faList} flip="horizontal" style={theme === 'dark' ? { color: "white" } : { color: "#000" }} />}
+                    </button>
+                </div>
+            </div>
+
+            <div className={`menu-overlay ${isMenuVisible ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="menu-content">
                     <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLoginClick}>
                         <FontAwesomeIcon icon={faUser} flip="horizontal" style={theme === 'dark' ? { color: "white" } : { color: "#000" }} />
                     </button>
@@ -121,15 +143,6 @@ const MobileHeader = ({ user, onLogout }) => {
                             </button>
                         </div>
                     }
-                    <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleMenuClick}>
-                        {isMenuVisible ? <FontAwesomeIcon icon={faClose} flip="horizontal" style={theme === 'dark' ? { color: "white",  } : { color: "#000" }} />
-                        : <FontAwesomeIcon icon={faList} flip="horizontal" style={theme === 'dark' ? { color: "white" } : { color: "#000" }} />}
-                    </button>
-                </div>
-            </div>
-
-            <div className={`menu-overlay ${isMenuVisible ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
-                <div className="menu-content">
                     <div>
                         <h3 className={`navigate-mobile ${theme === 'dark' ? 'dark' : ''}`} onClick={handleCalendarClick}>{translations[language]['calendar']}</h3>
                         <h3 className={`navigate-mobile ${theme === 'dark' ? 'dark' : ''}`} onClick={handleOrderClick}>{translations[language]['orders']}</h3>

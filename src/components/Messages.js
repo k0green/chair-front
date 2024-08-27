@@ -136,8 +136,8 @@ const MessageComponent = ({ id }) => {
         setNewMessage(null);
     };
 
-    const handleMessageClick = (messageId) => {
-        if (isChoosing) {
+    const handleMessageClick = (messageId, isMine) => {
+        if (isChoosing && isMine) {
             setSelectedMessageId(messageId);
         }
     };
@@ -189,7 +189,6 @@ const MessageComponent = ({ id }) => {
                     });
             });
         });
-
 
         connection.start()
             .then(() => console.log('Connection started'))
@@ -507,15 +506,14 @@ const MessageComponent = ({ id }) => {
                             <div
                                 key={index}
                                 className={`message ${message.isMine ? 'mine' : `theirs ${theme === 'dark' ? 'dark' : ''}`} ${selectedMessageId === message.id ? 'selected' : ''}`}
-                                onClick={() => handleMessageClick(message.id)}
+                                onClick={() => handleMessageClick(message.id, message.isMine)}
                             >
                                 {message.type === 1 ? (
                                     <img
+                                        className="messageImage"
                                         src={message.text}
                                         alt=""
                                         style={{
-                                            width: '300px',
-                                            height: '300px',
                                             borderRadius: '15px'
                                         }}
                                     />

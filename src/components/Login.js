@@ -1,12 +1,10 @@
-import React, {useState, Fragment, useEffect, useContext} from "react";
-import Cookies from 'js-cookie';
+import React, {useState, Fragment, useContext} from "react";
 import "../styles/Login.css";
 import {Link, useNavigate} from "react-router-dom";
-import axios from "axios";
 import { ThemeContext } from './ThemeContext';
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
-import {login} from "./api";
+import {LoadingAnimation, login} from "./api";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -16,7 +14,7 @@ function Login() {
     const navigate = useNavigate();
     const { theme } = useContext(ThemeContext);
     const { language, translations } = useContext(LanguageContext);
-
+    const [isSave, setIsSave] = useState(false);
 
     const handleEmailChange = (value) => {
         setEmail(value);
@@ -47,42 +45,49 @@ function Login() {
     };
 
     const handleSave = async () => {
-        const data = {
-            Email: email,
-            Password: password,
-            RememberMe: true,
-        };
+        setIsSave(true);
+        try{
+            const data = {
+                Email: email,
+                Password: password,
+                RememberMe: true,
+            };
 
-        if(email === null | password === null | email === '' || password === ""){
-            return(
-                toast.error("Fields are empty", {
+            if(email === null | password === null | email === '' || password === ""){
+                return(
+                    toast.error("Fields are empty", {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: "Fields are empty",
+                    })
+                );
+            }
+
+            const response = await login(navigate, data);
+            if(response){
+                localStorage.setItem('userName', response.name);
+                localStorage.setItem('userId', response.id);
+                localStorage.setItem('userEmail', response.email);
+                localStorage.setItem('userRole', response.role);
+                toast.success(translations[language]['Success'], {
                     position: "top-center",
                     autoClose: 5000,
                     hideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
                     draggable: true,
-                    toastId: "Fields are empty",
-                })
-            );
-        }
-
-        const response = await login(navigate, data);
-        if(response){
-            localStorage.setItem('userName', response.name);
-            localStorage.setItem('userId', response.id);
-            localStorage.setItem('userEmail', response.email);
-            localStorage.setItem('userRole', response.role);
-            toast.success(translations[language]['Success'], {
-                position: "top-center",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                toastId: 'Success',
-            });
-            navigate('/');
+                    toastId: 'Success',
+                });
+                navigate('/');
+            }
+        }catch (e){
+            console.log(e)
+        }finally {
+            setIsSave(false);
         }
     };
 
@@ -110,14 +115,15 @@ function Login() {
                         onChange={(e) => handlePasswordChange(e.target.value)}
                     />
                     {passwordError && <div className="login-error">{passwordError}</div>}
-                    <p className={`${theme === 'dark' ? 'register-redirect-text' : ''}`}>{translations[language]['DontHaveAnAccount']}? <Link className={`${theme === 'dark' ? 'register-redirect-link' : ''}`}to="/register">Register here</Link></p>
+                    <p className={`${theme === 'dark' ? 'register-redirect-text' : ''}`}>{translations[language]['DontHaveAnAccount']}? <Link className={`${theme === 'dark' ? 'register-redirect-link' : ''}`} to="/register">Register here</Link></p>
                     <button
                         type="button"
                         className={`register-button ${emailError || passwordError ? "" : "active"}`}
                         onClick={() => handleSave()}
+                        disabled={isSave}
                         //disabled={!email || !password || emailError || passwordError}
                     >
-                        {translations[language]['SignIn']}
+                        {isSave ? <LoadingAnimation /> : translations[language]['SignIn']}
                     </button>
                 </form>
             </div>

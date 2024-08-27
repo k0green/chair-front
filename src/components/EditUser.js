@@ -1,10 +1,10 @@
-import React, {Fragment, useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import '../styles/Register.css';
 import {useNavigate} from "react-router-dom";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
-import {getEditUserInfo, getUserInfoForEdit} from "./api";
+import {getEditUserInfo, getUserInfoForEdit, LoadingAnimation} from "./api";
 
 function Register() {
 
@@ -16,13 +16,14 @@ function Register() {
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const [nameError, setNameError] = useState("");
-    const [confirmPasswordError, setConfirmPasswordError] = useState("");
+    const [confirmPasswordError] = useState("");
 
     const [userData, setUserData] = useState([]);
     const [name, setName] = useState(userData.name);
     const [email, setEmail] = useState(userData.email);
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    const [isSave, setIsSave] = useState(false);
 
     useEffect(() => {
         const userId = localStorage.getItem('userId');
@@ -108,61 +109,68 @@ function Register() {
     };
 
     const handleSave = () => {
-        const data = {
-            Id: userData.id,
-            Name: name,
-            Email: email,
-            OldPassword: oldPassword,
-            NewPassword: newPassword,
-        };
+        setIsSave(true);
+        try{
+            const data = {
+                Id: userData.id,
+                Name: name,
+                Email: email,
+                OldPassword: oldPassword,
+                NewPassword: newPassword,
+            };
 
-        if(name === null | email === null | oldPassword === null | newPassword === null
-            | name === "" | email === '' | oldPassword === "" | newPassword === ""){
-            return(
-                toast.error("Fields are empty", {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    toastId: "Fields are empty",
-                })
-            );
-        }
-
-        getEditUserInfo( navigate, data)
-            .then(serverData => {
-                localStorage.setItem('userName', serverData.name);
-                localStorage.setItem('userId', serverData.id);
-                localStorage.setItem('userEmail', serverData.email);
-                localStorage.setItem('userRole', serverData.role);
-                toast.success(translations[language]['Success'], {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    toastId: 'Success',
-                });
-                navigate('/');
-            })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
+            if(name === null | email === null | oldPassword === null | newPassword === null
+                | name === "" | email === '' | oldPassword === "" || newPassword === ""){
+                return(
+                    toast.error("Fields are empty", {
                         position: "top-center",
                         autoClose: 5000,
                         hideProgressBar: false,
                         closeOnClick: true,
                         pauseOnHover: true,
                         draggable: true,
-                        toastId: errorMessage,
+                        toastId: "Fields are empty",
+                    })
+                );
+            }
+
+            getEditUserInfo( navigate, data)
+                .then(serverData => {
+                    localStorage.setItem('userName', serverData.name);
+                    localStorage.setItem('userId', serverData.id);
+                    localStorage.setItem('userEmail', serverData.email);
+                    localStorage.setItem('userRole', serverData.role);
+                    toast.success(translations[language]['Success'], {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: 'Success',
                     });
-                }
-                console.error('Error fetching data:', error);
-            });
+                    navigate('/');
+                })
+                .catch(error => {
+                    const errorMessage = error.message || 'Failed to fetch data';
+                    if (!toast.isActive(errorMessage)) {
+                        toast.error(errorMessage, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: errorMessage,
+                        });
+                    }
+                    console.error('Error fetching data:', error);
+                });
+        }catch (e){
+            console.log(e)
+        }finally {
+            setIsSave(false);
+        }
     };
 
     return (
@@ -210,9 +218,10 @@ function Register() {
                     <button
                         className={`register-button ${nameError || emailError || passwordError || confirmPasswordError ? "" : "active"}`}
                         onClick={handleSave}
+                        disabled={isSave}
                         //disabled={!name || !email || !password || !confirmPassword || !role ||nameError || emailError || passwordError || confirmPasswordError}
                     >
-                        {translations[language]['Save']}
+                        {isSave ? <LoadingAnimation /> : <p className="order-text">{translations[language]['Save']}</p>}
                     </button>
                 </div>
             </div>

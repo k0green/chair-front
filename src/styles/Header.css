@@ -81,6 +81,10 @@
     /*scale: 1.2;*/
 }
 
+.navigate-mobile.dark {
+    color: #ffffff;
+}
+
 .navigate.dark {
     color: #dedede;
 }
@@ -215,5 +219,26 @@
 @media (max-width: 1025px) {
     .hide-on-mobile {
         display: none;
+    }
+}
+
+@media (max-width: 1025px) {
+    .profile-header-button {
+        /*margin-top: 10px;*/
+        margin-right: 0;
+        margin-left: 10px;
+        background-color: white;
+        border: 2px solid black;
+        color: white;
+        border-radius: 20px;
+        padding: 6px 10px;
+        font-size: 24px;
+        text-decoration: none;
+        scale: 1.05;
+        cursor: pointer;
+    }
+
+    .header {
+        height: 50px;
     }
 }

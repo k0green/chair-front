@@ -18,7 +18,11 @@ const Footer = () => {
             <p className="footer-text">© {new Date().getFullYear()} Chair Inc.</p>
             <div style={{position: 'absolute', right: '15px'}}>
                 <div style={{display: 'flex', alignItems: 'center'}}>
-                    <select className="language-select" onChange={(e) => changeLanguage(e.target.value)}>
+                    <select
+                        className="language-select"
+                        value={language} // Set the current language as selected
+                        onChange={(e) => changeLanguage(e.target.value)}
+                    >
                         <option value="en">English</option>
                         <option value="ru">Русский</option>
                     </select>
@@ -31,4 +35,6 @@ const Footer = () => {
         </footer>
     );
 };
+
 export default Footer;
+

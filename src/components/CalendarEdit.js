@@ -25,6 +25,7 @@ const Calendar = ({full}) => {
         breakTime: "15",
         duration: "60",
         cost: "",
+        discountCost: "",
         executorComment: "",
     });
     const [appointmentsData, setAppointmentsData] = useState([]);
@@ -33,6 +34,10 @@ const Calendar = ({full}) => {
     let { id } = useParams();
     const navigate = useNavigate();
     const { language, translations } = useContext(LanguageContext);
+    const [isDeleteClick, setIsDeleteClick] = useState(false);
+    const [isSaveClick, setIsSaveClick] = useState(false);
+    const [isNewAppointmentSave, setIsNewAppointmentSave] = useState(false);
+
 
     useEffect(() => {
         fetchData();
@@ -82,6 +87,7 @@ const Calendar = ({full}) => {
     };
 
     const handleNewAppointmentSave = async () => {
+        setIsNewAppointmentSave(true);
         if (selectedDays.length === 0) {
             toast.error("Please select at least one day.", {
                 position: "top-center",
@@ -91,6 +97,7 @@ const Calendar = ({full}) => {
                 pauseOnHover: true,
                 draggable: true,
             });
+            setIsNewAppointmentSave(false);
             return;
         }
 
@@ -108,6 +115,7 @@ const Calendar = ({full}) => {
                     pauseOnHover: true,
                     draggable: true,
                 });
+                setIsNewAppointmentSave(false);
                 return;
             }
         }
@@ -121,6 +129,7 @@ const Calendar = ({full}) => {
                 pauseOnHover: true,
                 draggable: true,
             });
+            setIsNewAppointmentSave(false);
             return;
         }
 
@@ -149,6 +158,7 @@ const Calendar = ({full}) => {
                         pauseOnHover: true,
                         draggable: true,
                     });
+                    setIsNewAppointmentSave(false);
                     return;
                 }
 
@@ -158,6 +168,7 @@ const Calendar = ({full}) => {
                     duration: endDate.toISOString(),
                     executorComment: newAppointmentData.executorComment,
                     price: parseFloat(newAppointmentData.cost),
+                    discountPrice: parseFloat(newAppointmentData.discountCost),
                 };
                 newAppointments.push(appointmentData);
             }
@@ -179,10 +190,22 @@ const Calendar = ({full}) => {
                 });
             }
             console.error('Error saving data', error);
+        } finally {
+            setIsNewAppointmentSave(false);
         }
 
         setAppointmentsData([...appointmentsData, ...newAppointments]);
         setIsNewAppointment(false);
+        toast.success(translations[language]['Success'], {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            toastId: 'Success',
+        });
+        setIsNewAppointmentSave(false);
     };
 
     const handleEditClick = (appointment) => {
@@ -191,6 +214,7 @@ const Calendar = ({full}) => {
     };
 
     const handleDeleteClick = async (appointment) => {
+        setIsDeleteClick(true);
         try {
             await deleteOrder(navigate, appointment.id);
             const updatedAppointmentsData = appointmentsData.filter((item) => item.id !== appointment.id);
@@ -198,6 +222,15 @@ const Calendar = ({full}) => {
 
             setEditingAppointmentId(null);
             setEditedAppointments({});
+            toast.success(translations[language]['Success'], {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: 'Success',
+            });
         } catch (error) {
             if (!toast.isActive(error.message)) {
                 toast.error(error.message, {
@@ -211,10 +244,13 @@ const Calendar = ({full}) => {
                 });
             }
             console.error('Error deleting data', error);
+        } finally {
+            setIsDeleteClick(false);
         }
     };
 
     const handleSaveClick = async () => {
+        setIsSaveClick(true);
         if (editingAppointmentId !== null) {
             const updatedAppointmentsData = appointmentsData.map((appointment) => {
                 if (appointment.id === editingAppointmentId) {
@@ -253,12 +289,23 @@ const Calendar = ({full}) => {
                     });
                 }
                 console.error('Error updating data', error);
+            } finally {
+                setIsSaveClick(false);
             }
 
             setAppointmentsData(updatedAppointmentsData);
         }
         setEditingAppointmentId(null);
         setIsNewAppointment(false);
+        toast.success(translations[language]['Success'], {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            toastId: 'Success',
+        });
     };
 
     const handleCancelClick = async () => {
@@ -302,19 +349,33 @@ const Calendar = ({full}) => {
         return (
             <div className={`calendar ${theme === 'dark' ? 'dark' : ''}`}>
                 <div className={`monthNavigation ${theme === 'dark' ? 'dark' : ''}`}>
-                    <button className="monthButton" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}>
+                    <button
+                        className="monthButton"
+                        onClick={() => {
+                            setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+                            setAppointmentsData([]); // Clear the appointments data
+                        }}>
                         <FontAwesomeIcon
                             icon={faChevronCircleLeft}
                             className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
                             style={{ color: "gray", backgroundColor: "transparent" }}
                         />
                     </button>
-                    <div className={`currentMonth ${theme === 'dark' ? 'dark' : ''}`}>{currentMonth.toLocaleString(language, { month: 'long', year: 'numeric' })}</div>
-                    <button className="monthButton" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}>
+
+                    <div className={`currentMonth ${theme === 'dark' ? 'dark' : ''}`}>
+                        {currentMonth.toLocaleString(language, { month: 'long', year: 'numeric' })}
+                    </div>
+
+                    <button
+                        className="monthButton"
+                        onClick={() => {
+                            setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+                            setAppointmentsData([]); // Clear the appointments data
+                        }}>
                         <FontAwesomeIcon
                             icon={faChevronCircleRight}
                             className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
-                            style={{ color: "gray", backgroundColor: "transparent"  }}
+                            style={{ color: "gray", backgroundColor: "transparent" }}
                         />
                     </button>
                 </div>
@@ -323,13 +384,15 @@ const Calendar = ({full}) => {
                     {emptyDays}
                     {daysInMonth.map((day, index) => {
                         const hasAppointments = appointmentsData.some(appointment => appointment.day === day);
+                        const hasAppointmentDiscounts = appointmentsData.some(appointment => appointment.day === day
+                            && (appointment.discountPrice !== null && appointment.discountPrice <= appointment.price));
                         return (
                             <div
                                 key={index}
                                 className={`day ${theme === 'dark' ? 'dark' : ''} ${selectedDays.includes(day) ? "selectedDay" : `${hasAppointments ? "hasAppointments" : ""}`}`}
                                 onClick={() => handleDayClick(day)}
                             >
-                                {day}
+                                {day}{hasAppointmentDiscounts ? <p4 className="discount-circle">%</p4> : ""}
                             </div>
                         );
                     })}
@@ -359,6 +422,7 @@ const Calendar = ({full}) => {
             breakTime: "15",
             duration: "60",
             cost: "",
+            discountCost: "",
             executorComment: "",
         });
     };
@@ -376,6 +440,13 @@ const Calendar = ({full}) => {
         const finalMinutes = newMinutes % 60 < 10 ? `0${newMinutes % 60}` : `${newMinutes % 60}`;
         return `${finalHours}:${finalMinutes}`;
     };
+
+    const LoadingAnimation = () => (
+        <div className="spinner">
+            <div className="double-bounce1"></div>
+            <div className="double-bounce2"></div>
+        </div>
+    );
 
     const renderNewAppointmentForm = () => {
         if (isNewAppointment) {
@@ -474,6 +545,21 @@ const Calendar = ({full}) => {
                             {" "} б.р.
                         </div>
                         <div className="add-element">
+                            {translations[language]['DiscountCost']}:{" "}
+                            {
+                                <input
+                                    type="number"
+                                    name="discountCost"
+                                    style={{width: "8ch"}}
+                                    placeholder={translations[language]['DiscountCost']}
+                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                    value={newAppointmentData.discountCost}
+                                    onChange={(e) => setNewAppointmentData({ ...newAppointmentData, discountCost: e.target.value })}
+                                />
+                            }
+                            {" "} б.р.
+                        </div>
+                        <div className="add-element">
                             {translations[language]['ExecutorComment']}:{" "}
                             {
                                 <input
@@ -490,7 +576,13 @@ const Calendar = ({full}) => {
                     </div>
                     {
                         <div className='edit-appointment-div'>
-                            <button className="save" onClick={handleNewAppointmentSave}>{translations[language]['Save']}</button>
+                            <button
+                                className="save"
+                                onClick={handleNewAppointmentSave}
+                                disabled={isNewAppointmentSave}
+                            >
+                                {isNewAppointmentSave ? <LoadingAnimation /> : translations[language]['Save']}
+                            </button>
                             <button className="delete" onClick={handleNewAppointmentCancel}>{translations[language]['Cancel']}</button>
                         </div>
                     }
@@ -507,6 +599,15 @@ const Calendar = ({full}) => {
 
     const enrollButtonClick = (id) => {
         enrollCalendar(id);
+        toast.success(translations[language]['Success'], {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            toastId: 'Success',
+        });
     };
 
     const renderAppointments = () => {
@@ -590,6 +691,22 @@ const Calendar = ({full}) => {
                                             )}
                                         </div>
                                         <div style={theme === 'dark' ? { color: "white"} : {}}>
+                                            {translations[language]['DiscountCost']}:{" "}
+                                            {editingAppointmentId === appointment.id ? (
+                                                <input
+                                                    type="number"
+                                                    style={{width: "8ch"}}
+                                                    placeholder={translations[language]['DiscountCost']}
+                                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                                    name="discountPrice"
+                                                    value={editedAppointments[appointment.id]?.discountPrice || ""}
+                                                    onChange={(e) => handleInputChange(e, appointment.id)}
+                                                />
+                                            ) : (
+                                                <strong>{appointment.discountPrice} byn</strong>
+                                            )}
+                                        </div>
+                                        <div style={theme === 'dark' ? { color: "white"} : {}}>
                                             {translations[language]['ExecutorComment']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
@@ -627,15 +744,32 @@ const Calendar = ({full}) => {
                                     </div>
                                     {editingAppointmentId === appointment.id ? (
                                         <div className='edit-appointment-div'>
-                                            <button className="save" onClick={handleSaveClick}>{translations[language]['Save']}</button>
+                                            <button
+                                                className="save"
+                                                onClick={handleSaveClick}
+                                                disabled={isSaveClick}
+                                            >
+                                                {isSaveClick ? <LoadingAnimation /> : translations[language]['Save']}
+                                            </button>
                                             <button className="delete" onClick={handleCancelClick}>{translations[language]['Cancel']}</button>
                                         </div>
                                     ) : (
                                         <div>
                                             {appointment.clientId == null &&
                                                 <div className='edit-appointment-div'>
-                                                    <button className="edit" onClick={() => handleEditClick(appointment)}>{translations[language]['Edit']}</button>
-                                                    <button className="delete" onClick={() => handleDeleteClick(appointment)}>{translations[language]['Delete']}</button>
+                                                    <button
+                                                        className="edit"
+                                                        onClick={() => handleEditClick(appointment)}
+                                                    >
+                                                        {translations[language]['Edit']}
+                                                    </button>
+                                                    <button
+                                                        className="delete"
+                                                        onClick={() => handleDeleteClick(appointment)}
+                                                        disabled={isDeleteClick}
+                                                    >
+                                                        {isDeleteClick ? <LoadingAnimation /> : translations[language]['Delete']}
+                                                    </button>
                                                 </div>
                                             }
                                             {appointment.clientId != null && appointment.clientApprove

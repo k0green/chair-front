@@ -6,7 +6,7 @@ import "../styles/CategoryItem.css";
 import "../styles/ServiceCard.css";
 import Photo from "../components/Photo";
 
-const PhotoList = ({photos}) => {
+const PhotoList = ({photos, size}) => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 1;
@@ -45,16 +45,17 @@ const PhotoList = ({photos}) => {
                     <Photo
                         id={photo.id}
                         url={photo.url}
+                        size={size}
                     />
                 ))}
                 {photos.length > 1 && (
                     <div className="arrow-buttons">
-                        <button onClick={goToPreviousPage}><FontAwesomeIcon
+                        <button onClick={(e) => {e.stopPropagation(); goToPreviousPage();}}><FontAwesomeIcon
                             icon={faChevronLeft}
                             className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
                             style={{ color: "gray" }}
                         /></button>
-                        <button onClick={goToNextPage}><FontAwesomeIcon
+                        <button onClick={(e) => {e.stopPropagation(); goToNextPage();}}><FontAwesomeIcon
                             icon={faChevronRight}
                             className={theme === "dark" ? "pagination-arrow-dark-theme" : "pagination-arrow-light-theme"}
                             style={{ color: "gray"}}

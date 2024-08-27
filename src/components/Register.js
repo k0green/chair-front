@@ -4,7 +4,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
-import {registerQuery} from "./api";
+import {LoadingAnimation, registerQuery} from "./api";
 
 function Register() {
     const navigate = useNavigate();
@@ -23,6 +23,7 @@ function Register() {
     const [nameError, setNameError] = useState("");
     const [phoneError, setPhoneError] = useState("");
     const [confirmPasswordError, setConfirmPasswordError] = useState("");
+    const [isSave, setIsSave] = useState(false);
 
     const handleNameChange = (value) => {
         setName(value);
@@ -91,45 +92,52 @@ function Register() {
     };
 
     const handleSave = async () => {
-        const data = {
-            Name: name,
-            Email: email,
-            Password: password,
-            ConfirmPassword: confirmPassword,
-            Phone: phone,
-        };
+        setIsSave(true);
+        try{
+            const data = {
+                Name: name,
+                Email: email,
+                Password: password,
+                ConfirmPassword: confirmPassword,
+                Phone: phone,
+            };
 
-        if(name === null | email === null | password === null | confirmPassword === null
-            | name === "" | email === '' | password === "" | confirmPassword === ""){
-            return(
-                toast.error("Fields are empty", {
+            if(name === null | email === null | password === null | confirmPassword === null
+                | name === "" | email === '' | password === "" | confirmPassword === ""){
+                return(
+                    toast.error("Fields are empty", {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: "Fields are empty",
+                    })
+                );
+            }
+
+            const response = await registerQuery(navigate, data);
+            if(response){
+                localStorage.setItem('userName', response.name);
+                localStorage.setItem('userId', response.id);
+                localStorage.setItem('userEmail', response.email);
+                localStorage.setItem('userRole', response.role);
+                toast.success(translations[language]['Success'], {
                     position: "top-center",
                     autoClose: 5000,
                     hideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
                     draggable: true,
-                    toastId: "Fields are empty",
-                })
-            );
-        }
-
-        const response = await registerQuery(navigate, data);
-        if(response){
-            localStorage.setItem('userName', response.name);
-            localStorage.setItem('userId', response.id);
-            localStorage.setItem('userEmail', response.email);
-            localStorage.setItem('userRole', response.role);
-            toast.success(translations[language]['Success'], {
-                position: "top-center",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                toastId: 'Success',
-            });
-            navigate('/login');
+                    toastId: 'Success',
+                });
+                navigate('/login');
+            }
+        }catch (e){
+            console.log(e)
+        }finally {
+            setIsSave(false);
         }
     };
 
@@ -189,9 +197,10 @@ function Register() {
                     <button
                         className={`register-button ${nameError || emailError || passwordError || confirmPasswordError ? "" : "active"}`}
                         onClick={() => handleSave()}
+                        disabled={isSave}
                         //disabled={!name || !email || !password || !confirmPassword || !role ||nameError || emailError || passwordError || confirmPasswordError}
                     >
-                        {translations[language]['SignUp']}
+                        {isSave ? <LoadingAnimation /> : translations[language]['SignUp']}
                     </button>
                 </form>
             </div>

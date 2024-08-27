@@ -19,7 +19,7 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
     const { theme } = useContext(ThemeContext);
     const [servicesData, setServicesData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(4);
+    const [itemsPerPage, setItemsPerPage] = useState(1);
     const [selectedPlace, setSelectedPlace] = useState({ position: null, address: '' });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [totalCount, setTotalCount] = useState(5);
@@ -81,7 +81,7 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
             if (services && services[0] && services[0].masters) {
                 setServicesData(services[0].masters);
             } else {
-                throw new Error('Data format is incorrect');
+                console.log('Data format is incorrect');
             }
             setTotalCount(totalCount);
         } catch (error) {
@@ -102,6 +102,15 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
     };
 
     useEffect(() => {
+        setSortData([
+            {
+                field: "rating",
+                direction: 'desc',
+            },
+            {
+                field: "successOrdersAmount",
+                direction: 'desc',
+            }]);
         const newFilter = { ...filter, take: itemsPerPage, skip: (currentPage - 1) * itemsPerPage, sort: sortData, filter: filterValuesData };
         fetchData(newFilter);
     }, [id, filter, itemsPerPage, currentPage]);
@@ -375,7 +384,6 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
     const handleAddTimeRange = () => {
         setTimeRanges((prevRanges) => [...prevRanges, {startTime: null, endTime: null}]);
     };
-
 
     const handleRemoveTimeRange = (index) => {
         setTimeRanges((prevRanges) => {
@@ -728,7 +736,7 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
                             <div className="service-card">
                                 <div key={oprData.id} className="master-card">
                                     <div className="photos">
-                                        <PhotoList photos={oprData.photos} canDelete={false}/>
+                                        <PhotoList photos={oprData.photos} size={300} canDelete={false}/>
                                     </div>
                                     <div className="master-info">
                                         <h4 onClick={() => handleMasterNameClickClick(oprData.executorId)}>{oprData.name}</h4>

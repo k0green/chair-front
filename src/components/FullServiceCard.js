@@ -8,20 +8,21 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import {LanguageContext} from "./LanguageContext";
 import {ThemeContext} from "./ThemeContext";
 import ReactStars from "react-rating-stars-component";
-import ServiceCard from "./ServiceCard";
 import {addReview, getReviewsByServiceCardId, LoadingAnimation, updateReview, uploadMinioPhoto} from "./api";
 import {toast} from "react-toastify";
+import Calendar from "./Calendar";
+import PhotoList from "./PhotoList";
+import MapComponent from "./MapComponent";
 import {useDropzone} from "react-dropzone";
 import {
     faBoltLightning,
     faStar, faTrash
 } from "@fortawesome/free-solid-svg-icons";
-import PhotoList from "./PhotoList";
 
-const Reviews = ({ service }) => {
+const FullServiceCard = ({ service }) => {
     const navigate = useNavigate();
     const { language, translations } = useContext(LanguageContext);
-    const { theme, toggleTheme } = useContext(ThemeContext);
+    const { theme } = useContext(ThemeContext);
     const [uploadReviewModal, setUploadReviewModal] = useState(false);
     const [reviews, setReviews] = useState([]);
     const [editedText, setEditedText] = useState('');//useState(service.description);
@@ -40,26 +41,26 @@ const Reviews = ({ service }) => {
         fetchData();
     }, []);
 
-const fetchData = () => {
-    getReviewsByServiceCardId(service.id, navigate).then(newData => {
-        setReviews(newData);
-    })
-        .catch(error => {
-            const errorMessage = error.message || 'Failed to fetch data';
-            if (!toast.isActive(errorMessage)) {
-                toast.error(errorMessage, {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    toastId: errorMessage,
-                });
-            }
-            console.error('Error fetching data:', error);
-        });
-};
+    const fetchData = () => {
+        getReviewsByServiceCardId(service.id, navigate).then(newData => {
+            setReviews(newData);
+        })
+            .catch(error => {
+                const errorMessage = error.message || 'Failed to fetch data';
+                if (!toast.isActive(errorMessage)) {
+                    toast.error(errorMessage, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        toastId: errorMessage,
+                    });
+                }
+                console.error('Error fetching data:', error);
+            });
+    };
 
     function calculateStarCounts(reviews) {
         const starCounts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
@@ -107,18 +108,33 @@ const fetchData = () => {
         );
     }
 
-    const handleUpload = () => {
+    const handleUpload = async () => {
         setIsUpload(true);
         try{
+            const newFiles = files.filter(file => !file.id);
+
+            const promises = newFiles.map(file => {
+                const formData = new FormData();
+                formData.append('file', file);
+                return uploadMinioPhoto(navigate, formData);
+            });
+
+            const uploadedPhotos = await Promise.all(promises);
+
+            const filteredState = editedPhotos.filter(photo => photo.id && photo.id !== 'default');
+
+            setFiles([]);
+
             const date = new Date(2023,1,1,20, 50,0, 0);
             date.setHours(date.getHours()+3);
-            console.log(date);
             const updatedReviewData = {
                 userId: localStorage.getItem('userId'),
                 executorServiceId: service.id,
                 text: editedText,
                 stars: editedStars,
                 parentId: editedParentId,
+                photoIds: [...filteredState, ...uploadedPhotos.map(response => response.data).map(photo => photo.id)],
+                removePhotoIds: filesToDelete,
             };
 
             if(isEdit){
@@ -128,21 +144,6 @@ const fetchData = () => {
                     .then(() => {
                         setUploadReviewModal(false);
                         fetchData();
-                    })
-                    .catch(error => {
-                        const errorMessage = error.message || 'Failed to fetch data';
-                        if (!toast.isActive(errorMessage)) {
-                            toast.error(errorMessage, {
-                                position: "top-center",
-                                autoClose: 5000,
-                                hideProgressBar: false,
-                                closeOnClick: true,
-                                pauseOnHover: true,
-                                draggable: true,
-                                toastId: errorMessage,
-                            });
-                        }
-                        console.error('Error fetching data:', error);
                     });
                 toast.success(translations[language]['Success'], {
                     position: "top-center",
@@ -155,26 +156,12 @@ const fetchData = () => {
                 });
             }
             else{
+                console.log(editedPhotos);
                 addReview(updatedReviewData, navigate)
                     .then(() => {
                         setUploadReviewModal(false);
                         fetchData();
                     })
-                    .catch(error => {
-                        const errorMessage = error.message || 'Failed to fetch data';
-                        if (!toast.isActive(errorMessage)) {
-                            toast.error(errorMessage, {
-                                position: "top-center",
-                                autoClose: 5000,
-                                hideProgressBar: false,
-                                closeOnClick: true,
-                                pauseOnHover: true,
-                                draggable: true,
-                                toastId: errorMessage,
-                            });
-                        }
-                        console.error('Error fetching data:', error);
-                    });
                 toast.success(translations[language]['Success'], {
                     position: "top-center",
                     autoClose: 5000,
@@ -193,11 +180,18 @@ const fetchData = () => {
     };
 
     const handleAddClick = () => {
+        setFiles([]);
+        setFilesToDelete([]);
+        console.log('-+-+-');
+        console.log(editedPhotos);
+        setFiles(editedPhotos.map(photo => ({
+            preview: photo.url,
+            id: photo.id,
+        })));
         setUploadReviewModal(true);
     };
 
     const handleEditClick = (id) => {
-        setUploadReviewModal(true);
         const review = reviews.find(review => review.id === id);
         setEditedText(review.text);
         setEditedStars(review.stars);
@@ -205,7 +199,16 @@ const fetchData = () => {
         setEditedId(review.id);
         setCreateDate(review.createDate);
         setEditedPhotos(review.photos)
+        setFiles(review.photos.map(photo => ({
+            preview: photo.url,
+            id: photo.id,
+        })));
         setIsEdit(true);
+        setUploadReviewModal(true);
+    };
+
+    const handleMasterNameClickClick = (masterId) => {
+        navigate("/profile/" + masterId);
     };
 
     const handleUploadImages = async () => {
@@ -223,12 +226,18 @@ const fetchData = () => {
 
             const filteredState = editedPhotos.filter(photo => photo.id && photo.id !== 'default');
             setEditedPhotos([...filteredState, ...uploadedPhotos.map(response => response.data)]);
+            console.log(1);
+            console.log(uploadedPhotos);
 
             setFiles([]);
+            console.log(9);
+            console.log(editedPhotos);
         }catch (e){
             console.log(e)
         }finally {
             setIsUploadImages(false);
+            console.log(10);
+            console.log(editedPhotos);
         }
     };
 
@@ -270,51 +279,57 @@ const fetchData = () => {
     }
 
     return (
-        <div className="service-and-reviews-container">
-            <ServiceCard key={service.id} service={service} isProfile={false}/>
-            {uploadReviewModal && (
-                <div className={`filter-modal ${theme === 'dark' ? 'dark' : ''}`}>
-                    <div className={`modal-content ${theme === 'dark' ? 'dark' : ''}`}>
-            <span className="close" onClick={() => setUploadReviewModal(false)}>
-                &times;
-            </span>
-                        <div className="filter-modal">
-                            <div className="modal-content">
-                                <div className="dropzone-centrize">
-                                    <Dropzone />
-                                    <button
-                                        className="dropzone-order-button"
-                                        onClick={handleUploadImages}
-                                        disabled={isUploadImages}
-                                    >
-                                        {isUploadImages ? <LoadingAnimation /> : <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p>}
-                                    </button>
-                                </div>
-                            </div>
+        <div>
+            <div className="service-and-reviews-container">
+                <div className="photos-fullsize">
+                    {service.photos ? <PhotoList photos={service.photos} size={500} canDelete={false} /> :
+                        <img
+                            src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
+                            }}
+                            style={{minWidth: "500px", maxWidth: "500px", maxHeight: "500px", minHeight: "500px"}}
+                            alt=""/>}
+                    {service.hasDiscount || service.hasPromotions ? (
+                        <div className="discount-overlay">
+                            {service.hasDiscount ? <h4 className="discount">{translations[language]['Discount']}</h4> : ""}
+                            {service.hasPromotions ? <h4 className="discount">{translations[language]['Promotions']}</h4> : ""}
                         </div>
-                        <div className="extra-modal-content">
-                            <ReactStars
-                                count={5}
-                                value={editedStars}
-                                onChange={(newRating) => setEditedStars(newRating)}
-                                size={128}
-                                activeColor="#ffd700"
-                            />
-                            <textarea
-                                value={editedText}
-                                onChange={(e) => setEditedText(e.target.value)}
-                                placeholder={translations[language]['EnterReview']}
-                                className={`review-input ${theme === 'dark' ? 'dark' : ''}`}
-                            />
-                            <button className="review-order-button" onClick={handleUpload} disabled={isUpload}>
-                                {isUpload ? <LoadingAnimation /> : <p className="order-text">
-                                    <FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}
-                                </p>}
-                            </button>
-                        </div>
+                    ) : null}
+                </div>
+                <div>
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
+                        <h4 style={{ cursor: "pointer" }} onClick={() => handleMasterNameClickClick(service.executorId)}>{translations[language]['Name']}: {service.name}</h4>
+                    </div>
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
+                        <h4 style={{ cursor: "pointer" }} onClick={() => handleMasterNameClickClick(service.executorId)}>{translations[language]['Name']}: {service.serviceTypeName}</h4>
+                    </div>
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
+                        <h4 style={{ cursor: "pointer" }}>
+                            {translations[language]['Rating']}: {service.rating < 1 ? '-' : service.rating} <FontAwesomeIcon icon={faStar} className='item-icon' />
+                        </h4>
+                    </div>
+                    <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
+                        <h4>{translations[language]['Description']}: {service.description}</h4>
+                        <h4>{translations[language]['Address']}: {service.place.address}</h4>
+                        <h4>{translations[language]['AvailableSlots']}: {service.availableSlots}</h4>
+                    </div>
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
+                        <h4>{translations[language]['Duration(h:m)']}: {service.duration}</h4>
+                    </div>
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
+                        <h4>{translations[language]['Cost']}: {service.price} Byn</h4>
                     </div>
                 </div>
-            )}
+                <div style={{ height: '500px', width: '500px', overflow: "hidden" }}>
+                    <MapComponent
+                        initialPosition={service.place.position}
+                        canEdit={false}
+                    />
+                </div>
+            </div>
+            <Calendar full={false} />
             <div className="service-and-reviews-container">
                 <div className="photos-fullsize">
                     {reviews.filter(obj => obj.photos).flatMap(obj => obj.photos)
@@ -327,6 +342,36 @@ const fetchData = () => {
                             }}
                             alt=""/>}
                 </div>
+                {uploadReviewModal && (
+                    <div className={`filter-modal ${theme === 'dark' ? 'dark' : ''}`}>
+                        <div className={`modal-content ${theme === 'dark' ? 'dark' : ''}`}>
+            <span className="close" onClick={() => setUploadReviewModal(false)}>
+                &times;
+            </span>
+                            <Dropzone />
+                            <div className="extra-modal-content">
+                                <ReactStars
+                                    count={5}
+                                    value={editedStars}
+                                    onChange={(newRating) => setEditedStars(newRating)}
+                                    size={128}
+                                    activeColor="#ffd700"
+                                />
+                                <textarea
+                                    value={editedText}
+                                    onChange={(e) => setEditedText(e.target.value)}
+                                    placeholder={translations[language]['EnterReview']}
+                                    className={`review-input ${theme === 'dark' ? 'dark' : ''}`}
+                                />
+                                <button className="review-order-button" onClick={handleUpload} disabled={isUpload}>
+                                    {isUpload ? <LoadingAnimation /> : <p className="order-text">
+                                        <FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}
+                                    </p>}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <div style={{marginTop: "10px"}}>
                     <button className="order-button" onClick={handleAddClick} disabled={isUpload}>
                         {isUpload ? <LoadingAnimation /> : <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Add']}</p>}
@@ -378,4 +423,4 @@ const fetchData = () => {
     );
 };
 
-export default Reviews;
+export default FullServiceCard;

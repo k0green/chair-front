@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
-import {approveOrder, getOrders, registerQuery, updateOrder} from "./api";
+import {approveOrder, getOrders, LoadingAnimation, registerQuery, updateOrder} from "./api";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
 import {faClose} from "@fortawesome/free-solid-svg-icons/faClose";
@@ -20,6 +20,7 @@ const AppointmentsComponent = () => {
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { language, translations } = useContext(LanguageContext);
     const [clientComment, setClientComment] = useState();
+    const [isApproveClick, setIsApproveClick] = useState(false);
 
     useEffect(() => {
         const token = Cookies.get('token');
@@ -59,29 +60,54 @@ const AppointmentsComponent = () => {
     };
 
     const handleApproveClick = (id) => {
-        approveOrder(navigate, id, isExecutor)
-            .then(serverData => {
-                setAppointmentsData(serverData);
-            })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
+        setIsApproveClick(true);
+        try{
+            approveOrder(navigate, id, isExecutor)
+                .then(serverData => {
+                    setAppointmentsData(serverData);
+                })
+                .catch(error => {
+                    const errorMessage = error.message || 'Failed to fetch data';
+                    if (!toast.isActive(errorMessage)) {
+                        toast.error(errorMessage, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: errorMessage,
+                        });
+                    }
+                    console.error('Error fetching data:', error);
+                });
+            toast.success(translations[language]['Success'], {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: 'Success',
             });
+        }catch (e){
+            console.log(e)
+        }finally {
+            setIsApproveClick(false);
+        }
     };
 
     const saveClientComment = async () => {
         await updateOrder(navigate, clientComment);
+        toast.success(translations[language]['Success'], {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            toastId: 'Success',
+        });
     }
 
     const renderAppointments = (filteredAppointments) => {
@@ -97,6 +123,7 @@ const AppointmentsComponent = () => {
                                     <div style={theme === 'dark' ? { color: "white"} : { color: "black" }}>{translations[language]['StartTime']}: <strong>{formatTime(appointment.starDate)}</strong></div>
                                     <div style={theme === 'dark' ? { color: "white"} : { color: "black" }}>{translations[language]['Duration']}: <strong>{formatTime(appointment.duration)}</strong></div>
                                     <div style={theme === 'dark' ? { color: "white"} : { color: "black" }}>{translations[language]['Cost']}: <strong>{appointment.price} byn</strong></div>
+                                    <div style={theme === 'dark' ? { color: "white"} : { color: "black" }}>{translations[language]['DiscountCost']}: <strong>{appointment.discountPrice} byn</strong></div>
                                     <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorComment']}: <strong>{appointment.executorComment}</strong></div>
                                     <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientName']}: <strong>{appointment.clientName}</strong></div>
                                     {userRole === 'executor' ?
@@ -156,8 +183,9 @@ const AppointmentsComponent = () => {
                                         !appointment.clientApprove && appointment.executorApprove && (
                                             <button
                                                 onClick={() => handleApproveClick(appointment.id)}
-                                                disabled={!appointment.clientId}>
-                                                {translations[language]['ApproveOrder']}
+                                                disabled={!appointment.clientId && isApproveClick}
+                                            >
+                                                {isApproveClick ? <LoadingAnimation /> : translations[language]['ApproveOrder']}
                                             </button>
                                         )
                                     )

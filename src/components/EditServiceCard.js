@@ -3,7 +3,6 @@ import '../styles/ServiceCard.css';
 import {
     faAdd,
     faBoltLightning,
-    faClock, faDollar,
     faStar, faTrash
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,11 +13,11 @@ import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
 import MapModal from "./MapModal";
-import {addServiceCard, getAllServiceTypes, updateServiceCard, uploadMinioPhoto} from "./api";
+import {addServiceCard, getAllServiceTypes, LoadingAnimation, updateServiceCard, uploadMinioPhoto} from "./api";
 
 const ServiceCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
-    const { theme, toggleTheme } = useContext(ThemeContext);
+    const { theme } = useContext(ThemeContext);
     const [filesToDelete, setFilesToDelete] = useState([]);
 
     const formatTime = (rawTime) => {
@@ -30,14 +29,16 @@ const ServiceCard = ({ service, isNew, id }) => {
 
     const [editedDescription, setEditedDescription] = useState(service.description);
     const [editedServiceTypeId, setEditedServiceTypeId] = useState(service.serviceTypeId);
-    const [editedDuration, setEditedDuration] = useState(formatTime(service.duration));
-    const [editedPrice, setEditedPrice] = useState(service.price);
+    const [editedDuration] = useState(formatTime(service.duration));
+    const [editedPrice] = useState(service.price);
     const [editedAddress, setEditedAddress] = useState(service.place);
     const [editedPhotos, setEditedPhotos] = useState([...service.photos]);
     const [servicesLookupData, setServicesLookupData] = useState([]);
     const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
     const [files, setFiles] = useState([]);
     const { language, translations } = useContext(LanguageContext);
+    const [isEditSave, setIsEditSave] = useState(false);
+    const [isUpload, setIsUpload] = useState(false);
 
     const reverseFormatTime = (formattedTime, editedDuration) => {
         const [hours, minutes] = formattedTime.split(':').map(Number);
@@ -70,89 +71,121 @@ const ServiceCard = ({ service, isNew, id }) => {
     }, []);
 
     const handleEditSave = () => {
-        const updatedServiceData = {
-            id: service.id,
-            serviceTypeId: service.serviceTypeId,
-            executorId: service.executorId,
-            description: editedDescription,
-            place: editedAddress,
-            duration: reverseFormatTime(editedDuration, service.duration),
-            price: editedPrice,
-            photoIds: editedPhotos.map(photo => photo.id),
-            removePhotoIds: filesToDelete,
-        };
+        setIsEditSave(true);
+        try{
+            const updatedServiceData = {
+                id: service.id,
+                serviceTypeId: service.serviceTypeId,
+                executorId: service.executorId,
+                description: editedDescription,
+                place: editedAddress,
+                duration: reverseFormatTime(editedDuration, service.duration),
+                price: editedPrice,
+                photoIds: editedPhotos.map(photo => photo.id),
+                removePhotoIds: filesToDelete,
+            };
 
-        if (!updatedServiceData.serviceTypeId) {
-            toast.error("Service type must be filled.", {
+            if (!updatedServiceData.serviceTypeId) {
+                toast.error("Service type must be filled.", {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+                return;
+            }
+
+            updateServiceCard(updatedServiceData, navigate)
+                .catch(error => {
+                    const errorMessage = error.message || 'Failed to fetch data';
+                    if (!toast.isActive(errorMessage)) {
+                        toast.error(errorMessage, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: errorMessage,
+                        });
+                    }
+                    console.error('Error fetching data:', error);
+                });
+            toast.success(translations[language]['Success'], {
                 position: "top-center",
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
+                toastId: 'Success',
             });
-            return;
+        }catch (e){
+            console.log(e)
+        }finally {
+            setIsEditSave(false);
         }
-
-        updateServiceCard(updatedServiceData, navigate)
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
-            });
     };
 
     const handleAddSave = () => {
-        const date = new Date(2023,1,1,20, 50,0, 0);
-        date.setHours(date.getHours()+3);
-        const updatedServiceData = {
-            serviceTypeId: editedServiceTypeId.serviceTypeId,
-            executorId: id,
-            description: editedDescription,
-            place: editedAddress,
-            duration: reverseFormatTime(editedDuration, date),
-            price: editedPrice,
-            photoIds: editedPhotos.filter(photo => photo.id !== "default").map(photo => photo.id),
-        };
+        setIsEditSave(true);
+        try{
+            const date = new Date(2023,1,1,20, 50,0, 0);
+            date.setHours(date.getHours()+3);
+            const updatedServiceData = {
+                serviceTypeId: editedServiceTypeId.serviceTypeId,
+                executorId: id,
+                description: editedDescription,
+                place: editedAddress,
+                duration: reverseFormatTime(editedDuration, date),
+                price: editedPrice,
+                photoIds: editedPhotos.filter(photo => photo.id !== "default").map(photo => photo.id),
+            };
 
-        if (!updatedServiceData.serviceTypeId) {
-            toast.error("Service type must be filled.", {
+            if (!updatedServiceData.serviceTypeId) {
+                toast.error("Service type must be filled.", {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+                return;
+            }
+
+            addServiceCard(updatedServiceData, navigate)
+                .catch(error => {
+                    const errorMessage = error.message || 'Failed to fetch data';
+                    if (!toast.isActive(errorMessage)) {
+                        toast.error(errorMessage, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            toastId: errorMessage,
+                        });
+                    }
+                    console.error('Error fetching data:', error);
+                });
+            toast.success(translations[language]['Success'], {
                 position: "top-center",
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
+                toastId: 'Success',
             });
-            return;
+        }catch (e){
+            console.log(e)
+        }finally {
+            setIsEditSave(false);
         }
-
-        addServiceCard(updatedServiceData, navigate)
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
-            });
     };
 
     const handleAddPhoto = () => {
@@ -203,21 +236,28 @@ const ServiceCard = ({ service, isNew, id }) => {
     }
 
     const handleUpload = async () => {
-        const newFiles = files.filter(file => !file.id);
+        setIsUpload(true);
+        try{
+            const newFiles = files.filter(file => !file.id);
 
-        const promises = newFiles.map(file => {
-            const formData = new FormData();
-            formData.append('file', file);
-            return uploadMinioPhoto(navigate, formData);
-        });
+            const promises = newFiles.map(file => {
+                const formData = new FormData();
+                formData.append('file', file);
+                return uploadMinioPhoto(navigate, formData);
+            });
 
-        const uploadedPhotos = await Promise.all(promises);
+            const uploadedPhotos = await Promise.all(promises);
 
-        const filteredState = editedPhotos.filter(photo => photo.id && photo.id !== 'default');
-        setEditedPhotos([...filteredState, ...uploadedPhotos.map(response => response.data)]);
+            const filteredState = editedPhotos.filter(photo => photo.id && photo.id !== 'default');
+            setEditedPhotos([...filteredState, ...uploadedPhotos.map(response => response.data)]);
 
-        setFiles([]);
-        setUploadPhotoModal(false);
+            setFiles([]);
+            setUploadPhotoModal(false);
+        }catch (e){
+            console.log(e)
+        }finally {
+            setIsUpload(false);
+        }
     };
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -235,7 +275,7 @@ const ServiceCard = ({ service, isNew, id }) => {
         <div className={`service-card-edit ${theme === 'dark' ? 'dark' : ''}`}>
                 <div key={service.id} className="master-card">
                     <div className="photos-edit">
-                        <PhotoList photos={editedPhotos} />
+                        <PhotoList photos={editedPhotos} size={500} />
                         <button className="add-photo-button-new" onClick={handleAddPhoto}>
                             <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> {translations[language]['AddPhoto']}</p>
                         </button>
@@ -283,7 +323,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                         />
                         {/*<p>Available Slots: {service.availableSlots}</p>*/}
                     </div>
-                    <div className="master-info">
+{/*                    <div className="master-info">
                         <div className="time-module">
                             <FontAwesomeIcon icon={faClock} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`}/>
                             <input
@@ -305,10 +345,14 @@ const ServiceCard = ({ service, isNew, id }) => {
                             />
                             <h4 className={`item-icon ${theme === 'dark' ? 'dark' : ''}`}>  Byn</h4>
                         </div>
-                    </div>
+                    </div>*/}
                     <div>
-                        <button className="order-button" onClick={isNew ? handleAddSave : handleEditSave}>
-                            <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p>
+                        <button
+                            className="order-button"
+                            onClick={isNew ? handleAddSave : handleEditSave}
+                            disabled={isEditSave}
+                        >
+                            {isEditSave ? <LoadingAnimation /> : <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p>}
                         </button>
                     </div>
                 </div>
@@ -321,7 +365,13 @@ const ServiceCard = ({ service, isNew, id }) => {
                     </span>
                         <div className="dropzone-centrize">
                             <Dropzone />
-                            <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p></button>
+                            <button
+                                className="dropzone-order-button"
+                                onClick={handleUpload}
+                                disabled={isUpload}
+                            >
+                                {isUpload ? <LoadingAnimation /> : <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p>}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -331,6 +381,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                 onRequestClose={() => setIsModalOpen(false)}
                 onSaveAddress={handleSaveAddress}
                 initialPosition={editedAddress.position}
+                canEdit={true}
             />
         </div>
     );

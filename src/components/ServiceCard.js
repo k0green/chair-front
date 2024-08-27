@@ -21,6 +21,7 @@ const ServiceCard = ({ service, isProfile }) => {
     const [selectedPlace, setSelectedPlace] = useState({ position: null, address: '' });
     const [itemsPerPage, setItemsPerPage] = useState(4);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDelete, setIsDelete] = useState(false);
 
     useEffect(() => {
         const updateItemsPerPage = () => {
@@ -57,44 +58,39 @@ const ServiceCard = ({ service, isProfile }) => {
         navigate("/service-card/edit/" + executorServiceId);
     };
 
+    const handleCardClick = (executorServiceId) => {
+        navigate("/service-card/full/" + executorServiceId);
+    };
+
     const handleRemoveClick = (id) => {
-        deleteServiceCard(id, navigate).then(newData => {
-            const successMessage = "Success"
-            if (!toast.isActive(successMessage)) {
-                toast.success(successMessage, {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    toastId: successMessage,
-                });
-            }
-        })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
+        setIsDelete(true);
+        try{
+            deleteServiceCard(id, navigate).then(newData => {
+                const successMessage = "Success"
+                if (!toast.isActive(successMessage)) {
+                    toast.success(successMessage, {
                         position: "top-center",
                         autoClose: 5000,
                         hideProgressBar: false,
                         closeOnClick: true,
                         pauseOnHover: true,
                         draggable: true,
-                        toastId: errorMessage,
+                        toastId: successMessage,
                     });
                 }
-                console.error('Error fetching data:', error);
             });
-/*        window.location.reload();*/
+        }catch (e){
+            console.log(e)
+        }finally {
+            setIsDelete(false)
+        }
     };
 
     const handleAddressClick = () => {
         setIsModalOpen(true);
     };
 
-    const TruncatedText = ({ text, maxWidth, handleAddressClick, service }) => {
+    const TruncatedText = ({ text, icon, maxWidth, handleAddressClick, service }) => {
         const textRef = useRef(null);
         const [isTruncated, setIsTruncated] = useState(false);
         const [truncatedText, setTruncatedText] = useState(text);
@@ -117,7 +113,7 @@ const ServiceCard = ({ service, isProfile }) => {
                 onClick={handleAddressClick}
                 style={{ cursor: 'pointer', maxWidth: `${maxWidth}px`, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center' }}
             >
-                <FontAwesomeIcon icon={faHouse} className='item-icon' />
+                {icon ? <FontAwesomeIcon icon={faHouse} className='item-icon' /> : ''}
                 <span ref={textRef}>
                 {isTruncated ? truncatedText : text}
             </span>
@@ -126,60 +122,66 @@ const ServiceCard = ({ service, isProfile }) => {
     };
 
     return (
-            <div className="card-list">
-                    <div key={service.id} className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
-                        <div className="master-card">
-                            <div className="photos">
-                                {service.photos ? <PhotoList photos={service.photos} canDelete={false} /> :
-                                    <img
-                                        src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
-                                        }}
-                                    />}
+        <div className="card-list" onClick={() => handleCardClick(service.id)}>
+            <div key={service.id} className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="master-card">
+                    <div className="photos">
+                        {service.photos ? <PhotoList photos={service.photos} size={300}  canDelete={false} /> :
+                            <img
+                                src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
+                                }}
+                            />}
+                        {service.hasDiscount || service.hasPromotions ? (
+                            <div className="discount-overlay">
+                                {service.hasDiscount ? <h4 className="discount">{translations[language]['Discount']}</h4> : ""}
+                                {service.hasPromotions ? <h4 className="discount">{translations[language]['Promotions']}</h4> : ""}
                             </div>
-                            <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
-                                <h4 style={{ cursor: "pointer" }} onClick={() => handleMasterNameClickClick(service.executorId)}>{service.name}</h4>
-                                <h4 style={{ cursor: "pointer" }} onClick={() => handleReviewClick(service.id)}>
-                                    {service.rating} <FontAwesomeIcon icon={faStar} className='item-icon' />
-                                </h4>
-                            </div>
-                            <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
-                                <p>{service.description}</p>
-                                <TruncatedText text={service.place.address} maxWidth={270} handleAddressClick={handleAddressClick}/>
-                                <p>{translations[language]['AvailableSlots']}: {service.availableSlots}</p>
-                            </div>
-                            <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
-                                <h4><FontAwesomeIcon icon={faClock} className='item-icon' /> {service.duration}</h4>
-                                <h4>{service.price} Byn</h4>
-                            </div>
-                            <div>
-                                {isProfile ?
-                                    <div>
-                                        <button className="order-button" onClick={() => handleIsProfileClick(service.id)}>
-                                            <p className="order-text"><FontAwesomeIcon icon={faPencil} /> {translations[language]['Edit']}</p>
-                                        </button>
-                                        <br />
-                                        <br />
-                                        <button className="order-button" onClick={() => handleRemoveClick(service.id)}>
-                                            <p className="order-text"><FontAwesomeIcon icon={faTrash} /> {translations[language]['Delete']}</p>
-                                        </button>
-                                    </div>
-                                    :
-                                    <button className="order-button" onClick={() => handleOrderClick(service.id)}>
-                                        <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['MakeAnAppointment']}</p>
-                                    </button>
-                                }
-                            </div>
-                        </div>
+                        ) : null}
                     </div>
-                <MapModal
-                    isOpen={isModalOpen}
-                    onRequestClose={() => setIsModalOpen(false)}
-                    initialPosition={service.place.position}
-                />
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
+                        <h4 style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); handleMasterNameClickClick(service.executorId); }}>{service.name}</h4>
+                        <h4 style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); handleCardClick(service.id); }}>
+                            {service.rating < 1 ? '-' : service.rating} <FontAwesomeIcon icon={faStar} className='item-icon' />
+                        </h4>
+                    </div>
+                    <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
+                        <p>{service.description}</p>
+                        <TruncatedText text={service.place.address} maxWidth={270} handleAddressClick={(e) => { e.stopPropagation(); handleAddressClick(); }}/>
+                        <p>{translations[language]['AvailableSlots']}: {service.availableSlots}</p>
+                    </div>
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
+                        <h4><FontAwesomeIcon icon={faClock} className='item-icon' /> {service.duration}</h4>
+                        <h4>{service.price} Byn</h4>
+                    </div>
+                    <div>
+                        {isProfile ?
+                            <div>
+                                <button className="order-button" onClick={(e) => { e.stopPropagation(); handleIsProfileClick(service.id); }}>
+                                    <p className="order-text"><FontAwesomeIcon icon={faPencil} /> {translations[language]['Edit']}</p>
+                                </button>
+                                <br />
+                                <br />
+                                <button className="order-button" onClick={(e) => { e.stopPropagation(); handleRemoveClick(service.id); }}>
+                                    <p className="order-text"><FontAwesomeIcon icon={faTrash} /> {translations[language]['Delete']}</p>
+                                </button>
+                            </div>
+                            :
+                            <button className="order-button" onClick={(e) => { e.stopPropagation(); handleOrderClick(service.id); }}>
+                                <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['MakeAnAppointment']}</p>
+                            </button>
+                        }
+                    </div>
+                </div>
             </div>
+            <MapModal
+                isOpen={isModalOpen}
+                onRequestClose={() => setIsModalOpen(false)}
+                initialPosition={service.place.position}
+            />
+        </div>
     );
 };
 

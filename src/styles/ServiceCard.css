@@ -33,6 +33,20 @@
     background-size: 100%;
 }
 
+/* Стили для картинок */
+.photos-fullsize {
+    position: relative;
+    padding-top: -20px;
+    /*margin-top: -20px;*/
+    margin-bottom: -20px;
+    max-width: 500px;
+    max-height: 500px;
+    min-width: 500px;
+    min-height: 500px;
+    background-image: url("https://yandex.by/images/search?p=1&text=%D1%81%D0%B2%D0%B5%D1%82%D0%BB%D0%BE+%D1%81%D0%B5%D1%80%D1%8B%D0%B9+%D1%84%D0%BE%D0%BD&pos=14&rpt=simage&img_url=https%3A%2F%2Ffonoteka.top%2Fuploads%2Fposts%2F2021-04%2F1619116953_15-phonoteka_org-p-belii-fon-bez-nichego-na-ves-ekran-17.jpg&lr=157");
+    background-size: 100%;
+}
+
 .photos img {
     border-radius: 10px;
     width: 100%;
@@ -344,6 +358,34 @@ input[type="text"] {
     padding: 20px;
     width: 400px;
     height: 400px;
+}
+
+.discount-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    padding: 5px;
+}
+
+.discount {
+    border-radius: 8px;
+    padding: 3px 5px;
+    background-color: #ff0015;
+    color: white;
+    margin: 0;
+    position: relative;
+}
+
+.discount-circle {
+    border-radius: 15px;
+    padding: 0px 5px;
+    background-color: #ff0015;
+    color: white;
+    position: relative;
+    margin: 0 0 0 0;
 }
 
 @media (orientation: portrait) {
