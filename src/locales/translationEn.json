@@ -14,6 +14,7 @@
   "NumberOfSessions": "Number of sessions",
   "BreakTime": "Break time (minutes)",
   "Duration": "Duration (minutes)",
+  "Duration(h:m)": "Duration (h:m)",
   "Rating": "Rating",
   "Cost": "Cost",
   "Save": "Save",
@@ -72,5 +73,12 @@
   "ClientComment": "Client's comment",
   "ClientApprove": "Client's approve",
   "EditUserData": "Edit account data",
-  "Success": "Success"
+  "Success": "Success",
+  "exit": "Exit",
+  "Copied": "Copied!",
+  "DeletePhoto": "Delete photo",
+  "Discount": "Discount",
+  "Promotions": "Promotions",
+  "Services": "Services",
+  "CancelAppointment": "Cancel appointment"
 }
