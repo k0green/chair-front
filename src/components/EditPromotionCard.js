@@ -39,18 +39,6 @@ const PromotionCard = ({ service, isNew, id }) => {
                 removePhotoIds: filesToDelete,
             };
 
-            if (!updatedServiceData.serviceTypeId) {
-                toast.error("Service type must be filled.", {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                });
-                return;
-            }
-
             updatePromotionCard(updatedServiceData, navigate)
                 .catch(error => {
                     const errorMessage = error.message || 'Failed to fetch data';
@@ -93,18 +81,6 @@ const PromotionCard = ({ service, isNew, id }) => {
                 description: editedDescription,
                 photoIds: editedPhotos.filter(photo => photo.id !== "default").map(photo => photo.id),
             };
-
-            if (!updatedServiceData.serviceTypeId) {
-                toast.error("Service type must be filled.", {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                });
-                return;
-            }
 
             addPromotionCard(updatedServiceData, navigate)
                 .catch(error => {
@@ -221,23 +197,33 @@ const PromotionCard = ({ service, isNew, id }) => {
 
     return (
         <div className="centrize">
-        <div className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
+            <div className={`service-card-edit ${theme === 'dark' ? 'dark' : ''}`}>
                 <div key={service.id} className="master-card">
-                    <div className="photos">
-                        <PhotoList photos={editedPhotos} size={500} />
+                    <div className="photos-edit">
+                        <PhotoList photos={editedPhotos} size={480} />
                         <button className="add-photo-button-new" onClick={handleAddPhoto}>
                             <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> {translations[language]['AddPhoto']}</p>
                         </button>
                     </div>
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
+                    </div>
+                    <div className="service-description">
+                        <br />
+                        <br />
+                    </div>
                     <div className="service-description">
                         <textarea
+                            style={{width: "98%", height: "16ch", borderRadius: "10px", borderColor: "#c5c5c5", marginTop: "30px", marginBottom: "40px"}}
                             placeholder={translations[language]['Description']}
-                            className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
-                            style={{width: "100%", borderRadius: "10px"}}
+                            className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"
                             value={editedDescription || service.description}
                             onChange={(e) => setEditedDescription(e.target.value)}
                         />
+                        <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
+                        </div>
+                    </div>
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
                     </div>
                     <div>
                         <button
@@ -249,7 +235,7 @@ const PromotionCard = ({ service, isNew, id }) => {
                         </button>
                     </div>
                 </div>
-        </div>
+            </div>
             {uploadPhotoModal && (
                 <div className="filter-modal">
                     <div className="modal-content">

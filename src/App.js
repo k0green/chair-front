@@ -31,6 +31,7 @@ import EditPromotionCard from "./components/EditPromotionCard";
 import AddPromotionCardPage from "./pages/AddPromotionCardPage";
 import FullServiceCardPage from "./pages/FullServiceCardPage";
 import ErrorComponent from "./pages/ErrorPage";
+import EditPromotionCardPage from "./pages/EditPromotionCardPage";
 
 const translations = {
     en: translationEN,
@@ -118,7 +119,7 @@ function AppContent() {
                 <Route path="/messages/:id" element={<Messages />} />
                 <Route path="/service-card/edit/:id" element={<EditServiceCard />} />
                 <Route path="/service-card/add/:id" element={<AddServiceCard />} />
-                <Route path="/promotion-card/edit/:id" element={<EditPromotionCard />} />
+                <Route path="/promotion-card/edit/:id" element={<EditPromotionCardPage />} />
                 <Route path="/promotion-card/add/:id" element={<AddPromotionCardPage />} />
                 <Route path="/reviews/:id" element={<ReviewsPage />} />
                 <Route path="/service-card/full/:id" element={<FullServiceCardPage />} />

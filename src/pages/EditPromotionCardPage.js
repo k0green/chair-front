@@ -22,7 +22,7 @@ const EditPromotionCardPage = () => {
 
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
-            {service && <EditPromotionCard service={service} isNew={isNew} id={id}/>}
+            {service && <EditPromotionCard service={service} isNew={false} id={id}/>}
         </div>
     );
 };

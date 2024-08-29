@@ -40,7 +40,7 @@ const PromotionCard = ({ service, isProfile }) => {
     };
 
     const handleIsProfileClick = (executorServiceId) => {
-        navigate("/service-promotion/edit/" + executorServiceId);
+        navigate("/promotion-card/edit/" + executorServiceId);
     };
 
     const handleRemoveClick = (id) => {

@@ -14,6 +14,7 @@ import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
 import MapModal from "./MapModal";
 import {addServiceCard, getAllServiceTypes, LoadingAnimation, updateServiceCard, uploadMinioPhoto} from "./api";
+import {faClock} from "@fortawesome/free-solid-svg-icons/faClock";
 
 const ServiceCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
@@ -275,7 +276,7 @@ const ServiceCard = ({ service, isNew, id }) => {
         <div className={`service-card-edit ${theme === 'dark' ? 'dark' : ''}`}>
                 <div key={service.id} className="master-card">
                     <div className="photos-edit">
-                        <PhotoList photos={editedPhotos} size={500} />
+                        <PhotoList photos={editedPhotos} size={480} />
                         <button className="add-photo-button-new" onClick={handleAddPhoto}>
                             <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> {translations[language]['AddPhoto']}</p>
                         </button>
@@ -303,6 +304,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                     </div>
                     <div className="service-description">
                         <input
+                            style={{width: "95%", borderColor: "#c5c5c5"}}
                             placeholder={translations[language]['Address']}
                             className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"
@@ -314,38 +316,21 @@ const ServiceCard = ({ service, isNew, id }) => {
                         <br />
                     </div>
                     <div className="service-description">
-                        <input
+                        <textarea
+                            style={{width: "98%", borderRadius: "5px", borderColor: "#c5c5c5", marginTop: "5px", marginBottom: "5px"}}
                             placeholder={translations[language]['Description']}
-                            className={`profile-input ${theme === 'dark' ? 'dark' : ''}`}
+                            className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"
                             value={editedDescription || service.description}
                             onChange={(e) => setEditedDescription(e.target.value)}
                         />
-                        {/*<p>Available Slots: {service.availableSlots}</p>*/}
+                        <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
+                            <p>{translations[language]['AvailableSlots']}: {service.availableSlots}</p>
+                        </div>                    </div>
+                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
+                        <h4><FontAwesomeIcon icon={faClock} className='item-icon' /> {service.duration}</h4>
+                        <h4>{service.price} Byn</h4>
                     </div>
-{/*                    <div className="master-info">
-                        <div className="time-module">
-                            <FontAwesomeIcon icon={faClock} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`}/>
-                            <input
-                                type="time"
-                                className={`input-time ${theme === 'dark' ? 'dark' : ''}`}
-                                placeholder="50"
-                                value={editedDuration || formatTime(service.duration)}
-                                onChange={(e) => setEditedDuration(e.target.value)}
-                            />
-                            <h4 className={`item-icon ${theme === 'dark' ? 'dark' : ''}`}>  min</h4>
-                        </div>
-                        <div className="time-module">
-                            <FontAwesomeIcon icon={faDollar} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`}/>
-                            <input
-                                type="number"
-                                className={`input-number ${theme === 'dark' ? 'dark' : ''}`}
-                                value={editedPrice || service.price}
-                                onChange={(e) => setEditedPrice(e.target.value)}
-                            />
-                            <h4 className={`item-icon ${theme === 'dark' ? 'dark' : ''}`}>  Byn</h4>
-                        </div>
-                    </div>*/}
                     <div>
                         <button
                             className="order-button"
