@@ -357,6 +357,7 @@ const Profile = ({user, services, promotions, contacts, current}) => {
                             )
                     )}
                 </div>
+                {userRole === 'executor' ?
                 <div className="tab-switcher">
                     <button className={`tab-button ${theme === 'dark' ? 'dark' : 'light'} ${selectedTab === 'services' ? 'active' : ''}`} onClick={() => handleTabClick('services')}>
                         {translations[language]['Services']}
@@ -364,7 +365,7 @@ const Profile = ({user, services, promotions, contacts, current}) => {
                     <button className={`tab-button ${theme === 'dark' ? 'dark' : 'light'} ${selectedTab === 'promotions' ? 'active' : ''}`} onClick={() => handleTabClick('promotions')}>
                         {translations[language]['Promotions']}
                     </button>
-                </div>
+                </div> : <></>}
                 {selectedTab === 'services' && (
                     current && userRole === 'executor' ?
                         <button className="profile-add-serviceCard-button" onClick={handleNewServiceClick}>
