@@ -178,7 +178,6 @@ export const getProfileById = async (id, navigate) => {
         if(!token)
             navigate("/login");
         else {
-            console.log(id);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             if(!id)
             {
@@ -246,41 +245,54 @@ export const getProfileById = async (id, navigate) => {
             else {
                 const response = await axios.get(`${BASE_URL}/executor-profile/get-by-id/`+id)
                 const userData= {
-                            id: response.data.id,
-                            name: response.data.name,
-                            imageUrl: response.data.imageUrl,
-                            description: response.data.description,
-                            userId: response.data.userId,
-                            contacts: response.data.contacts.map(contact => ({
-                                id: contact.id,
-                                name: contact.name,
-                                type: contact.type,
-                                executorProfileId: contact.executorProfileId,
-                            })),
-                            services: response.data.services.map(service => ({
-                                id: service.id,
-                                name: service.executorName || 'Unknown Master',
-                                description: service.description,
-                                price: service.price,
-                                availableSlots: service.availableSlots,
-                                duration: formatTime(service.duration),
-                                rating: service.rating,
-                                address: service.place.address,
-                                hasDiscount: service.hasDiscount,
-                                hasPromotions: service.hasPromotions,
-                                place: {
-                                    address: service.place.address,
-                                    position: {
-                                        lat: service.place.position.lat,
-                                        lng: service.place.position.lng,
-                                    }
-                                },
-                                executorId: service.executorId,
-                            })),
-                        };
-
+                    id: response.data.id,
+                    name: response.data.name,
+                    imageUrl: response.data.imageUrl,
+                    description: response.data.description,
+                    userId: response.data.userId,
+                    contacts: response.data.contacts.map(contact => ({
+                        id: contact.id,
+                        name: contact.name,
+                        type: contact.type,
+                        executorProfileId: contact.executorProfileId,
+                    })),
+                    services: response.data.services.map(service => ({
+                        id: service.id,
+                        name: service.executorName || 'Unknown Master',
+                        description: service.description,
+                        price: service.price,
+                        availableSlots: service.availableSlots,
+                        duration: formatTime(service.duration),
+                        rating: service.rating,
+                        address: service.place.address,
+                        hasDiscount: service.hasDiscount,
+                        hasPromotions: service.hasPromotions,
+                        place: {
+                            address: service.place.address,
+                            position: {
+                                lat: service.place.position.lat,
+                                lng: service.place.position.lng,
+                            }
+                        },
+                        executorId: service.executorId,
+                    })),
+                    promotions: response.data.promotions.map(service => ({
+                        id: service.id,
+                        executorId: service.executorId,
+                        name: service.executorName || 'Unknown Master',
+                        description: service.description,
+                        photos: service.photos.length > 0 ? service.photos.map(photo => ({
+                            id: photo.id,
+                            url: photo.url,
+                        })) : [{
+                            id: 'default',
+                            url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
+                        }],
+                    })),
+                };
                 return {
                     services: userData.services,
+                    promotions: userData.promotions,
                     userData: userData,
                     contacts: userData.contacts
                 }
