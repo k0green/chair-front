@@ -13,12 +13,16 @@ import {toast} from "react-toastify";
 import {faList} from "@fortawesome/free-solid-svg-icons/faList";
 import {faClose} from "@fortawesome/free-solid-svg-icons/faClose";
 import {accountExit} from "./api";
+import CitySelector from "./CitySelector";
+import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
 
-const MobileHeader = ({ user, onLogout }) => {
+const MobileHeader = ({ user, onLogout, city }) => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { language, translations } = useContext(LanguageContext);
         const [isMenuVisible, setIsMenuVisible] = useState(false);
+    const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
+    const [cityName, setCityName] = useState(city);
 
     const userId = localStorage.getItem('userId');
     const handleLoginClick = () => {
@@ -36,10 +40,23 @@ const MobileHeader = ({ user, onLogout }) => {
         navigate("/");
     };
 
-    const handleSearchClick = () => {
-        /*request*/
+    const handleCityClick = () => {
+        setUploadPhotoModal(true);
     };
 
+    const handleCitySaveClick = () => {
+        toast.success(translations[language]['Success'], {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            toastId: 'Success',
+        });
+        setCityName(Cookies.get("city"));
+        setUploadPhotoModal(false);
+    };
     const handleCalendarClick = () => {
         const token = Cookies.get('token');
         const role = localStorage.getItem('userRole');
@@ -102,6 +119,12 @@ const MobileHeader = ({ user, onLogout }) => {
                 </div>
 
                 <div className="search-container">
+                    <h4
+                        className={`navigate ${theme === 'dark' ? 'dark' : ''}`}
+                        style={{cursor: "pointer", textDecoration: "underline"}} onClick={handleCityClick}
+                    >
+                        ˅{cityName}
+                    </h4>
                     <button style={{ backgroundColor: "transparent", border: "none" }} onClick={toggleTheme}>
                         {theme === 'light' ?
                             <img src={moon} style={{ width: '60%', height: '60%' }} />
@@ -150,6 +173,24 @@ const MobileHeader = ({ user, onLogout }) => {
                     </div>
                 </div>
             </div>
+            {uploadPhotoModal && (
+                <div className="filter-modal" >
+                    <div className="modal-content" style={{maxWidth: "400px", maxHeight: "100px"}}>
+                    <span className="close" onClick={() => setUploadPhotoModal(false)}>
+                        &times;
+                    </span>
+                        <div className="dropzone-centrize">
+                            <CitySelector/>
+                            <button
+                                className="dropzone-order-button"
+                                onClick={handleCitySaveClick}
+                            >
+                                {<p className="order-text"><FontAwesomeIcon icon={faSave} /> {translations[language]['Save']}</p>}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </header>
     );
 };

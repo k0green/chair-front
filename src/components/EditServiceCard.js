@@ -276,7 +276,7 @@ const ServiceCard = ({ service, isNew, id }) => {
         <div className={`service-card-edit ${theme === 'dark' ? 'dark' : ''}`}>
                 <div key={service.id} className="master-card">
                     <div className="photos-edit">
-                        <PhotoList photos={editedPhotos} size={480} />
+                        <PhotoList photos={editedPhotos} size={window.innerWidth < 700 ? 300 : 480} />
                         <button className="add-photo-button-new" onClick={handleAddPhoto}>
                             <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> {translations[language]['AddPhoto']}</p>
                         </button>

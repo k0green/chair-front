@@ -54,7 +54,7 @@ const HomePage = ({user, onLogout}) => {
                 <Icon categories={categories}/>
             </div>
             <div>
-                <ServiceList filter={filterData}/>
+                <ServiceList filter={filterData} itemPerPage={Math.floor(window.innerWidth / 400)}/>
             </div>
         </div>
     );

@@ -282,15 +282,22 @@ const FullServiceCard = ({ service }) => {
         <div>
             <div className="service-and-reviews-container">
                 <div className="photos-fullsize">
-                    {service.photos ? <PhotoList photos={service.photos} size={500} canDelete={false} /> :
-                        <img
+                    {service.photos ? <PhotoList photos={service.photos} size={window.innerWidth > 700 ? 500 : 300} canDelete={false} /> :
+                        window.innerWidth > 700 ? 300 : 480 ? (<img
                             src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
                             onError={(e) => {
                                 e.target.onerror = null;
                                 e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
                             }}
                             style={{minWidth: "500px", maxWidth: "500px", maxHeight: "500px", minHeight: "500px"}}
-                            alt=""/>}
+                            alt=""/>) : (<img
+                            src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
+                            }}
+                            style={{minWidth: "300px", maxWidth: "300px", maxHeight: "300px", minHeight: "300px"}}
+                            alt=""/>)}
                     {service.hasDiscount || service.hasPromotions ? (
                         <div className="discount-overlay">
                             {service.hasDiscount ? <h4 className="discount">{translations[language]['Discount']}</h4> : ""}
@@ -322,12 +329,17 @@ const FullServiceCard = ({ service }) => {
                         <h4>{translations[language]['Cost']}: {service.price} Byn</h4>
                     </div>
                 </div>
-                <div style={{ height: '500px', width: '500px', overflow: "hidden" }}>
+                {window.innerWidth > 700 ? 300 : 480 ? (<div style={{ height: '500px', width: '500px', overflow: "hidden" }}>
                     <MapComponent
                         initialPosition={service.place.position}
                         canEdit={false}
                     />
-                </div>
+                </div>) : (<div style={{ height: '300px', width: '300px', overflow: "hidden" }}>
+                    <MapComponent
+                        initialPosition={service.place.position}
+                        canEdit={false}
+                    />
+                </div>)}
             </div>
             <Calendar full={false} />
             <div className="service-and-reviews-container">

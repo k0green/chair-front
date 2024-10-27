@@ -75,9 +75,52 @@ class ErrorBoundary extends React.Component {
 
 function App() {
     const [language, setLanguage] = useState(() => Cookies.get('language') || 'ru');
+    const [city, setCity] = useState(() => Cookies.get('city') || '');
+
+    const getUserLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    await getCityFromCoordinates(latitude, longitude);
+                },
+                (error) => {
+                    console.error('Ошибка получения геолокации:', error);
+                }
+            );
+        } else {
+            console.error('Геолокация не поддерживается вашим браузером');
+        }
+    };
+
+    const YANDEX_API_KEY = 'd2aa6dcc-1f35-4ed7-a13b-fe4064f9904f';
+
+    const getCityFromCoordinates = async (lat, lng) => {
+        try {
+            const response = await fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=${YANDEX_API_KEY}&format=json&geocode=${lng},${lat}&results=1&kind=locality`);
+            const data = await response.json();
+
+            const geoObject = data.response.GeoObjectCollection.featureMember[0].GeoObject;
+            const cityName = geoObject.name || '';
+            const cityDescription = geoObject.description || '';
+
+            const city = {
+                label: `${cityName}, ${cityDescription}`,
+                value: cityName
+            };
+
+            Cookies.set('city', city.value, { expires: 365 });
+            setCity(city.value);
+        } catch (error) {
+            console.error('Ошибка при получении данных от Yandex Geocoder:', error);
+        }
+    };
 
     useEffect(() => {
         Cookies.set('language', language, { expires: 365 });
+
+        if(Cookies.get("city") === null )
+            getUserLocation();
     }, [language]);
 
     return (
@@ -85,7 +128,7 @@ function App() {
             <ThemeProvider>
                 <Router>
                     <ErrorBoundary>
-                        <AppContent />
+                        <AppContent city={city}/>
                     </ErrorBoundary>
                     <ToastContainer />
                 </Router>
@@ -95,13 +138,13 @@ function App() {
 }
 
 
-function AppContent() {
+function AppContent({city}) {
   const { theme } = useContext(ThemeContext);
     const isMobile = useMediaQuery({ query: '(max-width: 1025px)' });
 
   return (
       <div className={`app ${theme === 'dark' ? 'dark' : ''}`}>
-        {!isMobile && <Header/>}
+        {!isMobile && <Header city = {city}/>}
         {isMobile && <MobileHeader/>}
         <main className="app-content">
             <Routes>

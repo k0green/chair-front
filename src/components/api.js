@@ -870,7 +870,7 @@ export const uploadMinioPhoto = async (navigate, formData) => {
         else {
             const token = Cookies.get('token');
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            return await axios.post(`${BASE_URL}/minio/upload`, formData, {
+            return await axios.post(`${BASE_URL}/yandex-cloud/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faDoorOpen, faSearch, faUser, faUserEdit} from "@fortawesome/free-solid-svg-icons";
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import "../styles/Header.css";
 import Cookies from "js-cookie";
 import {ThemeContext} from "./ThemeContext";
@@ -9,16 +9,21 @@ import {LanguageContext} from "./LanguageContext";
 import moon from '../icons/moon.png';
 import sun from '../icons/sun.png';
 import {toast} from "react-toastify";
-import {accountExit} from "./api";
+import {accountExit, LoadingAnimation} from "./api";
+import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
+import CitySelector from "./CitySelector";
 
-const Header = ({ user, onLogout }) => {
+const Header = ({ user, onLogout, city }) => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { language, translations } = useContext(LanguageContext);
     const [isExit, setIsExit] = useState(false);
+    const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
+    const [cityName, setCityName] = useState(city);
 
     const userId = localStorage.getItem('userId');
     const token = Cookies.get('token');
+
     const handleLoginClick = () => {
         const token = Cookies.get('token');
         if(!token)
@@ -38,6 +43,24 @@ const Header = ({ user, onLogout }) => {
 
     const handleSearchClick = () => {
         /*request*/
+    };
+
+    const handleCityClick = () => {
+        setUploadPhotoModal(true);
+    };
+
+    const handleCitySaveClick = () => {
+        toast.success(translations[language]['Success'], {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            toastId: 'Success',
+        });
+        setCityName(Cookies.get("city"));
+        setUploadPhotoModal(false);
     };
 
     const handleCalendarClick = () => {
@@ -102,6 +125,12 @@ const Header = ({ user, onLogout }) => {
                 </div>
 
                 <div className="search-container">
+                    <h4
+                        className={`navigate ${theme === 'dark' ? 'dark' : ''}`}
+                        style={{cursor: "pointer", textDecoration: "underline"}} onClick={handleCityClick}
+                    >
+                        ˅{cityName}
+                    </h4>
                     <button style={{ backgroundColor: "transparent", border: "none" }} onClick={toggleTheme}>
                         {theme === 'light' ?
                             <img
@@ -132,6 +161,24 @@ const Header = ({ user, onLogout }) => {
                     }
                 </div>
             </div>
+            {uploadPhotoModal && (
+                <div className="filter-modal" >
+                    <div className="modal-content" style={{maxWidth: "400px", maxHeight: "100px"}}>
+                    <span className="close" onClick={() => setUploadPhotoModal(false)}>
+                        &times;
+                    </span>
+                        <div className="dropzone-centrize">
+                            <CitySelector/>
+                            <button
+                                className="dropzone-order-button"
+                                onClick={handleCitySaveClick}
+                            >
+                                {<p className="order-text"><FontAwesomeIcon icon={faSave} /> {translations[language]['Save']}</p>}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </header>
     );
 };

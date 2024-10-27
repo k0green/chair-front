@@ -480,7 +480,7 @@ const MessageComponent = ({ id }) => {
                 </div>
                 <div>
                     {isChoosing ? (
-                        <div className="choose-buttons">
+                        window.innerWidth > 700 ? (<div className="choose-buttons">
                             <button className="message-control-button" onClick={handleEdit}>
                                 <FontAwesomeIcon icon={faEdit}/><> {translations[language]['Edit']}</>
                             </button>
@@ -490,7 +490,17 @@ const MessageComponent = ({ id }) => {
                             <button className="message-control-button" onClick={handleCancel}>
                                 <FontAwesomeIcon icon={faCancel}/>
                             </button>
-                        </div>
+                        </div>) : (<div className="choose-buttons">
+                            <button className="message-control-button" onClick={handleEdit}>
+                                <FontAwesomeIcon icon={faEdit}/><></>
+                            </button>
+                            <button className="message-control-button" onClick={handleDelete}>
+                                <FontAwesomeIcon icon={faTrash}/><></>
+                            </button>
+                            <button className="message-control-button" onClick={handleCancel}>
+                                <FontAwesomeIcon icon={faCancel}/>
+                            </button>
+                        </div>)
                     ) : (
                         <button className="message-control-button" onClick={handleChoose} style={{ marginLeft: 'auto' }}>
                             <FontAwesomeIcon icon={faCheckCircle}/><> {translations[language]['Select']}</>
