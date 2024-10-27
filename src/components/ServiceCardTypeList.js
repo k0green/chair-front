@@ -14,12 +14,13 @@ import 'react-datepicker/dist/react-datepicker.css';
 import {faBoltLightning, faClock, faHouse, faStar} from "@fortawesome/free-solid-svg-icons";
 import {LanguageContext} from "./LanguageContext";
 import {isSameDay} from "date-fns";
+import Cookies from "js-cookie";
 
-const ServiceCardTypeList = ({ id, name, filter }) => {
+const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
     const { theme } = useContext(ThemeContext);
     const [servicesData, setServicesData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(itemPerPage);
     const [selectedPlace, setSelectedPlace] = useState({ position: null, address: '' });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [totalCount, setTotalCount] = useState(5);
@@ -111,7 +112,30 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
                 field: "successOrdersAmount",
                 direction: 'desc',
             }]);
-        const newFilter = { ...filter, take: itemsPerPage, skip: (currentPage - 1) * itemsPerPage, sort: sortData, filter: filterValuesData };
+
+            const nameFilter = {
+                logic: "and",
+                filters: [],
+            };
+
+            nameFilter.filters.push({
+                field: "place.address",
+                value: Cookies.get("city"),
+                operator: "contains",
+            });
+
+        setFilterValuesData(nameFilter);
+        filter.filter = nameFilter;
+        filter.sort = [
+            {
+                field: "rating",
+                direction: 'desc',
+            },
+            {
+                field: "successOrdersAmount",
+                direction: 'desc',
+            }];
+        const newFilter = { ...filter, take: itemsPerPage, skip: (currentPage - 1) * itemsPerPage };
         fetchData(newFilter);
     }, [id, filter, itemsPerPage, currentPage]);
 
@@ -163,6 +187,23 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
         setDurationSort(sortOptions.duration);
 
         const filters = [];
+
+        const city = Cookies.get("city");
+
+        if (city) {
+            const cityFilter = {
+                logic: "and",
+                filters: [],
+            };
+
+            cityFilter.filters.push({
+                field: "place.address",
+                value: '"' + city + '"',
+                operator: "contains",
+            });
+
+            filters.push(cityFilter);
+        }
 
         if (masterNameValue) {
             const nameFilter = {
@@ -419,8 +460,18 @@ const ServiceCardTypeList = ({ id, name, filter }) => {
     };
 
     const handleOptimizeServiceClick = async () => {
+
         const requestBody = {
-            filterModel: {},
+            filterModel: {
+                filter: {
+                    logic: "and",
+                    filters: [{
+                        field: "place.address",
+                        value: Cookies.get("city"),
+                        operator: "contains",
+                    }],
+                }
+            },
             serviceTypeId: id,
             conditions: [
                 {column: 1, value: freeSlots, lambda: 0.4},

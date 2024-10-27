@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { getPopularServiceTypes } from './api';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const ServiceList = ({filter}) => {
+const ServiceList = ({filter, itemPerPage}) => {
     const [popularTypesData, setPopularTypesData] = useState([]);
 
     useEffect(() => {
@@ -38,7 +38,7 @@ const ServiceList = ({filter}) => {
                 popularTypesData.map((type) => {
                     return (
                         <div key={type.id}>
-                            <ServiceCardTypeList id={type.id} name={type.name} filter={filter} />
+                            <ServiceCardTypeList id={type.id} name={type.name} filter={filter} itemPerPage={itemPerPage}/>
                         </div>
                     );
                 })
