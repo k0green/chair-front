@@ -63,7 +63,7 @@
     border: 1px solid #888;
     width: 34%;
     min-height: 300px;
-    min-width: 400px;
+    min-width: 300px;
     border-radius: 15px;
 }
 
@@ -172,4 +172,15 @@
     background-color: #66b2ff;
     color: #fff;
     border-radius: 50%;
+}
+
+@media (max-width: 768px) { /* Установите нужную ширину */
+    .flex-container {
+        flex-direction: column;
+    }
+
+    .flex-container > div {
+        max-width: 100%;
+        width: 100%;
+    }
 }

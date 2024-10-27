@@ -164,8 +164,8 @@ const ServiceCard = ({ service, isProfile }) => {
                                 </button>
                                 <br />
                                 <br />
-                                <button className="order-button" onClick={(e) => { e.stopPropagation(); handleRemoveClick(service.id); }}>
-                                    <p className="order-text"><FontAwesomeIcon icon={faTrash} /> {translations[language]['Delete']}</p>
+                                <button style={{ borderColor: 'red' }} className="order-button" onClick={(e) => { e.stopPropagation(); handleRemoveClick(service.id); }}>
+                                    <p style={{ color: 'red' }} className="order-text"><FontAwesomeIcon icon={faTrash} /> {translations[language]['Delete']}</p>
                                 </button>
                             </div>
                             :

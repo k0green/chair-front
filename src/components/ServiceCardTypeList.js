@@ -62,7 +62,8 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
 
     useEffect(() => {
         const updateItemsPerPage = () => {
-            const maxItems = Math.floor(window.innerWidth / 400);
+            const maxItems = Math.max(1, Math.floor(window.innerWidth / 400));
+
             setItemsPerPage(maxItems);
         };
 
@@ -611,7 +612,7 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
             <span className="close" onClick={handleModalClose}>
               &times;
             </span>
-                        <div style={{justifyContent: "space-between", display: "flex"}}>
+                        <div className="flex-container" style={{justifyContent: "space-between", display: "flex"}}>
                             <div style={{maxWidth: "48%"}}>
                                 <h2 className="dropzone-centrize"
                                     style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['Filter']}</h2>

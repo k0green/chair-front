@@ -80,5 +80,6 @@
   "Discount": "Скидки",
   "Promotions": "Акции",
   "Services": "Услуги",
-  "CancelAppointment": "Отменить запись"
+  "CancelAppointment": "Отменить запись",
+  "DiscountCost": "Скидка"
 }

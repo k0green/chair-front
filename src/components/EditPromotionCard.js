@@ -15,6 +15,7 @@ import {
     addPromotionCard, LoadingAnimation,
     updatePromotionCard, uploadMinioPhoto
 } from "./api";
+import {faCancel} from "@fortawesome/free-solid-svg-icons/faCancel";
 
 const PromotionCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
@@ -69,6 +70,10 @@ const PromotionCard = ({ service, isNew, id }) => {
         }finally {
             setIsEditSave(false);
         }
+    };
+
+    const handleCancel = () => {
+        navigate("/profile")
     };
 
     const handleAddSave = () => {
@@ -153,7 +158,7 @@ const PromotionCard = ({ service, isNew, id }) => {
         return (
             <div className="dropzone-centrize">
                 {images}
-                <div {...getRootProps({className:"dropzoneBorder"})}>
+                <div {...getRootProps({style: {border: '2px solid blue', borderRadius: "10px", padding: '20px', minWidth: "200px", minHeight: "200px", width: '30%'}})}>
                     <input {...getInputProps()} />
                     <p>{translations[language]['DragAndDrop']}</p>
                 </div>
@@ -232,6 +237,14 @@ const PromotionCard = ({ service, isNew, id }) => {
                             disabled={isEditSave}
                         >
                             {isEditSave ? <LoadingAnimation /> : <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p>}
+                        </button>
+                        <button
+                            className="order-button"
+                            onClick={handleCancel}
+                            disabled={isEditSave}
+                            style={{ borderColor: "red", marginTop: "20px" }}
+                        >
+                            {isEditSave ? <LoadingAnimation /> : <p style={{ color: "red" }} className="order-text"><FontAwesomeIcon icon={faCancel} /> {translations[language]['Cancel']}</p>}
                         </button>
                     </div>
                 </div>

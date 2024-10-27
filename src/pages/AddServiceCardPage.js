@@ -12,7 +12,7 @@ const AddServiceCardPage = () => {
         {
             id: 1,
             name: 'Service 1',
-            duration: '0001-01-01T01:00:00',
+            //duration: '0001-01-01T01:00:00',
             serviceTypeId: "36dc8d14-c955-4d33-9b2b-cf2ea432da3c",
             place: {
                 address: "",

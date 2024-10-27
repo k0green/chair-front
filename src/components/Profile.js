@@ -214,7 +214,7 @@ const Profile = ({user, services, promotions, contacts, current}) => {
 
         return (
             <div className="dropzone-centrize">
-                <div {...getRootProps({style: {border: '2px solid blue', padding: '20px', width: '350px', height: '400px'}})}>
+                <div {...getRootProps({style: {border: '2px solid blue', borderRadius: "10px", padding: '20px', minWidth: "200px", minHeight: "200px", width: '30%'}})}>
                     <input {...getInputProps()} />
                     {file && <img src={file.preview} style={{width: '50%'}} alt="preview" />}
                     {!file && <p>{translations[language]['DragAndDrop']}</p>}
@@ -350,7 +350,7 @@ const Profile = ({user, services, promotions, contacts, current}) => {
                                     >
                                         {isEditSave ? <LoadingAnimation /> : <FontAwesomeIcon icon={faSave}> {translations[language]['Save']}</FontAwesomeIcon>}
                                     </button>
-                                    <button style={{ marginLeft: '5px' }} className="message-button" onClick={handleCancelEditClick}>
+                                    <button style={{ marginLeft: '5px', backgroundColor: "red" }} className="message-button" onClick={handleCancelEditClick}>
                                         <FontAwesomeIcon icon={faCancel}/> {translations[language]['Cancel']}
                                     </button>
                                 </div>

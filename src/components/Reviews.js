@@ -261,7 +261,7 @@ const fetchData = () => {
         return (
             <div className="dropzone-centrize">
                 {images}
-                <div {...getRootProps({className:"dropzoneBorder"})}>
+                <div {...getRootProps({style: {border: '2px solid blue', borderRadius: "10px", padding: '20px', minWidth: "200px", minHeight: "200px", width: '30%'}})}>
                     <input {...getInputProps()} />
                     <p>{translations[language]['DragAndDrop']}</p>
                 </div>

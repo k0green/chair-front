@@ -72,7 +72,8 @@
 }
 
 .profile-input.light{
-    width: 50ch;
+    /*width: 50ch;*/
+    width: 70%;
     background-color: white;
     color: black;
 }

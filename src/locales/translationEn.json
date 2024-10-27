@@ -80,5 +80,6 @@
   "Discount": "Discount",
   "Promotions": "Promotions",
   "Services": "Services",
-  "CancelAppointment": "Cancel appointment"
+  "CancelAppointment": "Cancel appointment",
+  "DiscountCost": "Discount"
 }

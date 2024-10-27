@@ -367,7 +367,7 @@ const MessageComponent = ({ id }) => {
         return (
             <div className="dropzone-centrize">
                 {images}
-                <div {...getRootProps({style: {border: '2px solid blue', padding: '20px', width: '400px', height: '400px'}})}>
+                <div {...getRootProps({style: {border: '2px solid blue', borderRadius: "10px", padding: '20px', minWidth: "200px", minHeight: "200px", width: '30%'}})}>
                     <input {...getInputProps()} />
                     <p>{translations[language]['DragAndDrop']}</p>
                 </div>

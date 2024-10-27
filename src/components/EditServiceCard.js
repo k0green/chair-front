@@ -15,6 +15,7 @@ import {toast} from "react-toastify";
 import MapModal from "./MapModal";
 import {addServiceCard, getAllServiceTypes, LoadingAnimation, updateServiceCard, uploadMinioPhoto} from "./api";
 import {faClock} from "@fortawesome/free-solid-svg-icons/faClock";
+import {faCancel} from "@fortawesome/free-solid-svg-icons/faCancel";
 
 const ServiceCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
@@ -80,8 +81,8 @@ const ServiceCard = ({ service, isNew, id }) => {
                 executorId: service.executorId,
                 description: editedDescription,
                 place: editedAddress,
-                duration: reverseFormatTime(editedDuration, service.duration),
-                price: editedPrice,
+                duration: new Date(2023,1,1,20, 50,0, 0),//reverseFormatTime(editedDuration, service.duration),
+                price: 0,
                 photoIds: editedPhotos.map(photo => photo.id),
                 removePhotoIds: filesToDelete,
             };
@@ -140,8 +141,8 @@ const ServiceCard = ({ service, isNew, id }) => {
                 executorId: id,
                 description: editedDescription,
                 place: editedAddress,
-                duration: reverseFormatTime(editedDuration, date),
-                price: editedPrice,
+                duration: date,//reverseFormatTime(editedDuration, date),
+                price: 0,
                 photoIds: editedPhotos.filter(photo => photo.id !== "default").map(photo => photo.id),
             };
 
@@ -199,6 +200,10 @@ const ServiceCard = ({ service, isNew, id }) => {
         setUploadPhotoModal(true);
     };
 
+    const handleCancel = () => {
+        navigate("/profile")
+    };
+
     const Dropzone = () => {
         const { getRootProps, getInputProps } = useDropzone({
             accept: 'image/*',
@@ -228,7 +233,7 @@ const ServiceCard = ({ service, isNew, id }) => {
         return (
             <div className="dropzone-centrize">
                 {images}
-                <div {...getRootProps({className:"dropzoneBorder"})}>
+                <div {...getRootProps({style: {border: '2px solid blue', borderRadius: "10px", padding: '20px', minWidth: "200px", minHeight: "200px", width: '30%'}})}>
                     <input {...getInputProps()} />
                     <p>{translations[language]['DragAndDrop']}</p>
                 </div>
@@ -338,6 +343,14 @@ const ServiceCard = ({ service, isNew, id }) => {
                             disabled={isEditSave}
                         >
                             {isEditSave ? <LoadingAnimation /> : <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p>}
+                        </button>
+                        <button
+                            className="order-button"
+                            onClick={handleCancel}
+                            disabled={isEditSave}
+                            style={{ borderColor: "red", marginTop: "20px" }}
+                        >
+                            {isEditSave ? <LoadingAnimation /> : <p style={{ color: "red" }} className="order-text"><FontAwesomeIcon icon={faCancel} /> {translations[language]['Cancel']}</p>}
                         </button>
                     </div>
                 </div>
