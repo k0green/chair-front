@@ -31,6 +31,26 @@
     background-color: #2d2828;
 }
 
+.app-footer-mobile {
+    width: 100%;
+    color: white;
+    text-align: center;
+    background-color: white;
+    border-top: 1px solid #ccc;
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed; /* Делаем футер фиксированным */
+    bottom: 0; /* Закрепляем его внизу экрана */
+    left: 0;
+    right: 0;
+}
+
+.app-footer-mobile.dark {
+    background-color: #2d2828;
+}
+
 .app {
     display: flex;
     flex-direction: column;
@@ -43,6 +63,7 @@
 
 .app-content {
     flex-grow: 1;
+    padding-bottom: 80px;
 }
 
 .language-select{

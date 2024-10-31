@@ -145,7 +145,6 @@ function AppContent({city}) {
   return (
       <div className={`app ${theme === 'dark' ? 'dark' : ''}`}>
         {!isMobile && <Header city = {city}/>}
-        {isMobile && <MobileHeader/>}
         <main className="app-content">
             <Routes>
                 <Route path="/" element={<Main/>}/>
@@ -171,7 +170,8 @@ function AppContent({city}) {
                 <Route path="/trigger-error" element={<ErrorComponent />} />
             </Routes>
         </main>
-        <Footer />
+          {!isMobile && <Footer />}
+          {isMobile && <MobileHeader/>}
       </div>
   );
 }

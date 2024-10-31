@@ -95,9 +95,16 @@
 
 .search-container {
     display: flex;
-    align-items: center;
+    justify-content: space-between;
     margin-left: 10px;
 }
+
+.search-container-mobile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 
 .profile-header-button {
     /*margin-top: 10px;*/
@@ -179,11 +186,11 @@
 
 .menu-overlay {
     position: fixed;
-    top: 60px; /* Начало панели на 60px ниже */
+    bottom: 60px; /* Начало панели на 60px ниже */
     left: 0;
     width: 100%;
     height: calc(100% - 60px); /* Высота панели за вычетом 60px */
-    background: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон */
+    background: rgba(255, 255, 255, 1); /* Полупрозрачный белый фон */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -209,7 +216,7 @@
 }
 
 .dark .menu-overlay {
-    background: rgba(0, 0, 0, 0.7); /* Полупрозрачный темный фон для темной темы */
+    background: rgba(45, 40, 40, 1); /* Полупрозрачный темный фон для темной темы */
 }
 
 .dark .menu-content {

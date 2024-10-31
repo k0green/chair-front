@@ -81,5 +81,10 @@
   "Promotions": "Акции",
   "Services": "Услуги",
   "CancelAppointment": "Отменить запись",
-  "DiscountCost": "Скидка"
+  "DiscountCost": "Скидка",
+  "profile": "Профиль",
+  "profileEdit": "Редактирование профиля",
+  "ClickToSpecify": "Нажмите чтобы уточнить",
+  "ClickToSChange": "Нажмите чтобы изменить тему",
+  "YourCity": "Ваш город"
 }

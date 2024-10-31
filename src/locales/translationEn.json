@@ -81,5 +81,10 @@
   "Promotions": "Promotions",
   "Services": "Services",
   "CancelAppointment": "Cancel appointment",
-  "DiscountCost": "Discount"
+  "DiscountCost": "Discount",
+  "profile": "Profile",
+  "profileEdit": "Profile edit",
+  "ClickToSpecify": "Click to specify",
+  "ClickToSChange": "Click to change theme",
+  "YourCity": "Your city"
 }
