@@ -215,6 +215,16 @@ const MobileHeader = ({ city }) => {
                             onClick={handleCityClick}
                         >
                             <p style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>
+                                смена языка
+                                <FontAwesomeIcon icon={faLocationDot} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                                {cityName}  ({translations[language]['ClickToSpecify']})
+                            </p>
+                        </button>
+                        <button
+                            style={{width: "100%", display: "flex", justifyContent: "left", backgroundColor: "transparent", border: "none"}}
+                            onClick={handleCityClick}
+                        >
+                            <p style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>
                                 <FontAwesomeIcon icon={faLocationDot} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
                                 {cityName}  ({translations[language]['ClickToSpecify']})
                             </p>

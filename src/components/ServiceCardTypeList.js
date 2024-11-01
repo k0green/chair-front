@@ -15,6 +15,12 @@ import {faBoltLightning, faClock, faHouse, faStar} from "@fortawesome/free-solid
 import {LanguageContext} from "./LanguageContext";
 import {isSameDay} from "date-fns";
 import Cookies from "js-cookie";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import {faFilter} from "@fortawesome/free-solid-svg-icons/faFilter";
+import {faArrowDown} from "@fortawesome/free-solid-svg-icons/faArrowDown";
+import {faArrowUp} from "@fortawesome/free-solid-svg-icons/faArrowUp";
+import {faTrash} from "@fortawesome/free-solid-svg-icons/faTrash";
+import {faWandSparkles} from "@fortawesome/free-solid-svg-icons/faWandSparkles";
 
 const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
     const { theme } = useContext(ThemeContext);
@@ -59,6 +65,7 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
     const [filterData, setFilter] = useState(null);
     const [sortData, setSortData] = useState(null);
     const [filterValuesData, setFilterValuesData] = useState(null);
+    const [isFilterButtonVisible, setIsFilterButtonVisible] = useState(false);
 
     useEffect(() => {
         const updateItemsPerPage = () => {
@@ -331,8 +338,7 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
         };
         fetchData(requestBody);
 
-        setShowFilterModal(false);
-        setShowPeriodModal(false);
+        setIsFilterButtonVisible(false);
     };
 
     const handleFilterClear = () => {
@@ -361,9 +367,12 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
         document.getElementById("ratingTo").value = '';
         document.getElementById("durationFrom").value = '';
         document.getElementById("durationTo").value = '';
+
+        setSelectedDates([]);
+        setTimeRanges([]);
     };
 
-    const renderToggle = (field, checked, onChange) => (
+/*    const renderToggle = (field, checked, onChange) => (
         <div style={{justifyContent: "space-between", display: "flex"}}>
             <div>
                 <span className={`toggle-label ${theme === 'dark' ? 'dark' : ''}`}>{field}</span>
@@ -378,7 +387,7 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
                 <label style={theme === 'dark' ? {color: "white"} : {}}>{translations[language]['Max']}</label>
             </div>
         </div>
-    );
+    );*/
 
     const handleOrderClick = (executorServiceId) => {
         navigate("/calendar/" + executorServiceId);
@@ -390,17 +399,42 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
 
     const SortArrow = ({theme, sortOptions, field, handleSortClick, handleCancelSortClick}) => {
         const isActive = sortOptions[field];
-        const style = theme === 'dark' ? {color: "white"} : {};
+        console.log(isActive);
         return (
-            <div className="sort-arrows">
-                <span style={style} className={`arrow ${isActive === 'asc' ? 'active' : ''}`}
-                      onClick={() => handleSortClick(field, 'asc')}>&#8593;</span>
-                <span style={style} className={`arrow ${isActive === 'desc' ? 'active' : ''}`}
-                      onClick={() => handleSortClick(field, 'desc')}>&#8595;</span>
-                <span style={style} onClick={() => handleCancelSortClick(field)}>&#215;</span>
+            <div className="price-inputs">
+                <div className="input-group" style={{backgroundColor: "#eee", borderRadius: "6px", cursor: "pointer", ...(isActive === 'asc' ? { backgroundColor: "#007bff" } : '')}}>
+                    <FontAwesomeIcon icon={faArrowUp} onClick={() => handleSortClick(field, 'asc')} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                </div>
+                <div className="input-group" style={{backgroundColor: "#eee", borderRadius: "6px", cursor: "pointer", ...(isActive === 'desc' ? { backgroundColor: "#007bff" } : '')}}>
+                    <FontAwesomeIcon icon={faArrowDown} onClick={() => handleSortClick(field, 'desc')} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                </div>
+                <div className="input-group" style={{backgroundColor: "#eee", borderRadius: "6px", cursor: "pointer"}}>
+                    <FontAwesomeIcon icon={faXmark} onClick={() => handleCancelSortClick(field)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                </div>
             </div>
         );
     }
+
+    const renderToggle = (field, checked, onChange) => {
+        return (
+            <div className="price-inputs">
+                <div className="input-group"
+                     style={{backgroundColor: "#eee", borderRadius: "6px", cursor: "pointer", ...(!checked ? {backgroundColor: "#007bff"} : {})}}
+                     onClick={() => onChange(false)}>
+                    <label style={theme === 'dark' ? {color: !checked ? "#fff" : ""} : {color: !checked ? "#fff" : ""}}>
+                        {translations[language]['Min']}
+                    </label>
+                </div>
+                <div className="input-group"
+                     style={{backgroundColor: "#eee", borderRadius: "6px", cursor: "pointer", ...(checked ? {backgroundColor: "#007bff"} : {})}}
+                     onClick={() => onChange(true)}>
+                    <label style={theme === 'dark' ? {color: checked ? "#fff" : ""} : {color: checked ? "#fff" : ""}}>
+                        {translations[language]['Max']}
+                    </label>
+                </div>
+            </div>
+        );
+    };
 
     const handleDateChange = (date) => {
         const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -553,13 +587,27 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
         setShowPeriodModal(true);
     };
 
+    const handleFilterButtonClick = () => {
+        setIsFilterButtonVisible(!isFilterButtonVisible);
+    };
+
+    const handleFilterButtonCloseClick = () => {
+        setIsFilterButtonVisible(false);
+    };
+
     return (
         <div>
             <div key={id}>
                 <div className='parent-container-type'>
-                    <h1 className={`type-name ${theme === 'dark' ? 'dark' : ''}`}>{name}</h1>
-                    <div className="filter-button-container">
-                        <button className="filter-button" onClick={handlePeriodClick}>
+                    <div style={{ display: "flex", justifyContent: "space-between", width: "80%" }}>
+                        <h2 className={`type-name ${theme === 'dark' ? 'dark' : ''}`}>{name}</h2>
+                        <div>
+                            <FontAwesomeIcon icon={faFilter} onClick={handleFilterButtonClick} flip="horizontal" style={{ marginRight: "20px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                            <FontAwesomeIcon icon={faWandSparkles} onClick={handleOptimizeServiceClick} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                        </div>
+                    </div>
+{/*                    <div className="filter-button-container">
+                                                <button className="filter-button" onClick={handlePeriodClick}>
                             {translations[language]['SelectionByDates']}
                         </button>
                         <button className="filter-button" onClick={handleFilterClick}>
@@ -568,7 +616,7 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
                         <button className="filter-button" onClick={handleOPRClick}>
                             {translations[language]['FindTheBestOption']}
                         </button>
-                    </div>
+                    </div>*/}
                 </div>
                 <div className='card-list'>
                     <div className="category-container">
@@ -606,7 +654,211 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
                     </div>
                 </div>
             </div>
-            {showFilterModal && (
+
+            <div className={`filter-overlay ${isFilterButtonVisible ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="filter-content">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={handleFilterButtonCloseClick} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    </div>
+                    <div className="price-filter">
+                        <label className="filter-title">{translations[language]['MasterName']}:</label>
+                        <div className="price-inputs">
+                            <div className="input-group">
+                                <input defaultValue={masterNameValue} type={"text"}
+                                       id="masterName" placeholder={"Helen"}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="price-filter">
+                        <label className="filter-title">{translations[language]['Cost']}:</label>
+                        <div className="price-inputs">
+                            <div className="input-group">
+                                <label>{translations[language]['From']}</label>
+                                <input
+                                    defaultValue={priceFromValue} type="number"
+                                    id="priceFrom" placeholder={"0"}
+                                />
+                            </div>
+                            <div className="input-group">
+                                <label>{translations[language]['To']}</label>
+                                <input
+                                    defaultValue={priceToValue} type="number"
+                                    id="priceTo" placeholder={"110.5"}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="price-filter">
+                        <label className="filter-title">{translations[language]['Duration']}:</label>
+                        <div className="price-inputs">
+                            <div className="input-group">
+                                <label>{translations[language]['From']}</label>
+                                <input
+                                    defaultValue={durationFromValue} type="time" id="durationFrom" />
+                            </div>
+                            <div className="input-group">
+                                <label>{translations[language]['To']}</label>
+                                <input defaultValue={durationToValue} type="time" id="durationTo" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="price-filter">
+                        <label className="filter-title">{translations[language]['Rating']}:</label>
+                        <div className="price-inputs">
+                            <div className="input-group">
+                                <label>{translations[language]['From']}</label>
+                                <input
+                                    defaultValue={ratingFromValue}
+                                    type="number"
+                                    id="ratingFrom"
+                                    min="0"
+                                    max="5"
+                                    placeholder={"0"}
+                                />
+                            </div>
+                            <div className="input-group">
+                                <label>{translations[language]['To']}</label>
+                                <input
+                                    defaultValue={ratingToValue}
+                                    type="number"
+                                    id="ratingTo"
+                                    min="0"
+                                    max="5"
+                                    placeholder={"5"}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="price-filter" style={{display: "flex", justifyContent: "center"}}>
+                        <h4 className="filter-title">{translations[language]['SortBy']}:</h4>
+                        <label className="filter-title">{translations[language]['Name']}:</label>
+                        <SortArrow theme={theme} sortOptions={sortOptions} field='executorName'
+                                   handleSortClick={handleSortClick}
+                                   handleCancelSortClick={handleCancelSortClick}/>
+                        <label className="filter-title">{translations[language]['Cost']}:</label>
+                        <SortArrow theme={theme} sortOptions={sortOptions} field='price'
+                                   handleSortClick={handleSortClick}
+                                   handleCancelSortClick={handleCancelSortClick}/>
+                        <label className="filter-title">{translations[language]['AvailableSlots']}:</label>
+                        <SortArrow theme={theme} sortOptions={sortOptions} field='availableSlots'
+                                   handleSortClick={handleSortClick}
+                                   handleCancelSortClick={handleCancelSortClick}/>
+                        <label className="filter-title">{translations[language]['Rating']}:</label>
+                        <SortArrow theme={theme} sortOptions={sortOptions} field='rating'
+                                   handleSortClick={handleSortClick}
+                                   handleCancelSortClick={handleCancelSortClick}/>
+                        <label className="filter-title">{translations[language]['Duration']}:</label>
+                        <SortArrow theme={theme} sortOptions={sortOptions} field='duration'
+                                   handleSortClick={handleSortClick}
+                                   handleCancelSortClick={handleCancelSortClick}/>
+                    </div>
+                    <div className="price-filter">
+                        <label className="filter-title">{translations[language]['SelectionByDates']}:</label>
+                        <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                            <DatePicker
+                                selected={null} // Установите выбранную дату в null, чтобы позволить выбирать дни
+                                onChange={handleDateChange}
+                                inline // Рендер календаря всегда видимым
+                                dayClassName={(date) => (isDateSelected(date) ? 'selected' : '')} // Добавляем класс к выделенным дням
+                                locale={language}
+                            />
+                        </div>
+
+                        {timeRanges.map((timeRange, index) => (
+                            <div key={index} className="price-inputs">
+                                <div className="input-group">
+                                    <label>{index + 1}) {translations[language]['To']}</label>
+                                    <input
+                                        defaultValue={ratingFromValue}
+                                        type="time"
+                                        value={timeRange.startTime || '00:00'}
+                                        onChange={(e) => handleTimeChange(index, 'startTime', e.target.value)}
+                                    />
+                                </div>
+                                <div className="input-group">
+                                    <label>{translations[language]['To']}</label>
+                                    <input
+                                        type="time"
+                                        value={timeRange.endTime || '23:59'}
+                                        onChange={(e) => handleTimeChange(index, 'endTime', e.target.value)}
+                                    />
+                                </div>
+                                {index > -1 && (
+                                    <FontAwesomeIcon icon={faTrash} onClick={() => handleRemoveTimeRange(index)} flip="horizontal" style={{ color: "red", marginTop: "25px"}}/>
+                                )}
+                            </div>
+                        ))}
+                        <button className="filter-button"
+                                onClick={handleAddTimeRange}>{translations[language]['AddTimeRange']}</button>
+                    </div>
+                </div>
+                <div className="price-inputs">
+                    <div className="input-group">
+                        <button className="filter-button" style={{color: "red", borderColor: 'red'}} onClick={handleFilterClear}>{translations[language]['Clear']}</button>
+                    </div>
+                    <div className="input-group">
+                        <button className="filter-button" onClick={handleFilterApply}>{translations[language]['Apply']}</button>
+                    </div>
+                </div>
+            </div>
+
+            <div className={`filter-overlay ${optimizeServiceModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="filter-content">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={() => setOptimizeServiceModal(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    </div>
+                    <div className="price-filter" style={{display: "flex", justifyContent: "center"}}>
+                        <h4 className="filter-title">{translations[language]['FindTheBestOption']}:</h4>
+                        <label className="filter-title">{translations[language]['Cost']}:</label>
+                        {renderToggle(translations[language]['Cost'], priceSwitch, () => handleSwitchChange('price'))}
+                        <label className="filter-title">{translations[language]['AvailableSlots']}:</label>
+                        {renderToggle(translations[language]['AvailableSlots'], freeSlots, () => handleSwitchChange('freeSlots'))}
+                        <label className="filter-title">{translations[language]['Rating']}:</label>
+                        {renderToggle(translations[language]['Rating'], ratingSwitch, () => handleSwitchChange('rating'))}
+                        <label className="filter-title">{translations[language]['Duration']}:</label>
+                        {renderToggle(translations[language]['Duration'], durationSwitch, () => handleSwitchChange('duration'))}
+                    </div>
+                    <div className="price-inputs">
+                        <div className="input-group" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                            <button className="filter-button"
+                                    onClick={handleOptimizeServiceClick}>{translations[language]['OptimizeService']}</button>
+                        </div>
+                    </div>
+                    <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                        {showOprResModal && (
+                            <div className="service-card">
+                                <div key={oprData.id} className="master-card">
+                                    <div className="photos">
+                                        <PhotoList photos={oprData.photos} size={300} canDelete={false}/>
+                                    </div>
+                                    <div className="master-info">
+                                        <h4 onClick={() => handleMasterNameClickClick(oprData.executorId)}>{oprData.name}</h4>
+                                        <h4>{oprData.rating} <FontAwesomeIcon icon={faStar} className='item-icon'/></h4>
+                                    </div>
+                                    <div className="service-description">
+                                        <p>{oprData.description}</p>
+                                        <p><FontAwesomeIcon icon={faHouse} className='item-icon'/>{oprData.address}</p>
+                                        <p>Available Slots: {oprData.availableSlots}</p>
+                                    </div>
+                                    <div className="master-info">
+                                        <h4><FontAwesomeIcon icon={faClock} className='item-icon'/> {oprData.duration}
+                                        </h4>
+                                        <h4>{oprData.price} Byn</h4>
+                                    </div>
+                                    <div>
+                                        <button className="order-button" onClick={() => handleOrderClick(oprData.id)}>
+                                            <p className="order-text"><FontAwesomeIcon
+                                                icon={faBoltLightning}/> Записаться</p>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+{/*            {showFilterModal && (
                 <div className={`filter-modal ${theme === 'dark' ? 'dark' : ''}`}>
                     <div className={`modal-content ${theme === 'dark' ? 'dark' : ''}`}>
             <span className="close" onClick={handleModalClose}>
@@ -866,7 +1118,7 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
                         </div>
                     </div>
                 </div>
-            )}
+            )}*/}
         </div>
     );
 };
