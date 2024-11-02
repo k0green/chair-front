@@ -383,9 +383,11 @@ const Calendar = ({full}) => {
                 <div className={`daysContainer ${theme === 'dark' ? 'dark' : ''}`}>
                     {emptyDays}
                     {daysInMonth.map((day, index) => {
-                        const hasAppointments = appointmentsData.some(appointment => appointment.day === day);
-                        const hasAppointmentDiscounts = appointmentsData.some(appointment => appointment.day === day
-                            && (appointment.discountPrice !== null && appointment.discountPrice <= appointment.price));
+                        const hasAppointments = appointmentsData && appointmentsData.length > 0
+                            ? appointmentsData.some(appointment => appointment.day === day) : false;
+                        const hasAppointmentDiscounts = appointmentsData && appointmentsData.length > 0 ?
+                            appointmentsData.some(appointment => appointment.day === day
+                            && appointment.discountPrice !== null && appointment.discountPrice <= appointment.price) : false;
                         return (
                             <div
                                 key={index}

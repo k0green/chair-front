@@ -89,7 +89,7 @@
 
 .modal-content.dark {
     background-color: #342e2e;
-}
+}/*
 
 .extra-modal-content{
     display: flex;
@@ -97,7 +97,7 @@
     align-items: center;
     justify-content: center;
     margin-left: 10px;
-}
+}*/
 
 .close {
     color: #aaa;

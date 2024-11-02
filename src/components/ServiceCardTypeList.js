@@ -402,16 +402,37 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
         console.log(isActive);
         return (
             <div className="price-inputs">
-                <div className="input-group" style={{backgroundColor: "#eee", borderRadius: "6px", cursor: "pointer", ...(isActive === 'asc' ? { backgroundColor: "#007bff" } : '')}}>
-                    <FontAwesomeIcon icon={faArrowUp} onClick={() => handleSortClick(field, 'asc')} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                <div className="input-group"
+                     style={{
+                         backgroundColor: theme === 'dark' ? '#252525' : '#eee',
+                         borderRadius: "6px",
+                         cursor: "pointer",
+                         ...(isActive === 'asc' ? { backgroundColor: "#007bff" } : {})
+                     }}>
+                    <FontAwesomeIcon icon={faArrowUp} onClick={() => handleSortClick(field, 'asc')} flip="horizontal"
+                                     style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
                 </div>
-                <div className="input-group" style={{backgroundColor: "#eee", borderRadius: "6px", cursor: "pointer", ...(isActive === 'desc' ? { backgroundColor: "#007bff" } : '')}}>
-                    <FontAwesomeIcon icon={faArrowDown} onClick={() => handleSortClick(field, 'desc')} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                <div className="input-group"
+                     style={{
+                         backgroundColor: theme === 'dark' ? '#252525' : '#eee',
+                         borderRadius: "6px",
+                         cursor: "pointer",
+                         ...(isActive === 'desc' ? { backgroundColor: "#007bff" } : {})
+                     }}>
+                    <FontAwesomeIcon icon={faArrowDown} onClick={() => handleSortClick(field, 'desc')} flip="horizontal"
+                                     style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
                 </div>
-                <div className="input-group" style={{backgroundColor: "#eee", borderRadius: "6px", cursor: "pointer"}}>
-                    <FontAwesomeIcon icon={faXmark} onClick={() => handleCancelSortClick(field)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                <div className="input-group"
+                     style={{
+                         backgroundColor: theme === 'dark' ? '#252525' : '#eee',
+                         borderRadius: "6px",
+                         cursor: "pointer"
+                     }}>
+                    <FontAwesomeIcon icon={faXmark} onClick={() => handleCancelSortClick(field)} flip="horizontal"
+                                     style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
                 </div>
             </div>
+
         );
     }
 
@@ -419,14 +440,14 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
         return (
             <div className="price-inputs">
                 <div className="input-group"
-                     style={{backgroundColor: "#eee", borderRadius: "6px", cursor: "pointer", ...(!checked ? {backgroundColor: "#007bff"} : {})}}
+                     style={{backgroundColor: theme === 'dark' ? '#252525' : '#eee', borderRadius: "6px", cursor: "pointer", ...(!checked ? {backgroundColor: "#007bff"} : {})}}
                      onClick={() => onChange(false)}>
                     <label style={theme === 'dark' ? {color: !checked ? "#fff" : ""} : {color: !checked ? "#fff" : ""}}>
                         {translations[language]['Min']}
                     </label>
                 </div>
                 <div className="input-group"
-                     style={{backgroundColor: "#eee", borderRadius: "6px", cursor: "pointer", ...(checked ? {backgroundColor: "#007bff"} : {})}}
+                     style={{backgroundColor: theme === 'dark' ? '#252525' : '#eee', borderRadius: "6px", cursor: "pointer", ...(checked ? {backgroundColor: "#007bff"} : {})}}
                      onClick={() => onChange(true)}>
                     <label style={theme === 'dark' ? {color: checked ? "#fff" : ""} : {color: checked ? "#fff" : ""}}>
                         {translations[language]['Max']}
@@ -656,14 +677,14 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
             </div>
 
             <div className={`filter-overlay ${isFilterButtonVisible ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
-                <div className="filter-content">
+                <div className="filter-content ${theme === 'dark' ? 'dark' : ''}">
                     <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
                         <FontAwesomeIcon icon={faXmark} onClick={handleFilterButtonCloseClick} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
                     </div>
-                    <div className="price-filter">
+                    <div className={`price-filter ${theme === 'dark' ? 'dark' : ''}`}>
                         <label className="filter-title">{translations[language]['MasterName']}:</label>
                         <div className="price-inputs">
-                            <div className="input-group">
+                            <div className={`input-group ${theme === 'dark' ? 'dark' : ''}`}>
                                 <input defaultValue={masterNameValue} type={"text"}
                                        id="masterName" placeholder={"Helen"}/>
                             </div>
@@ -754,7 +775,8 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
                     </div>
                     <div className="price-filter">
                         <label className="filter-title">{translations[language]['SelectionByDates']}:</label>
-                        <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                        <div className={`${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}
+                             style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                             <DatePicker
                                 selected={null} // Установите выбранную дату в null, чтобы позволить выбирать дни
                                 onChange={handleDateChange}
@@ -826,7 +848,7 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage }) => {
                     </div>
                     <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
                         {showOprResModal && (
-                            <div className="service-card">
+                            <div className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
                                 <div key={oprData.id} className="master-card">
                                     <div className="photos">
                                         <PhotoList photos={oprData.photos} size={300} canDelete={false}/>

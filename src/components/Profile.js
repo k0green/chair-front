@@ -44,11 +44,6 @@ const Profile = ({user, services, promotions, contacts, current}) => {
     const [isUpload, setIsUpload] = useState(false);
     const [isEditSave, setIsEditSave] = useState(false);
 
-
-    if (!user || !user.services) {
-        return <div>Loading...</div>;
-    }
-
     const userRole = localStorage.getItem('userRole');
     const userId = localStorage.getItem('userId');
     current = userId === user.userId;

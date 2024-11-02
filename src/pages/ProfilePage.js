@@ -19,21 +19,21 @@ const ProfilePage = () => {
 
     useEffect(() => {
         getProfileById(id, navigate).then(newData => {
-            if (newData.services && newData.services.length > 0) {
-                setServicesData(newData.services.filter(service => service.isDeleted !== true));
-            } else {
-                setServicesData([]);
-            }
+            if(newData){
+                if (newData.services && newData.services.length > 0) {
+                    setServicesData(newData.services.filter(service => service.isDeleted !== true));
+                } else {
+                    setServicesData([]);
+                }
 
-            if (newData.promotions && newData.promotions.length > 0) {
-                setPromotionsData(newData.promotions.filter(service => service.isDeleted !== true));
-            } else {
-                setPromotionsData([]);
+                if (newData.promotions && newData.promotions.length > 0) {
+                    setPromotionsData(newData.promotions.filter(service => service.isDeleted !== true));
+                } else {
+                    setPromotionsData([]);
+                }
+                setUserData(newData.userData);
+                setContactData(newData.contacts);
             }
-            console.log(newData);
-            console.log(newData.promotions);
-            setUserData(newData.userData);
-            setContactData(newData.contacts);
         });
 
     }, [id]);

@@ -177,7 +177,7 @@ const Calendar = ({ full }) => {
                     {daysInMonth.map((day, index) => {
                         const hasAppointments = appointmentsData.some(appointment => appointment.day === day);
                         const hasAppointmentDiscounts = appointmentsData.some(appointment => appointment.day === day
-                            && (appointment.discountPrice !== null && appointment.discountPrice <= appointment.price));
+                            && appointment.discountPrice !== null && appointment.discountPrice <= appointment.price);
                         return (
                             <div
                                 key={index}

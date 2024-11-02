@@ -21,6 +21,9 @@ import {faCalendarDays} from "@fortawesome/free-solid-svg-icons/faCalendarDays";
 import {faLocationDot} from "@fortawesome/free-solid-svg-icons/faLocationDot";
 import {faMoon} from "@fortawesome/free-solid-svg-icons/faMoon";
 import {faSun} from "@fortawesome/free-solid-svg-icons/faSun";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import {faGlobe} from "@fortawesome/free-solid-svg-icons/faGlobe";
+import Select from "react-select";
 
 const MobileHeader = ({ city }) => {
     const navigate = useNavigate();
@@ -28,8 +31,14 @@ const MobileHeader = ({ city }) => {
     const {language, translations} = useContext(LanguageContext);
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
+    const [languageModal, setLanguageModal] = useState(false);
     const [cityName, setCityName] = useState(city || translations[language]['YourCity']);
     const location = useLocation();
+    const { lng, setLanguage } = useContext(LanguageContext);
+
+    const changeLanguage = (language) => {
+        setLanguage(language);
+    };
 
     const userId = localStorage.getItem('userId');
     const role = localStorage.getItem('userRole');
@@ -58,7 +67,12 @@ const MobileHeader = ({ city }) => {
 
     const handleCityClick = () => {
         setUploadPhotoModal(true);
-        setIsMenuVisible(false);
+        //setIsMenuVisible(false);
+    };
+
+    const handleLanguageClick = () => {
+        setLanguageModal(true);
+        //setIsMenuVisible(false);
     };
 
     const handleCitySaveClick = () => {
@@ -127,6 +141,42 @@ const MobileHeader = ({ city }) => {
 
     const handleMenuClick = () => {
         setIsMenuVisible(!isMenuVisible);
+    };
+
+    const languages = [
+        { label: 'English', value: 'en' },
+        { label: 'Русский', value: 'ru' },
+    ];
+
+    const customStyles = {
+        control: (styles) => ({
+            ...styles,
+            backgroundColor: theme === 'dark' ? '#252525' : '#ffffff',
+            color: theme === 'dark' ? '#fff' : '#000000',
+            borderColor: theme === 'dark' ? '#333333' : '#cccccc'
+        }),
+        singleValue: (styles) => ({
+            ...styles,
+            color: theme === 'dark' ? '#fff' : '#000000'
+        }),
+        placeholder: (styles) => ({
+            ...styles,
+            color: theme === 'dark' ? '#aaaaaa' : '#cccccc'
+        }),
+        menu: (styles) => ({
+            ...styles,
+            backgroundColor: theme === 'dark' ? '#252525' : '#ffffff',
+            color: theme === 'dark' ? '#fff' : '#000000'
+        }),
+        option: (styles, { isFocused }) => ({
+            ...styles,
+            backgroundColor: isFocused ? (theme === 'dark' ? '#333333' : '#f0f0f0') : undefined,
+            color: theme === 'dark' ? '#fff' : '#000000'
+        }),
+        input: (styles) => ({
+            ...styles,
+            color: theme === 'dark' ? '#ffffff' : '#000000' // Цвет вводимого текста
+        })
     };
 
     return (
@@ -212,12 +262,11 @@ const MobileHeader = ({ city }) => {
                         </button>
                         <button
                             style={{width: "100%", display: "flex", justifyContent: "left", backgroundColor: "transparent", border: "none"}}
-                            onClick={handleCityClick}
+                            onClick={handleLanguageClick}
                         >
                             <p style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>
-                                смена языка
-                                <FontAwesomeIcon icon={faLocationDot} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
-                                {cityName}  ({translations[language]['ClickToSpecify']})
+                                <FontAwesomeIcon icon={faGlobe} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                                {translations[language]['ClickToLanguage']}
                             </p>
                         </button>
                         <button
@@ -233,24 +282,40 @@ const MobileHeader = ({ city }) => {
                 </div>
             </div>
 
-            {uploadPhotoModal && (
-                <div className="filter-modal" >
-                    <div className="modal-content" style={{maxWidth: "400px", maxHeight: "100px"}}>
-                    <span className="close" onClick={() => setUploadPhotoModal(false)}>
-                        &times;
-                    </span>
-                        <div className="dropzone-centrize">
-                            <CitySelector/>
-                            <button
-                                className="dropzone-order-button"
-                                onClick={handleCitySaveClick}
-                            >
-                                {<p className="order-text"><FontAwesomeIcon icon={faSave} /> {translations[language]['Save']}</p>}
-                            </button>
+            <div className={`extra-modal-overlay ${uploadPhotoModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="extra-modal-content">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={() => setUploadPhotoModal(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    </div>
+                    <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                        <CitySelector/>
+                    </div>
+                    <div className="price-inputs">
+                        <div className="input-group" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                            <button className="filter-button"
+                                    onClick={handleCitySaveClick}><FontAwesomeIcon icon={faSave} /> {translations[language]['Save']}</button>
                         </div>
                     </div>
                 </div>
-            )}
+            </div>
+
+            <div className={`extra-modal-overlay ${languageModal? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="extra-modal-content">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={() => setLanguageModal(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    </div>
+                    <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                        <select
+                            value={lng} // Set the current language as selected
+                            onChange={(e) => changeLanguage(e.target.value)}
+                            className={`custom-select ${theme === 'dark' ? 'dark' : ''}`}
+                        >
+                            <option value="en">English</option>
+                            <option value="ru">Русский</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </footer>
     );
 };

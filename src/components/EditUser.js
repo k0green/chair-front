@@ -19,36 +19,24 @@ function Register() {
     const [confirmPasswordError] = useState("");
 
     const [userData, setUserData] = useState([]);
-    const [name, setName] = useState(userData.name);
-    const [email, setEmail] = useState(userData.email);
+    const [name, setName] = useState(userData ? userData.name : localStorage.getItem('userName'));
+    const [email, setEmail] = useState(userData ? userData.email : localStorage.getItem('userEmail'));
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [isSave, setIsSave] = useState(false);
 
     useEffect(() => {
-        const userId = localStorage.getItem('userId');
-        getUserInfoForEdit( navigate, userId)
-            .then(response => {
-                setUserData(response);
-                setEmail(response.email);
-                setName(response.name);
-            })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
-            });
-    }, []);
+        const fetchData = async () => {
+            const userId = localStorage.getItem('userId');
+            const response = await getUserInfoForEdit(navigate, userId);
+            setUserData(response);
+            setEmail(response ? response.email : localStorage.getItem('userEmail'));
+            setName(response ? response.name : localStorage.getItem('userName'));
+        };
+
+        fetchData();
+    }, [navigate]);
+
 
     const handleNameChange = (value) => {
         setName(value);
@@ -221,7 +209,7 @@ function Register() {
                         disabled={isSave}
                         //disabled={!name || !email || !password || !confirmPassword || !role ||nameError || emailError || passwordError || confirmPasswordError}
                     >
-                        {isSave ? <LoadingAnimation /> : <p className="order-text">{translations[language]['Save']}</p>}
+                        {isSave ? <LoadingAnimation /> : <p>{translations[language]['Save']}</p>}
                     </button>
                 </div>
             </div>
