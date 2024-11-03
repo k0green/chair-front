@@ -16,6 +16,8 @@ import {
     updatePromotionCard, uploadMinioPhoto
 } from "./api";
 import {faCancel} from "@fortawesome/free-solid-svg-icons/faCancel";
+import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 
 const PromotionCard = ({ service, isNew, id }) => {
     const navigate = useNavigate();
@@ -141,27 +143,29 @@ const PromotionCard = ({ service, isNew, id }) => {
         });
 
         const images = files.map((file, index) => (
-            <div className="dropzone-centrize" key={file.name}>
+            <div className="price-filter" key={file.name} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                    <FontAwesomeIcon icon={faTrash} onClick={() => {
+                        if (file.id) { // если файл существующий
+                            setFilesToDelete(prev => [...prev, file.id]);
+                            setEditedPhotos(prev => prev.filter(photo => photo.id !== file.id));
+                        }
+                        const newFiles = [...files];
+                        newFiles.splice(index, 1);
+                        setFiles(newFiles);
+                    }} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "#ff0000" } : { color: "#ff0000" })}}/>
+                </div>
                 <img src={file.preview} style={{width: '50%'}} alt="preview" />
-                <button className='trash-icon' onClick={() => {
-                    if (file.id) { // если файл существующий
-                        setFilesToDelete(prev => [...prev, file.id]);
-                        setEditedPhotos(prev => prev.filter(photo => photo.id !== file.id));
-                    }
-                    const newFiles = [...files];
-                    newFiles.splice(index, 1);
-                    setFiles(newFiles);
-                }}><FontAwesomeIcon icon={faTrash} />  {translations[language]['Delete']}</button>
             </div>
         ));
 
         return (
             <div className="dropzone-centrize">
-                {images}
                 <div {...getRootProps({style: {border: '2px solid blue', borderRadius: "10px", padding: '20px', minWidth: "200px", minHeight: "200px", width: '30%'}})}>
                     <input {...getInputProps()} />
                     <p>{translations[language]['DragAndDrop']}</p>
                 </div>
+                {images}
             </div>
         );
     }
@@ -249,25 +253,26 @@ const PromotionCard = ({ service, isNew, id }) => {
                     </div>
                 </div>
             </div>
-            {uploadPhotoModal && (
-                <div className="filter-modal">
-                    <div className="modal-content">
-                    <span className="close" onClick={() => setUploadPhotoModal(false)}>
-                        &times;
-                    </span>
-                        <div className="dropzone-centrize">
-                            <Dropzone />
-                            <button
-                                className="dropzone-order-button"
-                                onClick={handleUpload}
-                                disabled={isUpload}
+            <div className={`filter-overlay ${uploadPhotoModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="filter-content">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={() => setUploadPhotoModal(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    </div>
+                    <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                        <Dropzone />
+                    </div>
+                    <div className="price-inputs">
+                        <div className="input-group" style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
+                            <button className="filter-button"
+                                    onClick={handleUpload}
+                                    disabled={isUpload}
                             >
-                                {isUpload ? <LoadingAnimation /> : <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p>}
+                                {isUpload ? <LoadingAnimation /> : <><FontAwesomeIcon icon={faSave} /> {translations[language]['Save']}</>}
                             </button>
                         </div>
                     </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 };

@@ -29,6 +29,8 @@ import {faAdd} from "@fortawesome/free-solid-svg-icons/faAdd";
 import {faCopy} from "@fortawesome/free-solid-svg-icons/faCopy";
 import {faDeleteLeft} from "@fortawesome/free-solid-svg-icons/faDeleteLeft";
 import PromotionCard from "./PromotionCard";
+import CitySelector from "./CitySelector";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 
 const Profile = ({user, services, promotions, contacts, current}) => {
     const navigate = useNavigate();
@@ -388,23 +390,27 @@ const Profile = ({user, services, promotions, contacts, current}) => {
                     ))}
                 </div>
             )}
-            {uploadPhotoModal && (
-                <div className="filter-modal">
-                    <div className="modal-content">
-                    <span className="close" onClick={() => setUploadPhotoModal(false)}>
-                        &times;
-                    </span>
+
+            <div className={`extra-modal-overlay ${uploadPhotoModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="extra-modal-content">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={() => setUploadPhotoModal(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    </div>
+                    <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
                         <Dropzone />
-                        <button
-                            className="dropzone-order-button"
-                            onClick={handleUpload}
-                            disabled={isUpload}
-                        >
-                            {isUpload ? <LoadingAnimation /> : <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p>}
-                        </button>
+                    </div>
+                    <div className="price-inputs">
+                        <div className="input-group" style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
+                            <button className="filter-button"
+                                    onClick={handleUpload}
+                                    disabled={isUpload}
+                            >
+                                {isUpload ? <LoadingAnimation /> : <><FontAwesomeIcon icon={faSave} /> {translations[language]['Save']}</>}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

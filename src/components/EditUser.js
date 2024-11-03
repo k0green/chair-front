@@ -209,7 +209,7 @@ function Register() {
                         disabled={isSave}
                         //disabled={!name || !email || !password || !confirmPassword || !role ||nameError || emailError || passwordError || confirmPasswordError}
                     >
-                        {isSave ? <LoadingAnimation /> : <p>{translations[language]['Save']}</p>}
+                        {isSave ? <LoadingAnimation /> : <>{translations[language]['Save']}</>}
                     </button>
                 </div>
             </div>

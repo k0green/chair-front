@@ -172,7 +172,7 @@ const MapComponent = ({ initialPosition, initialAddress, apiKey, canEdit, onSave
     return (
         <div
             ref={mapRef}
-            style={{ height: '500px', width: '500px' }} // Adjust the height and width as needed
+            style={{ height: '100%', width: '100%', maxHeight: "500px" }} // Adjust the height and width as needed
         />
     );
 };

@@ -9,7 +9,7 @@ const Photo = ({ id, url, size }) => {
 
     return (
     <img
-        style={{height: `${size}px`, width: `${size}px`}}
+        style={{height: `${size}px`, width: `${size}px`, borderRadius: "10px"}}
         key={id}
         src={url}
         /*//alt={id}*/

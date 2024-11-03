@@ -18,6 +18,8 @@ import {
     faBoltLightning,
     faStar, faTrash
 } from "@fortawesome/free-solid-svg-icons";
+import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 
 const FullServiceCard = ({ service }) => {
     const navigate = useNavigate();
@@ -253,27 +255,29 @@ const FullServiceCard = ({ service }) => {
         });
 
         const images = files.map((file, index) => (
-            <div className="dropzone-centrize" key={file.name}>
+            <div className="price-filter" key={file.name} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                    <FontAwesomeIcon icon={faTrash} onClick={() => {
+                        if (file.id) { // если файл существующий
+                            setFilesToDelete(prev => [...prev, file.id]);
+                            setEditedPhotos(prev => prev.filter(photo => photo.id !== file.id));
+                        }
+                        const newFiles = [...files];
+                        newFiles.splice(index, 1);
+                        setFiles(newFiles);
+                    }} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "#ff0000" } : { color: "#ff0000" })}}/>
+                </div>
                 <img src={file.preview} style={{width: '50%'}} alt="preview" />
-                <button className='trash-icon' onClick={() => {
-                    if (file.id) { // если файл существующий
-                        setFilesToDelete(prev => [...prev, file.id]);
-                        setEditedPhotos(prev => prev.filter(photo => photo.id !== file.id));
-                    }
-                    const newFiles = [...files];
-                    newFiles.splice(index, 1);
-                    setFiles(newFiles);
-                }}><FontAwesomeIcon icon={faTrash} />  {translations[language]['Delete']}</button>
             </div>
         ));
 
         return (
             <div className="dropzone-centrize">
-                {images}
-                <div {...getRootProps({className:"dropzoneBorder"})}>
+                <div {...getRootProps({style: {border: '2px solid blue', borderRadius: "10px", padding: '20px', minWidth: "200px", minHeight: "200px", width: '30%'}})}>
                     <input {...getInputProps()} />
                     <p>{translations[language]['DragAndDrop']}</p>
                 </div>
+                {images}
             </div>
         );
     }
@@ -282,22 +286,7 @@ const FullServiceCard = ({ service }) => {
         <div>
             <div className="service-and-reviews-container">
                 <div className="photos-fullsize">
-                    {service.photos ? <PhotoList photos={service.photos} size={window.innerWidth > 700 ? 500 : 300} canDelete={false} /> :
-                        window.innerWidth > 700 ? 300 : 480 ? (<img
-                            src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
-                            onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
-                            }}
-                            style={{minWidth: "500px", maxWidth: "500px", maxHeight: "500px", minHeight: "500px"}}
-                            alt=""/>) : (<img
-                            src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
-                            onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
-                            }}
-                            style={{minWidth: "300px", maxWidth: "300px", maxHeight: "300px", minHeight: "300px"}}
-                            alt=""/>)}
+                    {service.photos ? <PhotoList photos={service.photos} size={300} canDelete={false} /> : ""}
                     {service.hasDiscount || service.hasPromotions ? (
                         <div className="discount-overlay">
                             {service.hasDiscount ? <h4 className="discount">{translations[language]['Discount']}</h4> : ""}
@@ -329,61 +318,60 @@ const FullServiceCard = ({ service }) => {
                         <h4>{translations[language]['Cost']}: {service.price} Byn</h4>
                     </div>
                 </div>
-                {window.innerWidth > 700 ? 300 : 480 ? (<div style={{ height: '500px', width: '500px', overflow: "hidden" }}>
-                    <MapComponent
-                        initialPosition={service.place.position}
-                        canEdit={false}
-                    />
-                </div>) : (<div style={{ height: '300px', width: '300px', overflow: "hidden" }}>
-                    <MapComponent
-                        initialPosition={service.place.position}
-                        canEdit={false}
-                    />
-                </div>)}
+                <div style={{display: "flex", justifyContent: "center", flexDirection: "column", maxWidth: "500px", width: "95%"}}>
+                    <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', borderRadius: "10px", maxWidth: "500px" }}>
+                        <MapComponent
+                            initialPosition={service.place.position}
+                            canEdit={false}
+                        />
+                    </div>
+                </div>
             </div>
             <Calendar full={false} />
             <div className="service-and-reviews-container">
-                <div className="photos-fullsize">
+                <div className="photos-fullsize" style={{marginBottom: "20px"}}>
                     {reviews.filter(obj => obj.photos).flatMap(obj => obj.photos)
-                        ? <PhotoList photos={reviews.filter(obj => obj.photos).flatMap(obj => obj.photos)} size={500}  canDelete={false} /> :
-                        <img
-                            src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
-                            onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
-                            }}
-                            alt=""/>}
+                        ? <PhotoList photos={reviews.filter(obj => obj.photos).flatMap(obj => obj.photos)} size={300}  canDelete={false} /> :
+                        ""}
                 </div>
-                {uploadReviewModal && (
-                    <div className={`filter-modal ${theme === 'dark' ? 'dark' : ''}`}>
-                        <div className={`modal-content ${theme === 'dark' ? 'dark' : ''}`}>
-            <span className="close" onClick={() => setUploadReviewModal(false)}>
-                &times;
-            </span>
+                <div className={`filter-overlay ${uploadReviewModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                    <div className="filter-content">
+                        <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                            <FontAwesomeIcon icon={faXmark} onClick={() => setUploadReviewModal(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                        </div>
+                        <div className={"price-filter"} style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
+                            <ReactStars
+                                count={5}
+                                value={editedStars}
+                                onChange={(newRating) => setEditedStars(newRating)}
+                                size={64}
+                                activeColor="#ffd700"
+                            />
+                        </div>
+                        <div className={"price-filter"} style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
                             <Dropzone />
-                            <div className="extra-modal-content">
-                                <ReactStars
-                                    count={5}
-                                    value={editedStars}
-                                    onChange={(newRating) => setEditedStars(newRating)}
-                                    size={128}
-                                    activeColor="#ffd700"
-                                />
-                                <textarea
-                                    value={editedText}
-                                    onChange={(e) => setEditedText(e.target.value)}
-                                    placeholder={translations[language]['EnterReview']}
-                                    className={`review-input ${theme === 'dark' ? 'dark' : ''}`}
-                                />
-                                <button className="review-order-button" onClick={handleUpload} disabled={isUpload}>
-                                    {isUpload ? <LoadingAnimation /> : <p className="order-text">
-                                        <FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}
-                                    </p>}
-                                </button>
-                            </div>
+                        </div>
+                        <div className={"price-filter"} style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                            <textarea
+                                value={editedText}
+                                onChange={(e) => setEditedText(e.target.value)}
+                                placeholder={translations[language]['EnterReview']}
+                                className={`review-input ${theme === 'dark' ? 'dark' : ''}`}
+                            />
                         </div>
                     </div>
-                )}
+                    <div className="price-inputs">
+                        <div className="input-group">
+                            <button className="filter-button"
+                                    onClick={handleUpload}
+                                    disabled={isUpload}
+                            >
+                                {isUpload ? <LoadingAnimation /> : <>
+                                    <FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</>}
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <div style={{marginTop: "10px"}}>
                     <button className="order-button" onClick={handleAddClick} disabled={isUpload}>
                         {isUpload ? <LoadingAnimation /> : <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Add']}</p>}
@@ -394,21 +382,15 @@ const FullServiceCard = ({ service }) => {
                             {reviews.map(review => (
                                 <div key={review.id} className="review-card">
                                     {review.photos
-                                        ? <PhotoList photos={review.photos} size={200}  canDelete={false} /> :
-                                        <img
-                                            src={'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain'}
-                                            onError={(e) => {
-                                                e.target.onerror = null;
-                                                e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
-                                            }}
-                                            alt=""/>}
+                                        ? <PhotoList photos={review.photos} size={200} canDelete={false} /> : ""}
                                     <div className="review-header">
                                         <div>
                                             <span className={`user-name ${theme === 'dark' ? 'dark' : ''}`}>{review.userName}</span>
                                             <span className="review-date">{new Date(review.createDate).toLocaleDateString()}</span>
                                         </div>
                                         <div>
-                                            { localStorage.getItem('userId') === review.userId ? <FontAwesomeIcon className={`edit-review ${theme === 'dark' ? 'dark' : ''}`} icon={faEdit} onClick={()=>handleEditClick(review.id)}/> : ''}
+                                            {localStorage.getItem('userId') === review.userId ?
+                                                <FontAwesomeIcon className={`edit-review ${theme === 'dark' ? 'dark' : ''}`} icon={faEdit} onClick={() => handleEditClick(review.id)} /> : ''}
                                             <span className={`stars ${theme === 'dark' ? 'dark' : ''}`}>{`${review.stars} ⭐`}</span>
                                         </div>
                                     </div>
@@ -419,12 +401,12 @@ const FullServiceCard = ({ service }) => {
                     </div>
                 </div>
                 <div className="reviews-summary">
-                    <h4>Overall Rating</h4>
-                    <p>⭐⭐⭐⭐⭐   {reviews.length > 0 ? calculateAverageRating(reviews) : 5} / 5</p>
+                    <h4 style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>Overall Rating</h4>
+                    <p style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>⭐⭐⭐⭐⭐   {reviews.length > 0 ? calculateAverageRating(reviews) : 5} / 5</p>
                     <ul>
                         {calculateStarCounts(reviews).map((item, index) => (
                             <li key={index}>
-                                <span>{item.stars} stars</span>
+                                <span style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>{item.stars} stars</span>
                                 <ProgressBar now={item.percentage} label={item.count} />
                             </li>
                         ))}
