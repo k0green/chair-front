@@ -11,6 +11,7 @@ import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
 import {faClose} from "@fortawesome/free-solid-svg-icons/faClose";
 import app from "../App";
 import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
+import LoadingSpinner from "./LoadingSpinner";
 
 const AppointmentsComponent = () => {
     const [appointmentsData, setAppointmentsData] = useState(null);
@@ -21,6 +22,8 @@ const AppointmentsComponent = () => {
     const { language, translations } = useContext(LanguageContext);
     const [clientComment, setClientComment] = useState();
     const [isApproveClick, setIsApproveClick] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isEmpty, setIsEmpty] = useState(false);
 
     useEffect(() => {
         const token = Cookies.get('token');
@@ -31,26 +34,28 @@ const AppointmentsComponent = () => {
     }, [currentMonth]);
 
     const fetchData = async () => {
-        getOrders(navigate)
-            .then(serverData => {
-                setAppointmentsData(serverData);
-            })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
-            });
+        const response = await getOrders(navigate);
+        if (response) {
+            setAppointmentsData(response);
+            setIsEmpty(!response);
+        } else {
+            setAppointmentsData(response);
+            setIsEmpty(true);
+        }
+        setIsLoading(false);
     };
+
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
+
+    if (isEmpty) {
+        return (
+            <div className={`empty-state ${theme === 'dark' ? 'dark' : ''}`}>
+                <p>Данные не найдены</p>
+            </div>
+        );
+    }
 
     const formatTime = (rawTime) => {
         const date = new Date(rawTime);

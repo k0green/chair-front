@@ -5,6 +5,7 @@ import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
 import {getEditUserInfo, getUserInfoForEdit, LoadingAnimation} from "./api";
+import LoadingSpinner from "./LoadingSpinner";
 
 function Register() {
 
@@ -24,19 +25,41 @@ function Register() {
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [isSave, setIsSave] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isEmpty, setIsEmpty] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             const userId = localStorage.getItem('userId');
             const response = await getUserInfoForEdit(navigate, userId);
-            setUserData(response);
-            setEmail(response ? response.email : localStorage.getItem('userEmail'));
-            setName(response ? response.name : localStorage.getItem('userName'));
+            if (response) {
+                setUserData(response);
+                setEmail(response ? response.email : localStorage.getItem('userEmail'));
+                setName(response ? response.name : localStorage.getItem('userName'));
+                setIsEmpty(!response);
+            } else {
+                setUserData(null);
+                setEmail(response ? response.email : localStorage.getItem('userEmail'));
+                setName(response ? response.name : localStorage.getItem('userName'));
+                setIsEmpty(true);
+            }
+            setIsLoading(false);
         };
 
         fetchData();
     }, [navigate]);
 
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
+
+    if (isEmpty) {
+        return (
+            <div className={`empty-state ${theme === 'dark' ? 'dark' : ''}`}>
+                <p>Данные не найдены</p> // Сообщение о пустом списке
+            </div>
+        );
+    }
 
     const handleNameChange = (value) => {
         setName(value);

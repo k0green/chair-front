@@ -3,8 +3,9 @@ import '../styles/Profile.css';
 import Profile from '../components/Profile';
 import {useNavigate, useParams} from "react-router-dom";
 import {ThemeContext} from "../components/ThemeContext";
-import {toast} from "react-toastify";
 import {getProfileById} from "../components/api";
+import LoadingSpinner from "../components/LoadingSpinner";
+import Cookies from "js-cookie";
 
 const ProfilePage = () => {
 
@@ -16,27 +17,45 @@ const ProfilePage = () => {
     const [servicesData, setServicesData] = useState([]);
     const [promotionsData, setPromotionsData] = useState([]);
     const [contactData, setContactData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isEmpty, setIsEmpty] = useState(false);
 
     useEffect(() => {
-        getProfileById(id, navigate).then(newData => {
-            if(newData){
-                if (newData.services && newData.services.length > 0) {
-                    setServicesData(newData.services.filter(service => service.isDeleted !== true));
+        const fetchData = async () => {
+            const userId = localStorage.getItem('userId');
+            const token = Cookies.get('token');
+            if (!token) {
+                navigate('/login');
+            } else {
+                const response = await getProfileById(id, navigate);
+                if (response) {
+                    setServicesData(response.services ? response.services.filter(service => !service.isDeleted) : []);
+                    setPromotionsData(response.promotions ? response.promotions.filter(service => !service.isDeleted) : []);
+                    setUserData(response.userData || {});
+                    setContactData(response.contacts || []);
+                    setIsEmpty(!response.userData);
                 } else {
-                    setServicesData([]);
+                    setIsEmpty(true);
                 }
-
-                if (newData.promotions && newData.promotions.length > 0) {
-                    setPromotionsData(newData.promotions.filter(service => service.isDeleted !== true));
-                } else {
-                    setPromotionsData([]);
-                }
-                setUserData(newData.userData);
-                setContactData(newData.contacts);
+                setIsLoading(false);
             }
-        });
+        };
 
-    }, [id]);
+        fetchData();
+    }, [id, navigate]);
+
+
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
+
+    if (isEmpty) {
+        return (
+            <div className={`empty-state ${theme === 'dark' ? 'dark' : ''}`}>
+                <p>Нет сообщений</p>
+            </div>
+        );
+    }
 
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>

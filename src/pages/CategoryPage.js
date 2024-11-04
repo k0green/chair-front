@@ -5,17 +5,27 @@ import {useParams} from "react-router-dom";
 import ServiceCardTypeList from "../components/ServiceCardTypeList";
 import {getServiceTypeById} from '../components/api';
 import {toast} from "react-toastify";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const HomePage = ({ user, onLogout }) => {
     const { theme } = useContext(ThemeContext);
     let { id } = useParams();
-    const [typeData, setTypeData] = useState([]);
+    const [typeData, setTypeData] = useState(null);
+    const [isEmpty, setIsEmpty] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        getServiceTypeById(id).then(newData => {
-            setTypeData(newData);
-        })
-            .catch(error => {
+        const fetchData = async () => {
+            try {
+                const newData = await getServiceTypeById(id);
+                if (newData) {
+                    setTypeData(newData);
+                    setIsEmpty(!newData);
+                } else {
+                    setTypeData(null);
+                    setIsEmpty(true);
+                }
+            } catch (error) {
                 const errorMessage = error.message || 'Failed to fetch data';
                 if (!toast.isActive(errorMessage)) {
                     toast.error(errorMessage, {
@@ -29,14 +39,32 @@ const HomePage = ({ user, onLogout }) => {
                     });
                 }
                 console.error('Error fetching data:', error);
-            });
-    }, []);
+                setTypeData(null);
+                setIsEmpty(true);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [id]);
+
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
+
+    if (isEmpty) {
+        return (
+            <div className={`empty-state ${theme === 'dark' ? 'dark' : ''}`}>
+                <p>Данные не найдены</p> // Сообщение о пустом списке
+            </div>
+        );
+    }
 
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
             <div>
                 <ServiceCardTypeList id={id} name={typeData.name} filter={{ skip: 0, take: 10 }} />
- {/*<ImageWithButton imageUrl="https://th.bing.com/th/id/OIG3.P9oT9D3EIP9NQhSwgVqH?w=1024&h=1024&rs=1&pid=ImgDetMain" text="К сожалению тут пусто"/>*/}
             </div>
         </div>
     );

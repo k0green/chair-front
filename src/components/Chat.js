@@ -1,16 +1,17 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {ThemeContext} from "./ThemeContext";
-import {toast} from "react-toastify";
-import {getAllChats, getOrdersByRole} from "./api";
-import Cookies from "js-cookie";
+import Cookies from 'js-cookie';
+import { ThemeContext } from './ThemeContext';
+import LoadingSpinner from './LoadingSpinner';
+import { getAllChats } from './api';
 
 function ChatList() {
     const navigate = useNavigate();
     const { theme } = useContext(ThemeContext);
 
     const [chatData, setChatData] = useState([]);
-    const [ messages, setMessages] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isEmpty, setIsEmpty] = useState(false);
 
     useEffect(() => {
         const userId = localStorage.getItem('userId');
@@ -19,17 +20,30 @@ function ChatList() {
             if (!token) {
                 navigate('/login');
             } else {
-                const response = await getAllChats( navigate, userId);
-                setMessages(response.messages);
+                const response = await getAllChats(navigate, userId);
                 setChatData(response);
+                setIsLoading(false);
+                setIsEmpty(response.length === 0);
             }
         };
         fetchData();
-    }, []);
+    }, [navigate]);
 
     const handleChatClick = (id) => {
         navigate(`/messages/${id}`);
     };
+
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
+
+    if (isEmpty) {
+        return (
+            <div className={`empty-state ${theme === 'dark' ? 'dark' : ''}`}>
+                <p>Нет сообщений</p>
+            </div>
+        );
+    }
 
     return (
         <div className="chat-list">

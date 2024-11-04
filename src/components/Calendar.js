@@ -8,6 +8,7 @@ import { ThemeContext } from "./ThemeContext";
 import { LanguageContext } from "./LanguageContext";
 import {cancelCalendar, enrollCalendar, getOrdersByRole, updateOrder} from "./api";
 import {toast} from "react-toastify";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Calendar = ({ full }) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -20,7 +21,8 @@ const Calendar = ({ full }) => {
     const [clientComment, setClientComment] = useState();
     const [isEnrollLoading, setIsEnrollLoading] = useState(false);
     const [isCancelLoading, setIsCancelLoading] = useState(false);
-
+    const [isLoading, setIsLoading] = useState(true);
+    const [isEmpty, setIsEmpty] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -28,12 +30,32 @@ const Calendar = ({ full }) => {
             if (!token) {
                 navigate('/login');
             } else {
-                const serverData = await getOrdersByRole(navigate, full, currentMonth, id);
-                setAppointmentsData(serverData);
+                const response = await getOrdersByRole(navigate, full, currentMonth, id);
+                setAppointmentsData(response);
+                if (response) {
+                    setAppointmentsData(response);
+                    setIsEmpty(!response);
+                } else {
+                    setAppointmentsData(null);
+                    setIsEmpty(true);
+                }
+                setIsLoading(false);
             }
         };
         fetchData();
     }, [currentMonth, navigate, full, id]);
+
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
+
+    if (isEmpty) {
+        return (
+            <div className={`empty-state ${theme === 'dark' ? 'dark' : ''}`}>
+                <p>Данные не найдены</p> // Сообщение о пустом списке
+            </div>
+        );
+    }
 
     const formatTime = (rawTime) => {
         const date = new Date(rawTime);
