@@ -315,16 +315,26 @@
 }
 
 .tab {
+    /*
     font-weight: bold;
-    border-bottom: 2px solid #000;
+    */
     cursor: pointer;
-    margin-bottom: 10px;
-    font-size: 32px;
+    margin-top: 10px;
+    font-size: 24px;
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 .tab.dark {
     border-bottom: 2px solid #ffffff;
     color: white;
+    background: #342e2e;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.8);
 }
 
 .tab-up {

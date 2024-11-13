@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import { ThemeContext } from "../components/ThemeContext";
 import "../styles/Main.css";
 import {useParams} from "react-router-dom";
-import ServiceCardTypeList from "../components/ServiceCardTypeList";
+import ServiceCardTypeList from "./ErrorPage";
 import {getServiceTypeById} from '../components/api';
 import {toast} from "react-toastify";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -64,7 +64,7 @@ const HomePage = ({ user, onLogout }) => {
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
             <div>
-                <ServiceCardTypeList id={id} name={typeData.name} filter={{ skip: 0, take: 10 }} />
+                <ServiceCardTypeList id={id} name={typeData.name} filter={{ skip: 0, take: 2 }} />
             </div>
         </div>
     );

@@ -1,12 +1,16 @@
 import React, {useState, useContext, useEffect} from 'react';
 import { ThemeContext } from "./ThemeContext";
-import CategoryItem from './CategoryItem';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
 import "../styles/CategoryItem.css";
+import IconComponent from "./IconComponent";
+import {useNavigate} from "react-router-dom";
 
 const CategoryList = ({categories}) => {
     const [itemsPerPage, setItemsPerPage] = useState(8);
+    const [currentPage, setCurrentPage] = useState(1);
+    const { theme } = useContext(ThemeContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const updateItemsPerPage = () => {
@@ -22,8 +26,9 @@ const CategoryList = ({categories}) => {
         };
     }, []);
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const { theme } = useContext(ThemeContext);
+    const handleCategoryClick = async (id) => {
+        navigate('/all-child-categories/' + id);
+    };
 
     const totalPages = Math.ceil(categories.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -52,7 +57,7 @@ const CategoryList = ({categories}) => {
     };
 
     return (
-        <div className="category-container">
+        <div className="category-type-container">
             <div className="pagination-arrow-container">
                 <FontAwesomeIcon
                     icon={faChevronLeft}
@@ -62,12 +67,10 @@ const CategoryList = ({categories}) => {
             </div>
             <div className="category-list">
                 {visibleCategories.map((category) => (
-                    <CategoryItem
-                        key={category.id}
-                        id={category.id}
-                        name={category.name}
-                        icon={category.icon}
-                    />
+                    <button className={theme === "dark" ? "main-category-item-dark-theme" : "main-category-item-light-theme"} onClick={() => handleCategoryClick(category.id)}>
+                        <IconComponent iconName={category.icon} className={theme === "dark" ? "main-category-icon-dark-theme" : "main-category-icon-light-theme"} />
+                        <div className={theme === "dark" ? "main-category-name-dark-theme" : "main-category-name-light-theme"}>{category.name}</div>
+                    </button>
                 ))}
             </div>
             <div className="pagination-arrow-container">

@@ -1,14 +1,13 @@
-import React, {useContext, useEffect, useState} from 'react';
-import '../styles/ServiceCard.css';
-import { useParams } from "react-router-dom";
-import EditServiceCard from "../components/EditServiceCard";
-import {ThemeContext} from "../components/ThemeContext";
-import {getAllServiceTypes} from "../components/api";
+import React, {useContext, useEffect, useState} from "react";
+import { ThemeContext } from "../components/ThemeContext";
+import "../styles/Main.css";
+import {useNavigate, useParams} from "react-router-dom";
+import {getAllServiceTypes} from '../components/api';
 import LoadingSpinner from "../components/LoadingSpinner";
 import AllCategories from "../components/AllCategories";
 
-const AddServiceCardPage = () => {
-    const { theme, toggleTheme } = useContext(ThemeContext);
+const AllCategoriesPage = () => {
+    const { theme } = useContext(ThemeContext);
     let { id } = useParams();
     const [categories, setCategories] = useState([]);
     const [isEmpty, setIsEmpty] = useState(true);
@@ -42,32 +41,13 @@ const AddServiceCardPage = () => {
         );
     }
 
-    const service =
-        {
-            id: 1,
-            name: 'Service 1',
-            //duration: '0001-01-01T01:00:00',
-            serviceTypeId: "36dc8d14-c955-4d33-9b2b-cf2ea432da3c",
-            place: {
-                address: "",
-                position: {
-                    lat: "",
-                    lng: "",
-                }
-            },
-            photos:  [{
-                id: 'default',
-                url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn',
-            }],
-        };
-
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
             <div>
-                <AllCategories categories={categories} isEditServiceCard = {true}/>
+                <AllCategories categories={categories} />
             </div>
         </div>
     );
 };
 
-export default AddServiceCardPage;
+export default AllCategoriesPage;

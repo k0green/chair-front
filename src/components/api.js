@@ -32,9 +32,9 @@ export const getPopularServiceTypes = async (filterModel) => {
     }
 };
 
-export const getAllServiceTypes = async () => {
+export const getAllServiceTypes = async (id) => {
     try {
-        const response = await axios.get(`${BASE_URL}/service-types/get-all`, {});
+        const response = await axios.get(`${BASE_URL}/service-types/get-all?parentId=` + id, {});
         return response.data;
     } catch (error) {
         if (!toast.isActive(error.message)) {
@@ -80,7 +80,7 @@ export const getServiceTypeById = async (id) => {
 
 export const getServiceCardByTypeId = async (id, filter) => {
     try {
-        const response = await axios.post(`${BASE_URL}/executor-service/type/${id}`, filter);
+        const response = await axios.post(`${BASE_URL}/executor-service/type?typeId=${id}`, filter);
 
         const servicesData = response.data.values.map(serviceType => ({
             id: serviceType.id,
@@ -105,6 +105,7 @@ export const getServiceCardByTypeId = async (id, filter) => {
                 userId: service.userId,
                 hasDiscount: service.hasDiscount,
                 hasPromotions: service.hasPromotions,
+                serviceTypeName: service.serviceTypeName,
                 photos: service.photos.length > 0 ? service.photos.map(photo => ({
                     id: photo.id,
                     url: photo.url,

@@ -12,6 +12,8 @@ import {faClose} from "@fortawesome/free-solid-svg-icons/faClose";
 import app from "../App";
 import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
 import LoadingSpinner from "./LoadingSpinner";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import {faEye} from "@fortawesome/free-solid-svg-icons/faEye";
 
 const AppointmentsComponent = () => {
     const [appointmentsData, setAppointmentsData] = useState(null);
@@ -24,6 +26,8 @@ const AppointmentsComponent = () => {
     const [isApproveClick, setIsApproveClick] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isEmpty, setIsEmpty] = useState(false);
+    const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
+    const [selectedTab, setSelectedTab] = useState(null);
 
     useEffect(() => {
         const token = Cookies.get('token');
@@ -206,20 +210,46 @@ const AppointmentsComponent = () => {
         }
     };
 
+    const openModal = (tabName) => {
+        setSelectedTab(tabName);
+        setUploadPhotoModal(true);
+    };
+
     return (
-        <div>
-            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`}>{translations[language]['ByMaster']}</div>
-            {appointmentsData && renderAppointments(appointmentsData.byClient)}
+        <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`} onClick={() => openModal('byClient')}>
+                {translations[language]['ByMaster']}
+                <FontAwesomeIcon icon={faEye} style={{ marginRight: '10px', scale: "0.8", cursor: 'pointer', ...(theme === 'dark' ? { color: 'white' } : { color: '#000' }) }} />
+            </div>
 
-            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`}>{translations[language]['ByClient']}</div>
-            {appointmentsData && renderAppointments(appointmentsData.byMaster)}
+            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`} onClick={() => openModal('byMaster')}>
+                {translations[language]['ByClient']}
+                    <FontAwesomeIcon icon={faEye} style={{ marginRight: '10px', scale: "0.8", cursor: 'pointer', ...(theme === 'dark' ? { color: 'white' } : { color: '#000' }) }} />
+            </div>
 
-            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`}>{translations[language]['OrdersForADay']}</div>
-            {appointmentsData && renderAppointments(appointmentsData.forToday)}
-
-            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`}>{translations[language]['OrdersForAWeek']}</div>
-            {appointmentsData && renderAppointments(appointmentsData.forWeek)}
+            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`} onClick={() => openModal('forToday')}>
+                {translations[language]['OrdersForADay']}
+                    <FontAwesomeIcon icon={faEye} style={{ marginRight: '10px', scale: "0.8", cursor: 'pointer', ...(theme === 'dark' ? { color: 'white' } : { color: '#000' }) }} />
+            </div>
+            <div className={`tab ${theme === 'dark' ? 'dark' : ''}`} onClick={() => openModal('forWeek')}>
+                {translations[language]['OrdersForAWeek']}
+                    <FontAwesomeIcon icon={faEye} style={{ marginRight: '10px', scale: "0.8", cursor: 'pointer', ...(theme === 'dark' ? { color: 'white' } : { color: '#000' }) }} />
+            </div>
+            <div className={`filter-overlay ${uploadPhotoModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="filter-content">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={() => setUploadPhotoModal(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" }) }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "center", flexDirection: "column" }}>
+                        {selectedTab === 'byClient' && appointmentsData && renderAppointments(appointmentsData.byClient)}
+                        {selectedTab === 'byMaster' && appointmentsData && renderAppointments(appointmentsData.byMaster)}
+                        {selectedTab === 'forToday' && appointmentsData && renderAppointments(appointmentsData.forToday)}
+                        {selectedTab === 'forWeek' && appointmentsData && renderAppointments(appointmentsData.forWeek)}
+                    </div>
+                </div>
+            </div>
         </div>
+
     );
 };
 

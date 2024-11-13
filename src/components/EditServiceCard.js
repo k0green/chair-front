@@ -139,7 +139,7 @@ const ServiceCard = ({ service, isNew, id }) => {
             const date = new Date(2023,1,1,20, 50,0, 0);
             date.setHours(date.getHours()+3);
             const updatedServiceData = {
-                serviceTypeId: editedServiceTypeId.serviceTypeId,
+                serviceTypeId: service.serviceTypeId,
                 executorId: id,
                 description: editedDescription,
                 place: editedAddress,
@@ -290,28 +290,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                             <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> {translations[language]['AddPhoto']}</p>
                         </button>
                     </div>
-                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
-                        {isNew ?
-                            <select
-                                name="procedure"
-                                className={`select ${theme === 'dark' ? 'dark' : ''}`}
-/*
-                                value={editedServiceTypeId.serviceTypeId || service.serviceTypeId}
-*/
-                                onChange={(e) => setEditedServiceTypeId({ ...editedServiceTypeId, serviceTypeId: e.target.value })}
-                            >
-                                <option value="">Выберите услугу</option>
-                                {servicesLookupData.map((service) => (
-                                    <option key={service.id} value={service.id}>
-                                        {service.name}
-                                    </option>
-                                ))}
-                            </select>
-                            : <h4>{service.name}</h4>
-                        }
-                        <h4>{service.rating} <FontAwesomeIcon icon={faStar} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`} /></h4>
-                    </div>
-                    <div className="service-description">
+                    <div className="service-description" style={{marginTop: "30px", marginBottom: "10px"}}>
                         <input
                             style={{width: "95%", borderColor: "#c5c5c5"}}
                             placeholder={translations[language]['Address']}
@@ -321,24 +300,16 @@ const ServiceCard = ({ service, isNew, id }) => {
                             onClick={handleAddressClick}
                             readOnly
                         />
-                        <br />
-                        <br />
                     </div>
-                    <div className="service-description">
+                    <div className="service-description" style={{marginBottom: "0px"}}>
                         <textarea
-                            style={{width: "98%", borderRadius: "5px", borderColor: "#c5c5c5", marginTop: "5px", marginBottom: "5px"}}
+                            style={{width: "99%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b" } : { backgroundColor: "#ffffff" })}}
                             placeholder={translations[language]['Description']}
                             className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"
                             value={editedDescription || service.description}
                             onChange={(e) => setEditedDescription(e.target.value)}
                         />
-                        <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
-                            <p>{translations[language]['AvailableSlots']}: {service.availableSlots}</p>
-                        </div>                    </div>
-                    <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
-                        <h4><FontAwesomeIcon icon={faClock} className='item-icon' /> {service.duration}</h4>
-                        <h4>{service.price} Byn</h4>
                     </div>
                     <div>
                         <button

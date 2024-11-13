@@ -26,10 +26,13 @@ import {
     BASE_URL,
     deleteMessage,
     editMessageText,
-    getChatById,
+    getChatById, LoadingAnimation,
     markAsReadMessage,
     uploadMinioPhoto
 } from "./api";
+import {faArrowLeft} from "@fortawesome/free-solid-svg-icons/faArrowLeft";
+import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 
 const MessageComponent = ({ id }) => {
 
@@ -44,7 +47,7 @@ const MessageComponent = ({ id }) => {
     const { language, translations } = useContext(LanguageContext);
     const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
     const [files, setFiles] = useState([]);
-
+    const [isUpload, setIsUpload] = useState(false);
 
     const handleSave = () => {
         const editedMessageIndex = messages.findIndex((message) => message.id === selectedMessageId);
@@ -354,23 +357,25 @@ const MessageComponent = ({ id }) => {
         });
 
         const images = files.map((file, index) => (
-            <div className="dropzone-centrize" key={file.name}>
+            <div className="price-filter" key={file.name} style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                    <FontAwesomeIcon icon={faTrash} onClick={() => {
+                        const newFiles = [...files];
+                        newFiles.splice(index, 1);
+                        setFiles(newFiles);
+                    }} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "#ff0000" } : { color: "#ff0000" })}}/>
+                </div>
                 <img src={file.preview} style={{width: '50%'}} alt="preview" />
-                <button className='trash-icon' onClick={() => {
-                    const newFiles = [...files];
-                    newFiles.splice(index, 1);
-                    setFiles(newFiles);
-                }}><FontAwesomeIcon icon={faTrash} />  Удалить</button>
             </div>
         ));
 
         return (
             <div className="dropzone-centrize">
-                {images}
                 <div {...getRootProps({style: {border: '2px solid blue', borderRadius: "10px", padding: '20px', minWidth: "200px", minHeight: "200px", width: '30%'}})}>
                     <input {...getInputProps()} />
                     <p>{translations[language]['DragAndDrop']}</p>
                 </div>
+                {images}
             </div>
         );
     }
@@ -471,10 +476,15 @@ const MessageComponent = ({ id }) => {
         setUploadPhotoModal(true);
     };
 
+    const handleReturnClick = () => {
+        navigate("/chats");
+    };
+
     return (
         <div className="chat-container">
             <div className={`message-header ${theme === 'dark' ? 'dark' : ''}`}>
                 <div className="message-header-image">
+                    <FontAwesomeIcon icon={faArrowLeft} onClick={handleReturnClick}/>
                     <div className="avatar"><img src={chatData.recipientProfileImg} className="avatar-image"/></div>
                     <div className={`name ${theme === 'dark' ? 'dark' : ''}`}>{chatData.recipientName}</div>
                 </div>
@@ -551,7 +561,7 @@ const MessageComponent = ({ id }) => {
                 Down
             </div>*/}
 
-            <div className={`message-input-div ${theme === 'dark' ? 'dark' : ''}`}>
+            <div id={'message-input-div'} className={`message-input-div ${theme === 'dark' ? 'dark' : ''}`}>
                 <button style={{backgroundColor: "transparent", color: "gray", border: "none", scale: "1.5", marginRight: "10px"}} onClick={handleAddPhoto}>
                     <FontAwesomeIcon icon={faPaperclip} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`} />
                 </button>
@@ -567,19 +577,26 @@ const MessageComponent = ({ id }) => {
                     {isEditing ? translations[language]['Save'] : translations[language]['Send']}
                 </button>
             </div>
-            {uploadPhotoModal && (
-                <div className="filter-modal">
-                    <div className="modal-content">
-                    <span className="close" onClick={() => setUploadPhotoModal(false)}>
-                        &times;
-                    </span>
-                        <div className="dropzone-centrize">
-                            <Dropzone />
-                            <button className="dropzone-order-button" onClick={handleUpload}><p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Save']}</p></button>
+            <div className={`filter-overlay ${uploadPhotoModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="filter-content">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={() => setUploadPhotoModal(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    </div>
+                    <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                        <Dropzone />
+                    </div>
+                    <div className="price-inputs">
+                        <div className="input-group" style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
+                            <button className="filter-button"
+                                    onClick={handleUpload}
+                                    disabled={isUpload}
+                            >
+                                {isUpload ? <LoadingAnimation /> : <><FontAwesomeIcon icon={faSave} /> {translations[language]['Save']}</>}
+                            </button>
                         </div>
                     </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 };

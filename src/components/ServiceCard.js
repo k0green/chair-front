@@ -134,6 +134,9 @@ const ServiceCard = ({ service, isProfile }) => {
                                     e.target.src = 'https://th.bing.com/th/id/OIG1.BFC0Yssw4i_ZI54VYkoa?w=1024&h=1024&rs=1&pid=ImgDetMain';
                                 }}
                             />}
+                            <div className="discount-overlay">
+                               <h4 className="discount" style={{backgroundColor: "#007bff"}}>{service.serviceTypeName}</h4>
+                            </div>
                         {service.hasDiscount || service.hasPromotions ? (
                             <div className="discount-overlay">
                                 {service.hasDiscount ? <h4 className="discount">{translations[language]['Discount']}</h4> : ""}

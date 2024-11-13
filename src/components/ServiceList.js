@@ -1,50 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import ServiceCardTypeList from './ServiceCardTypeList';
+import React, {useContext, useEffect, useState} from 'react';
+import ServiceCardTypeList from '../pages/ErrorPage';
 import "../styles/ServiceCard.css";
 import { toast } from "react-toastify";
 import { getPopularServiceTypes } from './api';
 import 'react-datepicker/dist/react-datepicker.css';
+import LoadingSpinner from "./LoadingSpinner";
+import {ThemeContext} from "./ThemeContext";
 
 const ServiceList = ({filter, itemPerPage}) => {
-    const [popularTypesData, setPopularTypesData] = useState([]);
+/*    const [popularTypesData, setPopularTypesData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isEmpty, setIsEmpty] = useState(false);*/
+    /*const {theme} = useContext(ThemeContext);*/
 
-    useEffect(() => {
-        getPopularServiceTypes({
-            skip: 0,
-            take: 5,
-        }).then(newData => {
-                setPopularTypesData(newData);
-            })
-            .catch(error => {
-                const errorMessage = error.message || 'Failed to fetch data';
-                if (!toast.isActive(errorMessage)) {
-                    toast.error(errorMessage, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        toastId: errorMessage,
-                    });
-                }
-                console.error('Error fetching data:', error);
-            });
-    }, []);
+/*    useEffect(() => {
+        const fetchData = async () => {
+                const response = await getPopularServiceTypes({
+                    skip: 0,
+                    take: 5,
+                });
+                setPopularTypesData(response);
+                setIsLoading(false);
+                setIsEmpty(response.length === 0);
+        };
+        fetchData();
+    }, []);*/
 
     return (
-        <div>
-            {popularTypesData != null && popularTypesData.length > 0 ? (
-                popularTypesData.map((type) => {
-                    return (
-                        <div key={type.id}>
-                            <ServiceCardTypeList id={type.id} name={type.name} filter={filter} itemPerPage={itemPerPage}/>
-                        </div>
-                    );
-                })
-            ) : (
-                <p>Loading...</p>
-            )}
+        <div style={{ position: 'relative' }}>
+            <div>
+                <ServiceCardTypeList name={"Популярные"} filter={filter} itemPerPage={itemPerPage}/>
+            </div>
         </div>
     );
 };

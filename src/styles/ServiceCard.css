@@ -10,6 +10,18 @@
     margin-right: 5px;
 }
 
+/*.service-card {
+    width: 100%;
+    max-width: 150px;
+    background-color: white;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin-top: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+}*/
+
 .service-card.dark {
     background-color: #342e2e;/*//#2d2828;*/
     box-shadow: 0 4px 8px rgba(255, 255, 255, 0.8);
@@ -27,8 +39,8 @@
     margin-bottom: -20px;
     max-width: 300px;
     max-height: 300px;
-    min-width: 300px;
-    min-height: 300px;
+    min-width: 100px;
+    min-height: 100px;
     background-image: url("https://yandex.by/images/search?p=1&text=%D1%81%D0%B2%D0%B5%D1%82%D0%BB%D0%BE+%D1%81%D0%B5%D1%80%D1%8B%D0%B9+%D1%84%D0%BE%D0%BD&pos=14&rpt=simage&img_url=https%3A%2F%2Ffonoteka.top%2Fuploads%2Fposts%2F2021-04%2F1619116953_15-phonoteka_org-p-belii-fon-bez-nichego-na-ves-ekran-17.jpg&lr=157");
     background-size: 100%;
 }
@@ -53,9 +65,9 @@
     transition: transform 0.3s ease;
 }
 
-.photos img:hover {
+/*.photos img:hover {
     transform: scale(1.1);
-}
+}*/
 
 /* Стили для переключателей между картинками */
 .arrow-buttons {
@@ -551,6 +563,16 @@ input[type="text"] {
     color: #ffffff;
 }
 
+.calendar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.calendar-styled {
+    display: inline; /* Принудительно отображаем календарь как блок */
+    position: relative; /* Убираем всплывающее поведение */
+}
 
 @media (orientation: portrait) {
     .F {

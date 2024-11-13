@@ -32,6 +32,8 @@ import AddPromotionCardPage from "./pages/AddPromotionCardPage";
 import FullServiceCardPage from "./pages/FullServiceCardPage";
 import ErrorComponent from "./pages/ErrorPage";
 import EditPromotionCardPage from "./pages/EditPromotionCardPage";
+import AllCategoriesPage from "./pages/AllCategoriesPage";
+import AllChildsCategoriesPage from "./pages/AllChildsCategoriesPage";
 
 const translations = {
     en: translationEN,
@@ -168,6 +170,8 @@ function AppContent({city}) {
                 <Route path="/collection/category/:id" element={<CategoryPage />} />
                 <Route path="/orders" element={<OrdersPage />} />
                 <Route path="/trigger-error" element={<ErrorComponent />} />
+                <Route path="/all-categories" element={<AllCategoriesPage />} />
+                <Route path="/all-child-categories/:id" element={<AllChildsCategoriesPage />} />
             </Routes>
         </main>
           {!isMobile && <Footer />}
