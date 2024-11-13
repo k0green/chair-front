@@ -1,14 +1,13 @@
 /* MessageComponent.css */
 .chat-container {
     width: 60%;
-    height: 90vh;
+    height: 100%;
     /*margin: 10px auto;*/
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     border: 1px solid #ccc;
     border-radius: 10px;
-    overflow: hidden;
     min-width: 350px;
 }
 
@@ -216,6 +215,7 @@
     color: #fff;
     padding: 10px;
     cursor: pointer;
+    bottom: 0;
 }
 
 .mark-as-read:hover {
@@ -229,6 +229,14 @@
     text-align: center;
     padding: 8px;
     border-radius: 4px;
+    bottom: 0;
+
+    display: flex;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    right: 0;
+    margin-bottom: 80px;
 }
 
 .message-list {
@@ -318,6 +326,23 @@
 
     .message {
         max-width: 90%; /* Немного увеличиваем ширину сообщений */
+    }
+}
+/* Полноэкранный режим для мобильных устройств */
+@media (min-width: 1000px) {
+    .message-header {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-bottom: 1px solid #ccc;
+        top: 0;
+        position: fixed;
+        left: 0;
+        right: 0;
+        margin-bottom: 40px;
+        z-index: 100;
+        min-height: 66px;
     }
 }
 

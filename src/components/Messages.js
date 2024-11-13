@@ -481,10 +481,10 @@ const MessageComponent = ({ id }) => {
     };
 
     return (
-        <div>
+        <div className={window.innerWidth > 1000 ? "chat-container": ""}>
             <div className={`message-header ${theme === 'dark' ? 'dark' : ''}`}>
                 <div className="message-header-image">
-                    <FontAwesomeIcon icon={faArrowLeft} style={{...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    <FontAwesomeIcon icon={faArrowLeft} onClick={handleReturnClick} style={{...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
                     <div className="avatar"><img src={chatData.recipientProfileImg} className="avatar-image" alt={""}/></div>
                     <div className={`name ${theme === 'dark' ? 'dark' : ''}`}>{chatData.recipientName}</div>
                 </div>

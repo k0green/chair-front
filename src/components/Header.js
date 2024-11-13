@@ -116,7 +116,7 @@ const Header = ({ user, onLogout, city }) => {
         <header className={`header ${theme === 'dark' ? 'dark' : ''}`}>
             <div className="header-content">
                 <div className="search-container">
-                <h1 className={`logo ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLogoClick}>Chair</h1>
+                    <h1 className={`logo ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLogoClick}>Chair</h1>
                 </div>
                 <div className="search-container">
                     <h3 className={`navigate ${theme === 'dark' ? 'dark' : ''}`} onClick={handleCalendarClick}>{translations[language]['calendar']}</h3>
