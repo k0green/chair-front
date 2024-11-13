@@ -561,7 +561,7 @@ const MessageComponent = ({ id }) => {
                 Down
             </div>*/}
 
-            <div id={'message-input-div'} className={`message-input-div ${theme === 'dark' ? 'dark' : ''}`}>
+            <footer className={`message-input-div ${theme === 'dark' ? 'dark' : ''}`}>
                 <button style={{backgroundColor: "transparent", color: "gray", border: "none", scale: "1.5", marginRight: "10px"}} onClick={handleAddPhoto}>
                     <FontAwesomeIcon icon={faPaperclip} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`} />
                 </button>
@@ -573,10 +573,10 @@ const MessageComponent = ({ id }) => {
                     onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
                 />
-                <button className="send-button" onClick={handleButtonClick}>
+                <button className="send-button" style={{color: "red"}} onClick={handleButtonClick}>
                     {isEditing ? translations[language]['Save'] : translations[language]['Send']}
                 </button>
-            </div>
+            </footer>
             <div className={`filter-overlay ${uploadPhotoModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
                 <div className="filter-content">
                     <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
