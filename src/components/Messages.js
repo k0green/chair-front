@@ -481,11 +481,11 @@ const MessageComponent = ({ id }) => {
     };
 
     return (
-        <div className="chat-container">
+        <div>
             <div className={`message-header ${theme === 'dark' ? 'dark' : ''}`}>
                 <div className="message-header-image">
-                    <FontAwesomeIcon icon={faArrowLeft} onClick={handleReturnClick}/>
-                    <div className="avatar"><img src={chatData.recipientProfileImg} className="avatar-image"/></div>
+                    <FontAwesomeIcon icon={faArrowLeft} style={{...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    <div className="avatar"><img src={chatData.recipientProfileImg} className="avatar-image" alt={""}/></div>
                     <div className={`name ${theme === 'dark' ? 'dark' : ''}`}>{chatData.recipientName}</div>
                 </div>
                 <div>
@@ -518,7 +518,7 @@ const MessageComponent = ({ id }) => {
                     )}
                 </div>
             </div>
-            <div id="messages" className="message-list">
+            <div id="messages" className="message-list" style={{marginTop: "80px"}}>
                 {Object.keys(groupedMessages).map((date) => (
                     <div key={date} className="message-group">
                         <div className={`date ${theme === 'dark' ? 'dark' : ''}`}>{date}</div>
@@ -557,11 +557,7 @@ const MessageComponent = ({ id }) => {
             <div className="mark-as-read" onClick={handleMarkAsRead} style={{ display: isBarVisible ? "block" : "none" }}>
                 {translations[language]['MarkAsRead']}
             </div>
-{/*            <div className="mark-as-read" onClick={down}>
-                Down
-            </div>*/}
-
-            <footer className={`message-input-div ${theme === 'dark' ? 'dark' : ''}`}>
+            <div className={`message-input-div ${theme === 'dark' ? 'dark' : ''}`}>
                 <button style={{backgroundColor: "transparent", color: "gray", border: "none", scale: "1.5", marginRight: "10px"}} onClick={handleAddPhoto}>
                     <FontAwesomeIcon icon={faPaperclip} className={`item-icon ${theme === 'dark' ? 'dark' : ''}`} />
                 </button>
@@ -573,10 +569,10 @@ const MessageComponent = ({ id }) => {
                     onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
                 />
-                <button className="send-button" style={{color: "red"}} onClick={handleButtonClick}>
+                <button className="send-button" onClick={handleButtonClick}>
                     {isEditing ? translations[language]['Save'] : translations[language]['Send']}
                 </button>
-            </footer>
+            </div>
             <div className={`filter-overlay ${uploadPhotoModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
                 <div className="filter-content">
                     <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
