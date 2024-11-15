@@ -65,6 +65,31 @@
     transition: transform 0.3s ease;
 }
 
+.photos-list {
+    display: flex;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Скрыть стандартный скроллбар */
+    -ms-overflow-style: none; /* Скрыть скроллбар для IE */
+}
+
+.photos-list::-webkit-scrollbar {
+    display: none; /* Скрыть скроллбар для Chrome/Safari */
+}
+
+.photos-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden; /* Скрываем выходящие элементы */
+}
+
+.photos-list img {
+    scroll-snap-align: center; /* Прокрутка фокусируется на фото */
+    flex-shrink: 0;
+    margin-right: 10px; /* Расстояние между фото */
+    transition: transform 0.2s;
+}
+
 /*.photos img:hover {
     transform: scale(1.1);
 }*/
@@ -442,6 +467,7 @@ input[type="text"] {
     text-align: left;
     /*max-height: calc(100% - 120px);*/ /* Ограничиваем высоту */
     overflow-y: auto; /* Добавляем прокрутку по вертикали */
+    max-width: 900px;
 }
 
 .dark .filter-overlay {
@@ -602,5 +628,14 @@ input[type="text"] {
         padding: 20px;
         width: 340px;
         height: 340px;
+    }
+}
+
+@media (min-width: 1000px) {
+    .filter-overlay{
+        bottom: 0;
+    }
+
+    .dark .filter-overlay {
     }
 }

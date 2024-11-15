@@ -94,7 +94,7 @@
     position: fixed;
     left: 0;
     right: 0;
-    z-index: 100;
+    z-index: 10002;
 }
 
 .message-input-div.dark {
@@ -111,6 +111,7 @@
 
 .message-input.dark {
     background-color: #695b5b;
+    color: white;
 }
 
 .message-input.dark::placeholder {

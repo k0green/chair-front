@@ -18,8 +18,9 @@ import {
     faBoltLightning,
     faStar, faTrash
 } from "@fortawesome/free-solid-svg-icons";
-import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import Cookies from "js-cookie";
+import InfoTooltip from "./InfoTooltip";
 
 const FullServiceCard = ({ service }) => {
     const navigate = useNavigate();
@@ -38,6 +39,7 @@ const FullServiceCard = ({ service }) => {
     const [filesToDelete, setFilesToDelete] = useState([]);
     const [files, setFiles] = useState([]);
     const [editedPhotos, setEditedPhotos] = useState([]);
+    const token = Cookies.get('token');
 
     useEffect(() => {
         fetchData();
@@ -315,7 +317,7 @@ const FullServiceCard = ({ service }) => {
                         <h4>{translations[language]['Duration(h:m)']}: {service.duration}</h4>
                     </div>
                     <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
-                        <h4>{translations[language]['Cost']}: {service.price} Byn</h4>
+                        <h4>{translations[language]['Cost']}: {service.price} Byn <InfoTooltip text="Сумма и продолжительность рассчитывается приблизительно, исходя из записей на текущий месяц!"/></h4>
                     </div>
                 </div>
                 <div style={{display: "flex", justifyContent: "center", flexDirection: "column", maxWidth: "500px", width: "95%"}}>
@@ -327,7 +329,8 @@ const FullServiceCard = ({ service }) => {
                     </div>
                 </div>
             </div>
-            <Calendar full={false} />
+            {token ? <Calendar full={false} /> : ""}
+            {/*<Calendar full={false} />*/}
             <div className="service-and-reviews-container">
                 <div className="photos-fullsize" style={{marginBottom: "20px"}}>
                     {reviews.filter(obj => obj.photos).flatMap(obj => obj.photos)
@@ -373,9 +376,10 @@ const FullServiceCard = ({ service }) => {
                     </div>
                 </div>
                 <div style={{marginTop: "10px"}}>
+                    {token ?
                     <button className="order-button" onClick={handleAddClick} disabled={isUpload}>
                         {isUpload ? <LoadingAnimation /> : <p className="order-text"><FontAwesomeIcon icon={faBoltLightning} /> {translations[language]['Add']}</p>}
-                    </button>
+                    </button> : ""}
 
                     <div className={`reviews-background ${theme === 'dark' ? 'dark' : ''}`}>
                         <div className="reviews-panel">

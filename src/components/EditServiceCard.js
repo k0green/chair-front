@@ -303,7 +303,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                     </div>
                     <div className="service-description" style={{marginBottom: "0px"}}>
                         <textarea
-                            style={{width: "99%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b" } : { backgroundColor: "#ffffff" })}}
+                            style={{width: "99%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
                             placeholder={translations[language]['Description']}
                             className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"

@@ -7,8 +7,8 @@ const LoginPage = () => {
     const { theme } = useContext(ThemeContext);
 
     return (
-        <div className={`login-container ${theme === 'light' ? 'main-light-theme' : 'main-dark-theme'}`}>
-            <div>
+        <div>
+            <div className={`login-container ${theme === 'light' ? 'main-light-theme' : 'main-dark-theme'}`}>
                 <Login />
             </div>
         </div>

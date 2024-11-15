@@ -143,42 +143,6 @@ const MobileHeader = ({ city }) => {
         setIsMenuVisible(!isMenuVisible);
     };
 
-    const languages = [
-        { label: 'English', value: 'en' },
-        { label: 'Русский', value: 'ru' },
-    ];
-
-    const customStyles = {
-        control: (styles) => ({
-            ...styles,
-            backgroundColor: theme === 'dark' ? '#252525' : '#ffffff',
-            color: theme === 'dark' ? '#fff' : '#000000',
-            borderColor: theme === 'dark' ? '#333333' : '#cccccc'
-        }),
-        singleValue: (styles) => ({
-            ...styles,
-            color: theme === 'dark' ? '#fff' : '#000000'
-        }),
-        placeholder: (styles) => ({
-            ...styles,
-            color: theme === 'dark' ? '#aaaaaa' : '#cccccc'
-        }),
-        menu: (styles) => ({
-            ...styles,
-            backgroundColor: theme === 'dark' ? '#252525' : '#ffffff',
-            color: theme === 'dark' ? '#fff' : '#000000'
-        }),
-        option: (styles, { isFocused }) => ({
-            ...styles,
-            backgroundColor: isFocused ? (theme === 'dark' ? '#333333' : '#f0f0f0') : undefined,
-            color: theme === 'dark' ? '#fff' : '#000000'
-        }),
-        input: (styles) => ({
-            ...styles,
-            color: theme === 'dark' ? '#ffffff' : '#000000' // Цвет вводимого текста
-        })
-    };
-
     return (
         <footer className={`app-footer-mobile ${theme === 'dark' ? 'dark' : ''}`}>
             <div style={{ display: "flex", justifyContent: "space-between", width: "80%" }}>

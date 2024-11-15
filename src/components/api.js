@@ -168,8 +168,17 @@ export const getOptimalServiceCard = async (requestBody) => {
             }],
         };
     } catch (error) {
-        console.error('Error fetching service cards:', error);
-        throw error;
+        if (!toast.isActive(error.message)) {
+            toast.error(error.message, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: error.message,
+            });
+        }
     }
 };
 
@@ -207,6 +216,7 @@ export const getProfileById = async (id, navigate) => {
                         address: service.place.address,
                         hasDiscount: service.hasDiscount,
                         hasPromotions: service.hasPromotions,
+                        serviceTypeName: service.serviceTypeName,
                         place: {
                             address: service.place.address,
                             position: {
@@ -327,11 +337,11 @@ export const getProfileById = async (id, navigate) => {
 
 export const getExecutorServiceById = async (id, navigate) => {
     try {
-        const token = Cookies.get('token');
+/*        const token = Cookies.get('token');
         if(!token)
             navigate("/login");
-        else {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        else {*/
+            //axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             const response = await axios.get(`${BASE_URL}/executor-service/get-by-id/${id}`);
             return {
                 id: response.data.id,
@@ -363,7 +373,7 @@ export const getExecutorServiceById = async (id, navigate) => {
                     url: 'https://th.bing.com/th/id/OIG3.CxBiSiz2vDBmebZOicmr?pid=ImgGn', // Здесь добавлен запасной URL
                 }],
             };
-        }
+        //}
     } catch (error) {
         if (!toast.isActive(error.message)) {
             toast.error(error.message, {
@@ -516,11 +526,11 @@ export const accountExit = async (navigate) => {
 
 export const getReviewsByServiceCardId = async (id, navigate) => {
     try {
-        const token = Cookies.get('token');
+        /*const token = Cookies.get('token');
         if(!token)
             navigate("/login");
         else {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;*/
             const response = await axios.get(`${BASE_URL}/review/${id}`);
             return response.data.map(review => ({
                 id: review.id,
@@ -532,7 +542,7 @@ export const getReviewsByServiceCardId = async (id, navigate) => {
                 createDate: review.createDate,
                 photos: review.photos,
             }));
-        }
+        //}
     } catch (error) {
         if (!toast.isActive(error.message)) {
             toast.error(error.message, {

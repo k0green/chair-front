@@ -1,0 +1,78 @@
+.info-tooltip-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+}
+
+.info-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    line-height: 20px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 14px;
+    user-select: none;
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 120%; /* Расположение над буквой */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: normal; /* Разрешает перенос строк */
+    max-width: 200px; /* Максимальная ширина всплывашки */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    word-wrap: break-word; /* Перенос слов, если слишком длинные */
+    overflow-wrap: break-word; /* Альтернативное свойство для переноса */
+}
+
+.tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Указывает на букву */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.tooltip {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.info-tooltip-container:hover .tooltip,
+.info-tooltip-container:focus .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Логика для предотвращения выхода за края экрана */
+.tooltip {
+    left: auto;
+    right: auto;
+}
+
+.tooltip[data-align="left"] {
+    left: 0;
+    transform: translateX(0);
+}
+
+.tooltip[data-align="right"] {
+    right: 0;
+    transform: translateX(0);
+}

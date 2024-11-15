@@ -1,28 +1,38 @@
-import { useNavigate } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faDoorOpen, faSearch, faUser, faUserEdit} from "@fortawesome/free-solid-svg-icons";
-import React, {useContext, useEffect, useState} from "react";
+import {faDoorOpen, faUser, faUserEdit} from "@fortawesome/free-solid-svg-icons";
+import React, {useContext, useState} from "react";
 import "../styles/Header.css";
 import Cookies from "js-cookie";
 import {ThemeContext} from "./ThemeContext";
 import {LanguageContext} from "./LanguageContext";
-import moon from '../icons/moon.png';
-import sun from '../icons/sun.png';
 import {toast} from "react-toastify";
-import {accountExit, LoadingAnimation} from "./api";
+import {accountExit} from "./api";
 import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
 import CitySelector from "./CitySelector";
+import {faMoon} from "@fortawesome/free-solid-svg-icons/faMoon";
+import {faGlobe} from "@fortawesome/free-solid-svg-icons/faGlobe";
+import {faLocationDot} from "@fortawesome/free-solid-svg-icons/faLocationDot";
+import {faList} from "@fortawesome/free-solid-svg-icons/faList";
+import "../styles/Header.css";
+import lightBackground from '../testPhotos/day.jpg';
+import darkBackground from '../testPhotos/night.jpg';
+import {faSun} from "@fortawesome/free-solid-svg-icons/faSun";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 
-const Header = ({ user, onLogout, city }) => {
+const Header = ({ city }) => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { language, translations } = useContext(LanguageContext);
     const [isExit, setIsExit] = useState(false);
     const [uploadPhotoModal, setUploadPhotoModal] = useState(false);
     const [cityName, setCityName] = useState(city);
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
+    const [languageModal, setLanguageModal] = useState(false);
+    const location = useLocation();
+    const { lng, setLanguage } = useContext(LanguageContext);
 
     const userId = localStorage.getItem('userId');
-    const token = Cookies.get('token');
 
     const handleLoginClick = () => {
         const token = Cookies.get('token');
@@ -31,18 +41,17 @@ const Header = ({ user, onLogout, city }) => {
         else{
             navigate("/profile")
         }
+        setIsMenuVisible(false);
     };
 
     const handleMessageClick = () => {
         navigate("/chats");
+        setIsMenuVisible(false);
     };
 
     const handleLogoClick = () => {
         navigate("/");
-    };
-
-    const handleSearchClick = () => {
-        /*request*/
+        setIsMenuVisible(false);
     };
 
     const handleCityClick = () => {
@@ -72,14 +81,17 @@ const Header = ({ user, onLogout, city }) => {
             navigate("/calendar/full/edit");
         else
             navigate("/calendar/full")
+        setIsMenuVisible(false);
     };
 
     const handleOrderClick = (checked) => {
         navigate("/orders");
+        setIsMenuVisible(false);
     };
 
     const handleEditClick = () => {
         navigate("/edit-user");
+        setIsMenuVisible(false);
     };
 
     const handleExitClick = async () => {
@@ -112,6 +124,19 @@ const Header = ({ user, onLogout, city }) => {
         }
     }
 
+    const handleMenuClick = () => {
+        setIsMenuVisible(!isMenuVisible);
+    };
+
+    const handleLanguageClick = () => {
+        setLanguageModal(true);
+        //setIsMenuVisible(false);
+    };
+
+    const changeLanguage = (language) => {
+        setLanguage(language);
+    };
+
     return (
         <header className={`header ${theme === 'dark' ? 'dark' : ''}`}>
             <div className="header-content">
@@ -125,60 +150,128 @@ const Header = ({ user, onLogout, city }) => {
                 </div>
 
                 <div className="search-container">
-                    <h4
-                        className={`navigate ${theme === 'dark' ? 'dark' : ''}`}
-                        style={{cursor: "pointer", textDecoration: "underline"}} onClick={handleCityClick}
-                    >
-                        ˅{cityName}
-                    </h4>
-                    <button style={{ backgroundColor: "transparent", border: "none" }} onClick={toggleTheme}>
-                        {theme === 'light' ?
-                            <img
-                                src={moon}
-                                style={{ width: '60%', height: '60%' }}
-                            />
-                            :
-                            <img
-                                src={sun}
-                                style={{ width: '70%', height: '70%', marginRight: "10px" }}
-                            />}
-                    </button>
-                    <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleSearchClick}>
-                        <FontAwesomeIcon icon={faSearch} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
-                    </button>
-                    <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLoginClick}>
-                        <FontAwesomeIcon icon={faUser} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
-                    </button>
-                    {token != null && userId != null &&
-                        <div>
-                            <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleEditClick}>
-                                <FontAwesomeIcon icon={faUserEdit} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
-                            </button>
-                            <button className={`profile-header-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleExitClick} disabled={isExit}>
-                                <FontAwesomeIcon icon={faDoorOpen} flip="horizontal" style={theme === 'dark' ? {color: "white"} : {color: "#000",}} />
-                            </button>
-                        </div>
-                    }
+                    <h3 style={{ cursor: "pointer" }} onClick={handleMenuClick}>
+                        <FontAwesomeIcon
+                            icon={faList}
+                            flip="horizontal"
+                            style={{
+                                color: theme === 'dark' ? (isMenuVisible ? "#007bff" : "white") : (isMenuVisible ? "#007bff" : "#ad9a9a")
+                            }}
+                        />
+                    </h3>
                 </div>
             </div>
-            {uploadPhotoModal && (
-                <div className="filter-modal" >
-                    <div className="modal-content" style={{maxWidth: "400px", maxHeight: "100px"}}>
-                    <span className="close" onClick={() => setUploadPhotoModal(false)}>
-                        &times;
-                    </span>
-                        <div className="dropzone-centrize">
-                            <CitySelector/>
-                            <button
-                                className="dropzone-order-button"
-                                onClick={handleCitySaveClick}
-                            >
-                                {<p className="order-text"><FontAwesomeIcon icon={faSave} /> {translations[language]['Save']}</p>}
-                            </button>
+            <div className={`menu-overlay ${isMenuVisible ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="menu-content">
+                    <h1 className={`logo ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLogoClick}>Chair</h1>
+                    <div>
+                        <button
+                            style={{width: "100%", display: "flex", justifyContent: "left", backgroundColor: "transparent", border: "none"}}
+                            onClick={handleLoginClick}
+                        >
+                            <p style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>
+                                <FontAwesomeIcon icon={faUser} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                                {translations[language]['profile']}
+                            </p>
+                        </button>
+                        {userId != null &&
+                            <div>
+                                <button
+                                    style={{width: "100%", display: "flex", justifyContent: "left", backgroundColor: "transparent", border: "none"}}
+                                    onClick={handleEditClick}
+                                >
+                                    <p style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>
+                                        <FontAwesomeIcon icon={faUserEdit} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                                        {translations[language]['profileEdit']}
+                                    </p>
+                                </button>
+                                <button
+                                    style={{width: "100%", display: "flex", justifyContent: "left", backgroundColor: "transparent", border: "none"}}
+                                    onClick={handleExitClick}
+                                >
+                                    <p style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>
+                                        <FontAwesomeIcon icon={faDoorOpen} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                                        {translations[language]['exit']}
+                                    </p>
+                                </button>
+                            </div>
+                        }
+                        <button
+                            style={{
+                                width: "100%",
+                                display: "flex",
+                                justifyContent: "left",
+                                backgroundImage: `url(${theme === 'light' ? lightBackground : darkBackground})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                                border: "none"
+                            }}
+                            onClick={toggleTheme}
+                        >
+                            <p style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>
+                                {theme === 'light' ?
+                                    <FontAwesomeIcon icon={faSun} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                                    :
+                                    <FontAwesomeIcon icon={faMoon} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>}
+                                {translations[language]['ClickToSChange']}
+                            </p>
+                        </button>
+                        <button
+                            style={{width: "100%", display: "flex", justifyContent: "left", backgroundColor: "transparent", border: "none"}}
+                            onClick={handleLanguageClick}
+                        >
+                            <p style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>
+                                <FontAwesomeIcon icon={faGlobe} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                                {translations[language]['ClickToLanguage']}
+                            </p>
+                        </button>
+                        <button
+                            style={{width: "100%", display: "flex", justifyContent: "left", backgroundColor: "transparent", border: "none"}}
+                            onClick={handleCityClick}
+                        >
+                            <p style={theme === 'dark' ? { color: "white" } : { color: "#000" }}>
+                                <FontAwesomeIcon icon={faLocationDot} flip="horizontal" style={{ marginRight: "10px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                                {cityName}  ({translations[language]['ClickToSpecify']})
+                            </p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div className={`extra-modal-overlay ${uploadPhotoModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="extra-modal-content">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={() => setUploadPhotoModal(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    </div>
+                    <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                        <CitySelector/>
+                    </div>
+                    <div className="price-inputs">
+                        <div className="input-group" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                            <button className="filter-button"
+                                    onClick={handleCitySaveClick}><FontAwesomeIcon icon={faSave} /> {translations[language]['Save']}</button>
                         </div>
                     </div>
                 </div>
-            )}
+            </div>
+
+            <div className={`extra-modal-overlay ${languageModal? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="extra-modal-content">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={() => setLanguageModal(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    </div>
+                    <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                        <select
+                            value={lng} // Set the current language as selected
+                            onChange={(e) => changeLanguage(e.target.value)}
+                            className={`custom-select ${theme === 'dark' ? 'dark' : ''}`}
+                        >
+                            <option value="en">English</option>
+                            <option value="ru">Русский</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </header>
     );
 };

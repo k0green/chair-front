@@ -222,7 +222,7 @@ const PromotionCard = ({ service, isNew, id }) => {
                     </div>
                     <div className="service-description">
                         <textarea
-                            style={{width: "98%", height: "16ch", borderRadius: "10px", borderColor: "#c5c5c5", marginTop: "30px", marginBottom: "40px", ...(theme === 'dark' ? { backgroundColor: "#695b5b" } : { backgroundColor: "#ffffff" })}}
+                            style={{width: "98%", height: "16ch", borderRadius: "10px", borderColor: "#c5c5c5", marginTop: "30px", marginBottom: "40px", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
                             placeholder={translations[language]['Description']}
                             className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                             type="text"

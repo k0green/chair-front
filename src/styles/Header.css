@@ -1,7 +1,7 @@
 .header {
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px 40px 0px 10px;
+    padding: 10px 40px 0 10px;
     height: 65px;
     border-bottom: 1px solid #ccc;
 }
@@ -187,7 +187,7 @@
 .menu-overlay {
     position: fixed;
     bottom: 60px; /* Начало панели на 60px ниже */
-    left: 0;
+    /*left: 0;*/
     width: 100%;
     height: calc(100% - 60px); /* Высота панели за вычетом 60px */
     background: rgba(255, 255, 255, 1); /* Полупрозрачный белый фон */
@@ -347,5 +347,20 @@
 
     .header {
         height: 50px;
+    }
+}
+
+@media (min-width: 900px) {
+    .menu-overlay {
+        bottom: 0; /* Начало панели на 60px ниже */
+        top: 60px;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+        transform: translateX(100%); /* Скрыта сверху экрана */
+        opacity: 0;
+        pointer-events: none;
+        max-width: 400px;
     }
 }

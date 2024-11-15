@@ -13,6 +13,7 @@ import {faHouse} from "@fortawesome/free-solid-svg-icons/faHouse";
 import {toast} from "react-toastify";
 import {deleteServiceCard} from "./api";
 import MapModal from "./MapModal";
+import InfoTooltip from "./InfoTooltip";
 
 const ServiceCard = ({ service, isProfile }) => {
     const navigate = useNavigate();
@@ -122,7 +123,7 @@ const ServiceCard = ({ service, isProfile }) => {
     };
 
     return (
-        <div className="card-list" onClick={() => handleCardClick(service.id)}>
+        <div className="card-list" style={{cursor: "pointer"}} onClick={() => handleCardClick(service.id)}>
             <div key={service.id} className={`service-card ${theme === 'dark' ? 'dark' : ''}`}>
                 <div className="master-card">
                     <div className="photos">
@@ -145,19 +146,19 @@ const ServiceCard = ({ service, isProfile }) => {
                         ) : null}
                     </div>
                     <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
-                        <h4 style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); handleMasterNameClickClick(service.executorId); }}>{service.name}</h4>
-                        <h4 style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); handleCardClick(service.id); }}>
+                        <h4 style={{ cursor: "pointer" }}>{service.name}</h4>
+                        <h4 style={{ cursor: "pointer" }}>
                             {service.rating < 1 ? '-' : service.rating} <FontAwesomeIcon icon={faStar} className='item-icon' />
                         </h4>
                     </div>
                     <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
                         <p>{service.description}</p>
-                        <TruncatedText text={service.place.address} maxWidth={270} handleAddressClick={(e) => { e.stopPropagation(); handleAddressClick(); }}/>
+                        <TruncatedText text={service.place.address} maxWidth={270}/>
                         <p>{translations[language]['AvailableSlots']}: {service.availableSlots}</p>
                     </div>
                     <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
                         <h4><FontAwesomeIcon icon={faClock} className='item-icon' /> {service.duration}</h4>
-                        <h4>{service.price} Byn</h4>
+                        <h4>{service.price} Byn  <InfoTooltip text="Сумма и продолжительность рассчитывается приблизительно, исходя из записей на текущий месяц!"/></h4>
                     </div>
                     <div>
                         {isProfile ?

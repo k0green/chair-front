@@ -45,6 +45,7 @@
     bottom: 0; /* Закрепляем его внизу экрана */
     left: 0;
     right: 0;
+    z-index: 10001;
 }
 
 .app-footer-mobile.dark {

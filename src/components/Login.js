@@ -92,8 +92,7 @@ function Login() {
     };
 
     return (
-        <Fragment>
-            <div className="login-container">
+            <div>
                 <form className="login-form">
                     <div className={`login-header ${theme === 'dark' ? 'dark' : ''}`}>Login</div>
                     <label className={`login-label ${theme === 'dark' ? 'dark' : ''}`} htmlFor="txtEmail">Email</label>
@@ -127,7 +126,6 @@ function Login() {
                     </button>
                 </form>
             </div>
-        </Fragment>
     );
 }
 
