@@ -5,7 +5,7 @@ import IconComponent from "./IconComponent";
 import { ThemeContext } from "./ThemeContext";
 import EditServiceCard from "./EditServiceCard";
 
-const CategoryItem = ({ id, name, icon, isEditServiceCard }) => {
+const CategoryItem = ({ id, name, icon, isEditServiceCard, userId }) => {
     const { theme } = useContext(ThemeContext);
     const navigate = useNavigate();
     const [showEditServiceCard, setShowEditServiceCard] = useState(false);
@@ -39,7 +39,7 @@ const CategoryItem = ({ id, name, icon, isEditServiceCard }) => {
         <>
             {showEditServiceCard ?
                 <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
-                    <EditServiceCard service={service} isNew={true} id={id} />
+                    <EditServiceCard service={service} isNew={true} id={userId} />
                 </div>
                 :
                 <button className={theme === "dark" ? "main-category-item-dark-theme" : "main-category-item-light-theme"} onClick={handleCategoryClick}>

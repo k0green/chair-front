@@ -2,7 +2,7 @@ import React from 'react';
 import CategoryItem from './CategoryItem';
 import "../styles/CategoryItem.css";
 
-const AllChildrenCategory = ({categories, isEditServiceCard}) => {
+const AllChildrenCategory = ({categories, isEditServiceCard, userId}) => {
 
     return (
         <div className="all-category-type-container">
@@ -14,6 +14,7 @@ const AllChildrenCategory = ({categories, isEditServiceCard}) => {
                         name={category.name}
                         icon={category.icon}
                         isEditServiceCard={isEditServiceCard}
+                        userId = {userId}
                     />
                 ))}
             </div>

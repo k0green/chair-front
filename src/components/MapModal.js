@@ -1,6 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import Modal from 'react-modal';
 import '../styles/MapModal.css';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import {ThemeContext} from "./ThemeContext";
 
 const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, initialAddress, apiKey, canEdit }) => {
     const [position, setPosition] = useState({ lat: 55.751574, lng: 37.573856 });
@@ -10,6 +13,7 @@ const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, init
     const mapInstanceRef = useRef(null);
     const searchRef = useRef(null);
     const mapLoadedRef = useRef(false); // Map loaded flag
+    const { theme } = useContext(ThemeContext);
 
     const initialMarkerRef = useRef(null);
 
@@ -184,35 +188,30 @@ const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, init
     }, [isOpen, initialPosition, initialAddress]);
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onRequestClose={onRequestClose}
-            style={{
-                content: {
-                    height: '80vh',
-                    overflow: 'auto',
-                },
-            }}
-        >
-            <span className="close" onClick={onRequestClose}>
-                &times;
-            </span>
-            {position && address && (
-                <button
-                    onClick={() => {
-                        onSaveAddress({ position, address });
-                        onRequestClose();
-                    }}
-                >
-                    Сохранить адрес
-                </button>
-            )}
-            <div
-                ref={mapRef}
-                style={{ height: '100%', width: '100%' }}
-                key={isOpen ? 'map-container' : 'map-container-hidden'} // Force remount when modal opens
-            />
-        </Modal>
+        <div className={`filter-overlay ${isOpen ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+            <div className="filter-content">
+                <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                    <FontAwesomeIcon icon={faXmark} onClick={() => onRequestClose()} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                </div>
+                <div style={{height: "100vh"}}>
+                    {position && address && (
+                        <button
+                            onClick={() => {
+                                onSaveAddress({ position, address });
+                                onRequestClose();
+                            }}
+                        >
+                            Сохранить адрес
+                        </button>
+                    )}
+                    <div
+                        ref={mapRef}
+                        style={{ height: '100%', width: '100%' }}
+                        key={isOpen ? 'map-container' : 'map-container-hidden'} // Force remount when modal opens
+                    />
+                </div>
+            </div>
+        </div>
     );
 };
 

@@ -8,7 +8,7 @@ import {getAllServiceTypes} from "./api";
 import LoadingSpinner from "./LoadingSpinner";
 import AllChildrenCategory from "./AllChildrenCategory";
 
-const AllCategories = ({categories, isEditServiceCard}) => {
+const AllCategories = ({categories, isEditServiceCard, userId}) => {
     const [types, setCategories] = useState(categories);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const { theme } = useContext(ThemeContext);
@@ -51,7 +51,7 @@ const AllCategories = ({categories, isEditServiceCard}) => {
     return (
         <div className="all-category-type-container">
             {isChildCategoryVisible ?
-                <AllChildrenCategory categories={types} isEditServiceCard={isEditServiceCard} />
+                <AllChildrenCategory categories={types} isEditServiceCard={isEditServiceCard} userId = {userId}/>
             :
                 <div className="all-category-list">
                     {types.map((category) => (
