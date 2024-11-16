@@ -240,7 +240,7 @@ const Profile = ({user, services, promotions, contacts, current}) => {
                 <div className="profile-avatar">
                     {isEditing ? (
                         <>
-                            <img onClick={handleAddPhoto} src={editedUser.imageUrl} alt="" className="avatar-image"/>
+                            <img onClick={handleAddPhoto} src={editedUser.imageUrl.split('?')[0]} alt="" className="avatar-image"/>
                             {user.imageUrl ?
                             <button style={{ background: 'red' }} className="message-button" onClick={handleDeleteAvatarClick}>
                                 <FontAwesomeIcon icon={faTrash}/> {translations[language]['DeletePhoto']}
@@ -250,7 +250,7 @@ const Profile = ({user, services, promotions, contacts, current}) => {
                         </>
                     ) : (
                         <>
-                            <img src={user.imageUrl} alt="" className="avatar-image"/>
+                            <img src={user.imageUrl.split('?')[0]} alt="" className="avatar-image"/>
                         </>
                     )}
                 </div>

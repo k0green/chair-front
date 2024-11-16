@@ -11,7 +11,7 @@ const Photo = ({ id, url, size }) => {
     <img
         style={{height: `${size}px`, width: `${size}px`, borderRadius: "10px"}}
         key={id}
-        src={url}
+        src={url.split('?')[0]}
         /*//alt={id}*/
         onError={(e) => {
             e.target.onerror = null;
