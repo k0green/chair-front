@@ -251,8 +251,8 @@ const Calendar = ({ full }) => {
                                         {userRole === 'executor' ?
                                             <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientComment']}: <strong>{appointment.clientComment}</strong></div>
                                             :
-                                            <div>
-                                                {translations[language]['ExecutorComment']}:{" "}
+                                            <div style={theme === 'dark' ? { color: "white" } : {}}>
+                                                {translations[language]['ClientComment']}:{" "}
                                                 <input
                                                     type="text"
                                                     name="clientComment"
