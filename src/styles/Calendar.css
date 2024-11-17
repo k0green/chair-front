@@ -314,6 +314,10 @@
     margin-left: 15px;
 }
 
+.add-element.dark{
+    color: white;
+}
+
 .tab {
     /*
     font-weight: bold;

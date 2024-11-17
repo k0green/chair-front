@@ -473,7 +473,7 @@ const Calendar = ({full}) => {
                                 </select>
                             }
                         </div>
-                        <div className="add-element">
+                        <div className={`add-element ${theme === 'dark' ? 'dark' : ''}`}>
                             {translations[language]['StartTime']}:{" "}
                             {
                                 <input
@@ -487,7 +487,7 @@ const Calendar = ({full}) => {
                                 />
                             }
                         </div>
-                        <div className="add-element">
+                        <div className={`add-element ${theme === 'dark' ? 'dark' : ''}`}>
                             {translations[language]['NumberOfSessions']}:{" "}
                             {
                                 <input
@@ -501,7 +501,7 @@ const Calendar = ({full}) => {
                                 />
                             }
                         </div>
-                        <div className="add-element">
+                        <div className={`add-element ${theme === 'dark' ? 'dark' : ''}`}>
                             {translations[language]['BreakTime']}:{" "}
                             {
                                 <input
@@ -516,7 +516,7 @@ const Calendar = ({full}) => {
                             }
                             {" "}мин
                         </div>
-                        <div className="add-element">
+                        <div className={`add-element ${theme === 'dark' ? 'dark' : ''}`}>
                             {translations[language]['Duration']}:{" "}
                             {
                                 <input
@@ -531,7 +531,7 @@ const Calendar = ({full}) => {
                             }
                             {" "}мин
                         </div>
-                        <div className="add-element">
+                        <div className={`add-element ${theme === 'dark' ? 'dark' : ''}`}>
                             {translations[language]['Cost']}:{" "}
                             {
                                 <input
@@ -546,7 +546,7 @@ const Calendar = ({full}) => {
                             }
                             {" "} б.р.
                         </div>
-                        <div className="add-element">
+                        <div className={`add-element ${theme === 'dark' ? 'dark' : ''}`}>
                             {translations[language]['DiscountCost']}:{" "}
                             {
                                 <input
@@ -561,7 +561,7 @@ const Calendar = ({full}) => {
                             }
                             {" "} б.р.
                         </div>
-                        <div className="add-element">
+                        <div className={`add-element ${theme === 'dark' ? 'dark' : ''}`}>
                             {translations[language]['ExecutorComment']}:{" "}
                             {
                                 <input
@@ -659,11 +659,11 @@ const Calendar = ({full}) => {
                                             )}
                                         </div>
                                         <div style={theme === 'dark' ? { color: "white"} : {}}>
-                                            {translations[language]['Duration']}:{" "}
+                                            {translations[language]['EndTime']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <input
                                                     type="time"
-                                                    placeholder={translations[language]['Duration']}
+                                                    placeholder={translations[language]['EndTime']}
                                                     style={{width: "auto"}}
                                                     className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                                     name="duration"
@@ -689,7 +689,7 @@ const Calendar = ({full}) => {
                                                     onChange={(e) => handleInputChange(e, appointment.id)}
                                                 />
                                             ) : (
-                                                <strong>{appointment.price} byn</strong>
+                                                <strong>{appointment.price ?? 0} byn</strong>
                                             )}
                                         </div>
                                         <div style={theme === 'dark' ? { color: "white"} : {}}>
@@ -705,7 +705,7 @@ const Calendar = ({full}) => {
                                                     onChange={(e) => handleInputChange(e, appointment.id)}
                                                 />
                                             ) : (
-                                                <strong>{appointment.discountPrice} byn</strong>
+                                                <strong>{appointment.discountPrice ?? 0} byn</strong>
                                             )}
                                         </div>
                                         <div style={theme === 'dark' ? { color: "white"} : {}}>

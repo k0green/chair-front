@@ -243,9 +243,9 @@ const Calendar = ({ full }) => {
                                     <div className="appointment-details">
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['Name']}: <strong>{appointment.serviceTypeName}</strong> </div>
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['StartTime']}: <strong>{formatTime(appointment.starDate)}</strong></div>
-                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['Duration']}: <strong>{formatTime(appointment.duration)}</strong></div>
-                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['Cost']}: <strong>{appointment.price} byn</strong></div>
-                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['DiscountCost']}: <strong>{appointment.discountPrice} byn</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['EndTime']}: <strong>{formatTime(appointment.duration)}</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['Cost']}: <strong>{appointment.price ?? 0} byn</strong></div>
+                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['DiscountCost']}: <strong>{appointment.discountPrice ?? 0} byn</strong></div>
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorComment']}: <strong>{appointment.executorComment}</strong></div>
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientName']}: <strong>{appointment.clientName}</strong></div>
                                         {userRole === 'executor' ?
