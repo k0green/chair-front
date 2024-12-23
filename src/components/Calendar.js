@@ -253,12 +253,12 @@ const Calendar = ({ full }) => {
                                             :
                                             <div style={theme === 'dark' ? { color: "white" } : {}}>
                                                 {translations[language]['ClientComment']}:{" "}
-                                                <input
+                                                <textarea
+                                                    style={{width: "99%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
+                                                    placeholder={translations[language]['ClientComment']}
+                                                    className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                                                     type="text"
                                                     name="clientComment"
-                                                    style={{ width: "18ch" }}
-                                                    placeholder={translations[language]['ClientComment']}
-                                                    className={`newAppointmentForm1-input ${theme === 'dark' ? 'dark' : ''}`}
                                                     value={clientComment?.clientComment ?? appointment.clientComment}
                                                     onChange={(e) => setClientComment({ ...appointment, clientComment: e.target.value })}
                                                 />

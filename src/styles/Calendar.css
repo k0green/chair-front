@@ -92,22 +92,21 @@
     height: 50px;
 }
 
-.appointmentContainer {
-    width: 97%;
-    margin-left: 1%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 0.6%;
-    flex-wrap: wrap;
-    justify-content: space-between; /* Добавил выравнивание по горизонтали */
+.cards-container {
+    display: flex; /* Используем flexbox для горизонтального расположения карточек */
+    flex-wrap: wrap; /* Позволяет переносить карточки на следующую строку при нехватке места */
+    gap: 16px; /* Отступы между карточками */
+    padding: 16px; /* Внутренний отступ для контейнера */
 }
 
 .appointment {
+    flex: 1 1 calc(25% - 16px); /* Карточки занимают 25% ширины контейнера минус отступы */
+    max-width: 300px; /* Максимальная ширина карточки */
+    min-width: 330px; /* Минимальная ширина карточки */
     display: flex;
+    flex-direction: column; /* Содержимое карточки располагается вертикально */
     justify-content: space-between;
     padding: 10px;
-    width: 100%;
     border-radius: 10px;
     background-color: #f6fff6;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
@@ -120,11 +119,14 @@
 
 .appointment-details {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
 }
 
 .appointment-details > div {
-    margin-right: 10px; /* Отступ между элементами внутри записи */
+    margin-right: 0;
+    width: 100%;
 }
 
 .appointment button {
@@ -298,11 +300,18 @@
     margin-left: -3%;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+
+    flex: 1 1 calc(25% - 16px);
+    max-width: 330px;
+    min-width: 330px;
+    flex-direction: column;
 }
 
 .appointmentAdd-details {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
 }
 
 .small-input {
@@ -311,7 +320,7 @@
 }
 
 .add-element{
-    margin-left: 15px;
+
 }
 
 .add-element.dark{
@@ -384,6 +393,15 @@
         width: 90%;
     }
 
+    .cards-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 16px; /* Отступы между карточками */
+        padding: 16px;
+    }
+
     .newAppointmentButton {
         margin-right: 3.5%;
     }
@@ -420,7 +438,7 @@
     .appointment button {
         align-self: stretch;
         margin-top: 10px;
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .appointmentAdd-details > div {
@@ -431,7 +449,7 @@
     .appointmentAdd button {
         align-self: stretch;
         margin-top: 10px;
-        font-size: 24px;
+        font-size: 22px;
     }
 
     .edit-appointment-div button {

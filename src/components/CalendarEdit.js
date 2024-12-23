@@ -564,12 +564,12 @@ const Calendar = ({full}) => {
                         <div className={`add-element ${theme === 'dark' ? 'dark' : ''}`}>
                             {translations[language]['ExecutorComment']}:{" "}
                             {
-                                <input
+                                <textarea
+                                    style={{width: "99%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
+                                    placeholder={translations[language]['ExecutorComment']}
+                                    className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                                     type="text"
                                     name="executorComment"
-                                    style={{width: "18ch"}}
-                                    placeholder={translations[language]['ExecutorComment']}
-                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
                                     value={newAppointmentData.executorComment}
                                     onChange={(e) => setNewAppointmentData({ ...newAppointmentData, executorComment: e.target.value })}
                                 />
@@ -617,7 +617,7 @@ const Calendar = ({full}) => {
             const appointments = appointmentsData.filter((appointment) => selectedDays.includes(appointment.day));
             if (appointments.length > 0) {
                 return (
-                    <div>
+                    <div className="cards-container">
                         {appointments.map((appointment, index) => (
                             <div key={index} className="appointmentContainer">
                                 <div className={`appointment ${theme === 'dark' ? 'dark' : ''}`}>
@@ -711,8 +711,11 @@ const Calendar = ({full}) => {
                                         <div style={theme === 'dark' ? { color: "white"} : {}}>
                                             {translations[language]['ExecutorComment']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
-                                                <input
-                                                    className={`newAppointmentForm-input ${theme === 'dark' ? 'dark' : ''}`}
+                                                <textarea
+                                                    style={{width: "99%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
+                                                    placeholder={translations[language]['ExecutorComment']}
+                                                    className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
+                                                    type="text"
                                                     name="executorComment"
                                                     value={editedAppointments[appointment.id]?.executorComment || ""}
                                                     onChange={(e) => handleInputChange(e, appointment.id)}

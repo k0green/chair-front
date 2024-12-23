@@ -123,7 +123,7 @@ const AppointmentsComponent = () => {
         if (filteredAppointments !== null && filteredAppointments.length > 0) {
             const userRole = localStorage.getItem('userRole');
             return (
-                <div>
+                <div className="cards-container">
                     {filteredAppointments.map((appointment, index) => (
                         <div key={index} className="appointmentContainer">
                             <div className={`appointment ${theme === 'dark' ? 'dark' : ''}`}>
