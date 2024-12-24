@@ -236,7 +236,7 @@ const Calendar = ({ full }) => {
                 const userRole = localStorage.getItem('userRole');
                 const userId = localStorage.getItem('userId');
                 return (
-                    <div>
+                    <div className="cards-container">
                         {appointments.map((appointment, index) => (
                             <div key={index} className="appointmentContainer">
                                 <div className={`appointment ${theme === 'dark' ? 'dark' : ''}`}>
