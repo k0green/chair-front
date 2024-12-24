@@ -565,7 +565,7 @@ const Calendar = ({full}) => {
                             {translations[language]['ExecutorComment']}:{" "}
                             {
                                 <textarea
-                                    style={{width: "99%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
+                                    style={{width: "98%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
                                     placeholder={translations[language]['ExecutorComment']}
                                     className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                                     type="text"
@@ -712,7 +712,7 @@ const Calendar = ({full}) => {
                                             {translations[language]['ExecutorComment']}:{" "}
                                             {editingAppointmentId === appointment.id ? (
                                                 <textarea
-                                                    style={{width: "99%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
+                                                    style={{width: "98%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
                                                     placeholder={translations[language]['ExecutorComment']}
                                                     className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                                                     type="text"

@@ -254,7 +254,7 @@ const Calendar = ({ full }) => {
                                             <div style={theme === 'dark' ? { color: "white" } : {}}>
                                                 {translations[language]['ClientComment']}:{" "}
                                                 <textarea
-                                                    style={{width: "99%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
+                                                    style={{width: "98%", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
                                                     placeholder={translations[language]['ClientComment']}
                                                     className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                                                     type="text"
@@ -263,11 +263,14 @@ const Calendar = ({ full }) => {
                                                     onChange={(e) => setClientComment({ ...appointment, clientComment: e.target.value })}
                                                 />
                                                 {full ?
-                                                    <button onClick={() => saveClientComment()}>
+                                                    <button
+                                                        className="save"
+                                                        onClick={() => saveClientComment()}
+                                                    >
                                                         <FontAwesomeIcon
                                                             icon={faSave}
                                                             style={{ color: "lightgreen", backgroundColor: "transparent" }}
-                                                        />
+                                                        /> translations[language]['Save']
                                                     </button>
                                                     : <></>}
                                             </div>
