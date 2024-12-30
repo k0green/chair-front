@@ -152,7 +152,7 @@ const ServiceCard = ({ service, isProfile }) => {
                         </h4>
                     </div>
                     <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
-                        <p>{service.description}</p>
+                        <TruncatedText text={service.description} maxWidth={270}/>
                         <TruncatedText text={service.place.address} maxWidth={270}/>
                         <p>{translations[language]['AvailableSlots']}: {service.availableSlots}</p>
                     </div>
