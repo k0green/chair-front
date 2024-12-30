@@ -370,6 +370,7 @@ input[type="text"] {
     flex-wrap: wrap; /* Карточки переносятся на следующую строку, если не помещаются */
     justify-content: center; /* Центрирование карточек */
     gap: 20px; /* Отступы между карточками */
+    max-width: 300px;
 }
 
 .add-photo-button-new {
@@ -486,7 +487,7 @@ input[type="text"] {
 
 .discount-circle {
     border-radius: 15px;
-    padding: 0px 5px;
+    padding: 0 5px;
     background-color: #ff0015;
     color: white;
     position: relative;
@@ -699,6 +700,7 @@ input[type="text"] {
     .card-list {
         justify-content: flex-start; /* Выравнивание по левому краю */
         gap: 10px; /* Более плотное расположение */
+        max-width: 300px;
     }
 
     .service-card {
