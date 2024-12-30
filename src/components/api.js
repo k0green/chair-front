@@ -3,8 +3,8 @@ import {toast} from "react-toastify";
 import Cookies from "js-cookie";
 import React from "react";
 
-/*export const BASE_URL = 'https://localhost:7001';//'/api';5155*/
-export const BASE_URL = '/api';
+export const BASE_URL = 'http://localhost:5155';//'/api';7001*/
+//export const BASE_URL = '/api';
 /*export const BASE_URL = 'http://chairBack.somee.com';*/
 
 export const getPopularServiceTypes = async (filterModel) => {
