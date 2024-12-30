@@ -524,12 +524,12 @@ input[type="text"] {
     width: 100%;
     text-align: left;
     /*max-height: calc(100% - 120px);*/ /* Ограничиваем высоту */
-    overflow-y: auto; /* Добавляем прокрутку по вертикали */
+    overflow-y: auto;
     max-width: 900px;
 }
 
 .dark .filter-overlay {
-    background: rgba(45, 40, 40, 1); /* Полупрозрачный темный фон для темной темы */
+    background: rgba(45, 40, 40, 1);
 }
 
 .dark .filter-content {
