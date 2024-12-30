@@ -124,7 +124,7 @@ const PromotionCard = ({ service, isProfile }) => {
                             <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}>
                                 <h4 style={{ cursor: "pointer" }} onClick={() => handleMasterNameClickClick(service.executorId)}>{service.name}</h4>
                             </div>
-                            <div className={`service-description ${theme === 'dark' ? 'dark' : ''}`}>
+                            <div className={`promotion-description ${theme === 'dark' ? 'dark' : ''}`}>
                                 <p>{service.description}</p>
                             </div>
                             <div>

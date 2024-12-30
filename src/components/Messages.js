@@ -386,26 +386,8 @@ const MessageComponent = ({ id }) => {
             formData.append('file', file);
 
             let url = '';
-
-            uploadMinioPhoto(navigate, formData)
-                .then(serverData => {
-                    url = serverData.data.url;
-                })
-                .catch(error => {
-                    const errorMessage = error.message || 'Failed to fetch data';
-                    if (!toast.isActive(errorMessage)) {
-                        toast.error(errorMessage, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: errorMessage,
-                        });
-                    }
-                    console.error('Error fetching data:', error);
-                });
+            const response = await uploadMinioPhoto(navigate, formData);
+            url = response.data.url
 
                 const messageId = uuidv4();
                 const newMessageObject = {

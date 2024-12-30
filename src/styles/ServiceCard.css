@@ -1,4 +1,4 @@
-.service-card {
+/*.service-card {
     width: 20%;
     min-width: 300px;
     background-color: white;
@@ -8,6 +8,34 @@
     margin-top: 20px;
     margin-left: 5px;
     margin-right: 5px;
+
+    flex: 1 1 calc(25% - 16px); !* Карточки занимают 25% ширины контейнера минус отступы *!
+    max-width: 300px; !* Максимальная ширина карточки *!
+    display: flex;
+    flex-direction: column; !* Содержимое карточки располагается вертикально *!
+    justify-content: space-between;
+}*/
+
+.service-card {
+    width: 100%;
+    max-width: 300px; /* Максимальная ширина карточки */
+    min-width: 300px;
+    background-color: white;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+
+.card-container-test {
+    width: 100%; /* По умолчанию контейнер занимает всю ширину */
+    display: flex;
+    justify-content: center;
 }
 
 /*.service-card {
@@ -147,6 +175,25 @@
 }
 
 .service-description p:not(:last-child) {
+    margin-bottom: 5px;
+}
+
+.promotion-description {
+    margin-top: -10px;
+    margin-bottom: -10px;
+}
+
+.promotion-description.dark {
+    color: white;
+}
+
+.promotion-description p {
+    display: flex;
+    margin-top: -5px;
+    text-align: left;
+}
+
+.promotion-description p:not(:last-child) {
     margin-bottom: 5px;
 }
 
@@ -307,12 +354,22 @@ input[type="text"] {
     justify-content: space-between;
 }
 
-.card-list {
+/*.card-list {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    align-items: stretch; /* Добавлено */
+    align-items: stretch; !* Добавлено *!
     background-color: transparent;
+
+    gap: 16px; !* Отступы между карточками *!
+    padding: 6px; !* Внутренний отступ для контейнера *!
+}*/
+
+.card-list {
+    display: flex;
+    flex-wrap: wrap; /* Карточки переносятся на следующую строку, если не помещаются */
+    justify-content: center; /* Центрирование карточек */
+    gap: 20px; /* Отступы между карточками */
 }
 
 .add-photo-button-new {
@@ -637,5 +694,20 @@ input[type="text"] {
     }
 
     .dark .filter-overlay {
+    }
+
+    .card-list {
+        justify-content: flex-start; /* Выравнивание по левому краю */
+        gap: 10px; /* Более плотное расположение */
+    }
+
+    .service-card {
+        flex: 1 1 calc(25% - 16px); /* Каждая карточка занимает 25% ширины контейнера */
+        max-width: calc(25% - 16px); /* Ограничиваем ширину карточки */
+    }
+
+    .card-container-test {
+        width: 80%; /* Контейнер занимает 80% ширины экрана */
+        margin: 0 auto; /* Центрирование контейнера по горизонтали */
     }
 }

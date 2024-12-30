@@ -267,7 +267,7 @@
 .extra-modal-content {
     background: white;
     width: 100%;
-    max-height: 35vh; /* Ограничение по высоте */
+    max-height: 45vh; /* Ограничение по высоте */
     min-height: 400px;
     border-radius: 8px 8px 0 0;
     padding: 20px;

@@ -260,6 +260,7 @@ const Profile = ({user, services, promotions, contacts, current}) => {
                             <div>
                             <input
                                 className={`profile-input ${theme === 'dark' ? 'dark' : 'light'}`}
+                                style={{width: "95%", maxWidth: "500px", borderRadius: "5px", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
                                 type="text"
                                 name="name"
                                 value={editedUser.name}
@@ -267,8 +268,9 @@ const Profile = ({user, services, promotions, contacts, current}) => {
                                 placeholder={translations[language]['Name']}
                             />
                             </div>
-                            <input
-                                className={`profile-input ${theme === 'dark' ? 'dark' : 'light'}`}
+                            <textarea
+                                style={{width: "98%", maxWidth: "500px", borderRadius: "5px", height: "16ch", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
+                                className={`description-textarea ${theme === 'dark' ? 'dark' : ''}`}
                                 type="text"
                                 name="description"
                                 value={editedUser.description}
@@ -299,6 +301,7 @@ const Profile = ({user, services, promotions, contacts, current}) => {
                                         />
                                         {isEditing ? (
                                                 <input
+                                                    style={{width: "95%", maxWidth: "150px", borderRadius: "5px", borderColor: "#c5c5c5", ...(theme === 'dark' ? { backgroundColor: "#695b5b", color: "#fff" } : { backgroundColor: "#ffffff", color: "fff" })}}
                                                     type="text"
                                                     name={contactIcon.id.toString()}
                                                     value={editedContact ? editedContact.name : ''}
@@ -342,10 +345,10 @@ const Profile = ({user, services, promotions, contacts, current}) => {
                             ) : (
                                 <div>
                                     <button
-                                        style={{ marginRight: '5px' }} className="message-button" onClick={handleEditSaveClick}
+                                        style={{ marginRight: '5px', backgroundColor: "green" }} className="message-button" onClick={handleEditSaveClick}
                                         disabled={isEditSave}
                                     >
-                                        {isEditSave ? <LoadingAnimation /> : <FontAwesomeIcon icon={faSave}> {translations[language]['Save']}</FontAwesomeIcon>}
+                                        {isEditSave ? <LoadingAnimation /> : <><FontAwesomeIcon icon={faSave}/> {translations[language]['Save']}</>}
                                     </button>
                                     <button style={{ marginLeft: '5px', backgroundColor: "red" }} className="message-button" onClick={handleCancelEditClick}>
                                         <FontAwesomeIcon icon={faCancel}/> {translations[language]['Cancel']}

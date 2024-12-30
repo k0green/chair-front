@@ -59,7 +59,8 @@ export const getServiceTypeById = async (id) => {
         return {
             id: response.data.id,
             name: response.data.name,
-            icon: response.data.icon
+            icon: response.data.icon,
+            parentId: response.data.parentId
         };
     } catch (error) {
         if (!toast.isActive(error.message)) {
@@ -196,6 +197,7 @@ export const getProfileById = async (id, navigate) => {
                     id: response.data.id,
                     name: response.data.name,
                     imageUrl: response.data.imageUrl,
+                    imageId: response.data.imageId,
                     description: response.data.description,
                     userId: response.data.userId,
                     contacts: response.data.contacts.map(contact => ({
@@ -259,6 +261,7 @@ export const getProfileById = async (id, navigate) => {
                     id: response.data.id,
                     name: response.data.name,
                     imageUrl: response.data.imageUrl,
+                    imageId: response.data.imageId,
                     description: response.data.description,
                     userId: response.data.userId,
                     contacts: response.data.contacts.map(contact => ({
@@ -805,7 +808,7 @@ export const getOrders = async (navigate) => {
                     }));
                     return {
                         byMaster: mapData(userRole === "executor" ? response.data.byMaster : response.data.byClient),
-                        byClient: mapData(userRole === "executor" ? response.data.byClient : response.data.byMaster),
+                        byClient: mapData(userRole === "executor" ? response.data.byMaster : response.data.byMaster),
                         forToday: mapData(response.data.forToday),
                         forWeek: mapData(response.data.forWeek)
                     };
@@ -855,7 +858,7 @@ export const approveOrder = async (navigate, id, isExecutor) => {
         else {
             const token = Cookies.get('token');
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            await axios.get(`${BASE_URL}/order/approve/${id}?isExecutor=${isExecutor}`);
+            await axios.post(`${BASE_URL}/order/approve/${id}?isExecutor=${isExecutor}`);
         }
     } catch (error) {
         if (!toast.isActive(error.message)) {

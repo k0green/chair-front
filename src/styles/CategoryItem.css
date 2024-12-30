@@ -106,8 +106,9 @@
 
 .all-category-type-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    align-items: flex-start;
+    text-align: left;
     padding: 20px;
 }
 

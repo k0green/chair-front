@@ -23,8 +23,9 @@ import {faTrash} from "@fortawesome/free-solid-svg-icons/faTrash";
 import {faWandSparkles} from "@fortawesome/free-solid-svg-icons/faWandSparkles";
 import LoadingSpinner from "../components/LoadingSpinner";
 import FilterCalendar from "../components/FilterCalendar";
+import {faArrowLeft} from "@fortawesome/free-solid-svg-icons/faArrowLeft";
 
-const ServiceCardTypeList = ({ id, name, filter, itemPerPage = 2 }) => {
+const ServiceCardTypeList = ({ id, name, parentTypeId, filter, itemPerPage = 2 }) => {
     const { theme } = useContext(ThemeContext);
     const [servicesData, setServicesData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -582,19 +583,26 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage = 2 }) => {
         </div>
     );
 
+    const handleBackClick = async () => {
+        navigate('/all-child-categories/' + parentTypeId);
+    };
+
     return (
         <div>
             <div className='parent-container-type'>
                 <div style={{ display: "flex", justifyContent: "space-between", width: "80%" }}>
-                    <h2 className={`type-name ${theme === 'dark' ? 'dark' : ''}`}>{name}</h2>
+                    <h2 className={`type-name ${theme === 'dark' ? 'dark' : ''}`}>
+                        { parentTypeId ? <FontAwesomeIcon icon={faArrowLeft} onClick={handleBackClick} style={{ cursor: "pointer", marginRight: "20px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/> : ""}
+                        {name}
+                    </h2>
                     <div>
                         <FontAwesomeIcon icon={faFilter} onClick={handleFilterButtonClick} flip="horizontal" style={{ marginRight: "20px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
                         <FontAwesomeIcon icon={faWandSparkles} onClick={handleOptimizeServiceClick} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
                     </div>
                 </div>
             </div>
+            <div className="card-container-test">
             <div className='card-list'>
-                <div className="category-container">
                     {isLoading && <LoadingSpinner isLocal={true} />}
                     {isEmpty ? (
                         <div className={`empty-state ${theme === 'dark' ? 'dark' : ''}`}>
@@ -611,7 +619,7 @@ const ServiceCardTypeList = ({ id, name, filter, itemPerPage = 2 }) => {
                         initialPosition={selectedPlace.position}
                         initialAddress={selectedPlace.address}
                     />
-                </div>
+            </div>
             </div>
 
             <div className={`filter-overlay ${isFilterButtonVisible ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>

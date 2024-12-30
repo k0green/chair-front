@@ -64,7 +64,7 @@ const HomePage = ({ user, onLogout }) => {
     return (
         <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
             <div>
-                <ServiceCardTypeList id={id} name={typeData.name} filter={{ skip: 0, take: 2 }} />
+                <ServiceCardTypeList id={id} name={typeData.name} parentTypeId = {typeData.parentId} filter={{ skip: 0, take: 2 }} />
             </div>
         </div>
     );

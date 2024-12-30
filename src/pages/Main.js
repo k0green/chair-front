@@ -71,7 +71,7 @@ const HomePage = ({user, onLogout}) => {
             <div>
                 <ServiceList
                     filter={filterData}
-                    itemPerPage={Math.max(2, Math.floor(window.innerWidth / 400))}
+                    itemPerPage={Math.max(2, Math.floor(window.innerWidth / 200))}
                 />
             </div>
         </div>

@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import { ThemeContext } from "./ThemeContext";
 import { LanguageContext } from "./LanguageContext";
-import {cancelCalendar, enrollCalendar, getOrdersByRole, updateOrder} from "./api";
+import {approveOrder, cancelCalendar, enrollCalendar, getOrdersByRole, LoadingAnimation, updateOrder} from "./api";
 import {toast} from "react-toastify";
 import LoadingSpinner from "./LoadingSpinner";
 
@@ -23,27 +23,30 @@ const Calendar = ({ full }) => {
     const [isCancelLoading, setIsCancelLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isEmpty, setIsEmpty] = useState(false);
+    const [isApproveClick, setIsApproveClick] = useState(false);
+    const isExecutor = localStorage.getItem("userRole") === "executor";
 
     useEffect(() => {
-        const fetchData = async () => {
-            const token = Cookies.get('token');
-            if (!token) {
-                navigate('/login');
-            } else {
-                const response = await getOrdersByRole(navigate, full, currentMonth, id);
-                setAppointmentsData(response);
-                if (response) {
-                    setAppointmentsData(response);
-                    setIsEmpty(!response);
-                } else {
-                    setAppointmentsData(null);
-                    setIsEmpty(true);
-                }
-                setIsLoading(false);
-            }
-        };
         fetchData();
     }, [currentMonth, navigate, full, id]);
+
+    const fetchData = async () => {
+        const token = Cookies.get('token');
+        if (!token) {
+            navigate('/login');
+        } else {
+            const response = await getOrdersByRole(navigate, full, currentMonth, id);
+            setAppointmentsData(response);
+            if (response) {
+                setAppointmentsData(response);
+                setIsEmpty(!response);
+            } else {
+                setAppointmentsData(null);
+                setIsEmpty(true);
+            }
+            setIsLoading(false);
+        }
+    };
 
     if (isLoading) {
         return <LoadingSpinner />;
@@ -229,6 +232,35 @@ const Calendar = ({ full }) => {
         });
     }
 
+    const handleApproveClick = async (id) => {
+        setIsApproveClick(true);
+        try{
+            await approveOrder(navigate, id, isExecutor);
+            await fetchData();
+            toast.success(translations[language]['Success'], {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: 'Success',
+            });
+        }catch (e){
+            toast.error(translations[language]['Error'], {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: 'Error',
+            });
+        }finally {
+            setIsApproveClick(false);
+        }
+    };
+
     const renderAppointments = () => {
         if (selectedDay !== null) {
             const appointments = appointmentsData.filter(appointment => appointment.day === selectedDay);
@@ -265,17 +297,18 @@ const Calendar = ({ full }) => {
                                                 {full ?
                                                     <button
                                                         className="save"
+                                                        style={{width: "100%"}}
                                                         onClick={() => saveClientComment()}
                                                     >
                                                         <FontAwesomeIcon
                                                             icon={faSave}
                                                             style={{ color: "lightgreen", backgroundColor: "transparent" }}
-                                                        /> translations[language]['Save']
+                                                        /> {translations[language]['Save']}
                                                     </button>
                                                     : <></>}
                                             </div>
                                         }
-                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorApprove']}: <strong>{appointment.executorApprove ?
+                                        {/*<div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorApprove']}: <strong>{appointment.executorApprove ?
                                             <FontAwesomeIcon
                                                 icon={faCheck}
                                                 style={{ color: "lightgreen", backgroundColor: "transparent" }}
@@ -284,7 +317,7 @@ const Calendar = ({ full }) => {
                                             <FontAwesomeIcon
                                                 icon={faClose}
                                                 style={{ color: "red", backgroundColor: "transparent" }}
-                                            />} </strong></div>
+                                            />} </strong></div>*/}
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientApprove']}: <strong>{appointment.clientApprove ?
                                             <FontAwesomeIcon
                                                 icon={faCheck}
@@ -307,8 +340,20 @@ const Calendar = ({ full }) => {
                                     )}
 
                                     {new Date(appointment.starDate) > new Date() && appointment.clientId !== null && appointment.clientId === userId && (
+                                        !appointment.executorApprove && !appointment.clientApprove && (
+                                            <button
+                                                onClick={() => handleApproveClick(appointment.id)}
+                                                disabled={!appointment.clientId}
+                                                style={{ backgroundColor: "transparent" }}
+                                            >
+                                                {isApproveClick ? <LoadingAnimation /> : translations[language]['ApproveOrder']}
+                                            </button>
+                                        )
+                                    )}
+
+                                    {new Date(appointment.starDate) > new Date() && appointment.clientId !== null && appointment.clientId === userId && (
                                         <button
-                                            style={{ backgroundColor: "transparent" }}
+                                            style={{ backgroundColor: "transparent", color: "red", marginTop: "5px", borderColor: "red" }}
                                             onClick={() => cancelButtonClick(appointment)}
                                             disabled={isCancelLoading}
                                         >

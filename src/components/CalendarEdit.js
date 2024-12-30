@@ -8,7 +8,15 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import {LanguageContext} from "./LanguageContext";
 import {toast} from "react-toastify";
-import {addOrder, deleteOrder, enrollCalendar, getExecutorServicesLookup, getOrdersByRole, updateOrder} from "./api";
+import {
+    addOrder,
+    approveOrder,
+    deleteOrder,
+    enrollCalendar,
+    getExecutorServicesLookup,
+    getOrdersByRole,
+    updateOrder
+} from "./api";
 import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
 import {faClose} from "@fortawesome/free-solid-svg-icons/faClose";
 
@@ -37,7 +45,8 @@ const Calendar = ({full}) => {
     const [isDeleteClick, setIsDeleteClick] = useState(false);
     const [isSaveClick, setIsSaveClick] = useState(false);
     const [isNewAppointmentSave, setIsNewAppointmentSave] = useState(false);
-
+    const [isApproveClick, setIsApproveClick] = useState(false);
+    const isExecutor = localStorage.getItem("userRole") === "executor";
 
     useEffect(() => {
         fetchData();
@@ -612,6 +621,35 @@ const Calendar = ({full}) => {
         });
     };
 
+    const handleApproveClick = async (id) => {
+        setIsApproveClick(true);
+        try{
+            await approveOrder(navigate, id, isExecutor);
+            await fetchData();
+            toast.success(translations[language]['Success'], {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: 'Success',
+            });
+        }catch (e){
+            toast.error(translations[language]['Error'], {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                toastId: 'Error',
+            });
+        }finally {
+            setIsApproveClick(false);
+        }
+    };
+
     const renderAppointments = () => {
         if (selectedDays.length > 0) {
             const appointments = appointmentsData.filter((appointment) => selectedDays.includes(appointment.day));
@@ -726,7 +764,7 @@ const Calendar = ({full}) => {
                                         </div>
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientName']}: <strong>{appointment.clientName === null || appointment.clientName === "" ? '-' : appointment.clientName}</strong></div>
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientComment']}: <strong>{appointment.clientComment === null || appointment.clientComment === "" ? '-' : appointment.clientComment}</strong></div>
-                                        <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorApprove']}: <strong>{appointment.executorApprove?
+                                        {/*<div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ExecutorApprove']}: <strong>{appointment.executorApprove?
                                             <FontAwesomeIcon
                                                 icon={faCheck}
                                                 style={{ color: "lightgreen", backgroundColor: "transparent" }}
@@ -735,7 +773,7 @@ const Calendar = ({full}) => {
                                             <FontAwesomeIcon
                                                 icon={faClose}
                                                 style={{ color: "red", backgroundColor: "transparent" }}
-                                            />} </strong></div>
+                                            />} </strong></div>*/}
                                         <div style={theme === 'dark' ? { color: "white" } : {}}>{translations[language]['ClientApprove']}: <strong>{appointment.clientApprove ?
                                             <FontAwesomeIcon
                                                 icon={faCheck}
@@ -777,13 +815,36 @@ const Calendar = ({full}) => {
                                                     </button>
                                                 </div>
                                             }
-                                            {appointment.clientId != null && appointment.clientApprove
+{/*                                            {new Date(appointment.starDate) > new Date() && appointment.clientId !== null && (
+                                                !appointment.executorApprove && appointment.clientApprove && (
+                                                    <button
+                                                        onClick={() => handleApproveClick(appointment.id)}
+                                                        disabled={!appointment.clientId}
+                                                        style={{ backgroundColor: "transparent" }}
+                                                    >
+                                                        {isApproveClick ? <LoadingAnimation /> : translations[language]['ApproveOrder']}
+                                                    </button>
+                                                )
+                                            )}*/}
+ {/*                                           {appointment.clientId != null && appointment.clientApprove
                                                 && !appointment.executorApprove && new Date(appointment.starDate) > new Date() &&
                                                         <button style={{ backgroundColor: "transparent" }} onClick={() => enrollButtonClick(appointment.id)}>{translations[language]['MakeAnAppointment']}</button>
 
-                                            }
+                                            }*/}
                                         </div>
                                     )}
+
+{/*                                    {new Date(appointment.starDate) > new Date() && appointment.clientId !== null && (
+                                        !appointment.executorApprove && appointment.clientApprove && (
+                                            <button
+                                                onClick={() => handleApproveClick(appointment.id)}
+                                                disabled={!appointment.clientId}
+                                                style={{ backgroundColor: "transparent" }}
+                                            >
+                                                {isApproveClick ? <LoadingAnimation /> : translations[language]['ApproveOrder']}
+                                            </button>
+                                        )
+                                    )}*/}
                                 </div>
                             </div>
                         ))}
