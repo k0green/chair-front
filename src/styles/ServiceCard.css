@@ -370,7 +370,6 @@ input[type="text"] {
     flex-wrap: wrap; /* Карточки переносятся на следующую строку, если не помещаются */
     justify-content: center; /* Центрирование карточек */
     gap: 20px; /* Отступы между карточками */
-    max-width: 300px;
 }
 
 .add-photo-button-new {
@@ -700,7 +699,6 @@ input[type="text"] {
     .card-list {
         justify-content: flex-start; /* Выравнивание по левому краю */
         gap: 10px; /* Более плотное расположение */
-        max-width: 300px;
     }
 
     .service-card {
