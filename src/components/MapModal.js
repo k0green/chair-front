@@ -6,7 +6,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {ThemeContext} from "./ThemeContext";
 
 const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, initialAddress, apiKey, canEdit }) => {
-    const [position, setPosition] = useState({ lat: 55.751574, lng: 37.573856 });
+    const [position, setPosition] = useState({lat: 53.90215390255788, lng: 27.56189595549677});
     const [address, setAddress] = useState(initialAddress || '');
     const [selectedObject, setSelectedObject] = useState(null);
     const mapRef = useRef(null);
@@ -17,7 +17,11 @@ const MapModal = ({ isOpen, onRequestClose, onSaveAddress, initialPosition, init
 
     const initialMarkerRef = useRef(null);
 
+    const setDefaultPosition = (position) => { if (!position.lat || !position.lng) { return {lat: 53.90215390255788, lng: 27.56189595549677}; } return position; };
+
     useEffect(() => {
+        if(initialPosition)
+            initialPosition = setDefaultPosition(initialPosition);
         const loadMap = () => {
             if (!window.ymaps || mapLoadedRef.current) return;
 

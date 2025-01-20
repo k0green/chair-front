@@ -62,11 +62,8 @@ const AddServiceCardPage = () => {
         };
 
     return (
-        <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
-            <div>
-                <AllCategories categories={categories} isEditServiceCard = {true} userId = {id}/>
-            </div>
-        </div>
+        <EditServiceCard service={service} isNew={true} id={id} categories={categories}/>
+        /*<AllCategories categories={categories} isEditServiceCard = {true} userId = {id}/>*/
     );
 };
 

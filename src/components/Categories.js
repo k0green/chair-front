@@ -27,7 +27,7 @@ const CategoryList = ({categories}) => {
     }, []);
 
     const handleCategoryClick = async (id) => {
-        navigate('/all-child-categories/' + id);
+        navigate('/all-categories', { state: { parentId: id } });
     };
 
     const totalPages = Math.ceil(categories.length / itemsPerPage);

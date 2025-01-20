@@ -18,8 +18,10 @@ import {faClock} from "@fortawesome/free-solid-svg-icons/faClock";
 import {faCancel} from "@fortawesome/free-solid-svg-icons/faCancel";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
+import {faEdit} from "@fortawesome/free-solid-svg-icons/faEdit";
+import AllCategories from "./AllCategories";
 
-const ServiceCard = ({ service, isNew, id }) => {
+const ServiceCard = ({ service, isNew, id, categories }) => {
     const navigate = useNavigate();
     const { theme } = useContext(ThemeContext);
     const [filesToDelete, setFilesToDelete] = useState([]);
@@ -33,6 +35,7 @@ const ServiceCard = ({ service, isNew, id }) => {
 
     const [editedDescription, setEditedDescription] = useState(service.description);
     const [editedServiceTypeId, setEditedServiceTypeId] = useState(service.serviceTypeId);
+    const [editedServiceTypeName, setEditedServiceTypeName] = useState(service.serviceTypeName);
     const [editedDuration] = useState(formatTime(service.duration));
     const [editedPrice] = useState(service.price);
     const [editedAddress, setEditedAddress] = useState(service.place);
@@ -43,6 +46,7 @@ const ServiceCard = ({ service, isNew, id }) => {
     const { language, translations } = useContext(LanguageContext);
     const [isEditSave, setIsEditSave] = useState(false);
     const [isUpload, setIsUpload] = useState(false);
+    const [isFilterButtonVisible, setIsFilterButtonVisible] = useState(false);
 
     const reverseFormatTime = (formattedTime, editedDuration) => {
         const [hours, minutes] = formattedTime.split(':').map(Number);
@@ -74,16 +78,16 @@ const ServiceCard = ({ service, isNew, id }) => {
 
     }, []);
 
-    const handleEditSave = () => {
+    const handleEditSave = async () => {
         setIsEditSave(true);
-        try{
+        try {
             const updatedServiceData = {
                 id: service.id,
                 serviceTypeId: service.serviceTypeId,
                 executorId: service.executorId,
                 description: editedDescription,
                 place: editedAddress,
-                duration: new Date(2023,1,1,20, 50,0, 0),//reverseFormatTime(editedDuration, service.duration),
+                duration: new Date(2023, 1, 1, 20, 50, 0, 0), // reverseFormatTime(editedDuration, service.duration),
                 price: 0,
                 photoIds: editedPhotos.map(photo => photo.id),
                 removePhotoIds: filesToDelete,
@@ -101,45 +105,33 @@ const ServiceCard = ({ service, isNew, id }) => {
                 return;
             }
 
-            updateServiceCard(updatedServiceData, navigate)
-                .catch(error => {
-                    const errorMessage = error.message || 'Failed to fetch data';
-                    if (!toast.isActive(errorMessage)) {
-                        toast.error(errorMessage, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: errorMessage,
-                        });
-                    }
-                    console.error('Error fetching data:', error);
+            const response = await updateServiceCard(updatedServiceData, navigate);
+
+            if (response) {
+                toast.success(translations[language]['Success'], {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: 'Success',
                 });
-            toast.success(translations[language]['Success'], {
-                position: "top-center",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                toastId: 'Success',
-            });
-        }catch (e){
-            console.log(e)
-        }finally {
+            }
+        } catch (e) {
+            console.log(e);
+        } finally {
             setIsEditSave(false);
         }
     };
 
-    const handleAddSave = () => {
+    const handleAddSave = async() => {
         setIsEditSave(true);
         try{
             const date = new Date(2023,1,1,20, 50,0, 0);
             date.setHours(date.getHours()+3);
             const updatedServiceData = {
-                serviceTypeId: service.serviceTypeId,
+                serviceTypeId: editedServiceTypeId,
                 executorId: id,
                 description: editedDescription,
                 place: editedAddress,
@@ -160,31 +152,19 @@ const ServiceCard = ({ service, isNew, id }) => {
                 return;
             }
 
-            addServiceCard(updatedServiceData, navigate)
-                .catch(error => {
-                    const errorMessage = error.message || 'Failed to fetch data';
-                    if (!toast.isActive(errorMessage)) {
-                        toast.error(errorMessage, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            toastId: errorMessage,
-                        });
-                    }
-                    console.error('Error fetching data:', error);
+            const response = await addServiceCard(updatedServiceData, navigate)
+
+            if (response) {
+                toast.success(translations[language]['Success'], {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: 'Success',
                 });
-            toast.success(translations[language]['Success'], {
-                position: "top-center",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                toastId: 'Success',
-            });
+            }
         }catch (e){
             console.log(e)
         }finally {
@@ -280,9 +260,19 @@ const ServiceCard = ({ service, isNew, id }) => {
         setEditedAddress(address);
     };
 
+    const handleFilterButtonCloseClick = (value) => {
+        setIsFilterButtonVisible(value);
+    };
+
+    const handleCategorySelect = (id, name) => {
+        setEditedServiceTypeId(id);
+        setEditedServiceTypeName(name);
+        handleFilterButtonCloseClick(false);
+    };
+
     return (
-        <div className="centrize">
-        <div className={`service-card-edit ${theme === 'dark' ? 'dark' : ''}`}>
+        <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"} style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+            <div className={`service-card-edit ${theme === 'dark' ? 'dark' : ''}`}>
                 <div key={service.id} className="master-card">
                     <div className="photos-edit">
                         <PhotoList photos={editedPhotos} size={window.innerWidth < 700 ? 300 : 480} />
@@ -290,6 +280,19 @@ const ServiceCard = ({ service, isNew, id }) => {
                             <p className="add-photo-text"><FontAwesomeIcon icon={faAdd} /> {translations[language]['AddPhoto']}</p>
                         </button>
                     </div>
+                    {isNew ?
+                        <div className={`master-info ${theme === 'dark' ? 'dark' : ''}`}
+                             onClick={() => handleFilterButtonCloseClick(true)}
+                             style={{cursor: "pointer", marginBottom: "-40px", padding: 0, fontSize: "16px"}}
+                        >
+                            <h4 style={{ cursor: "pointer" }}>{editedServiceTypeName || service.serviceTypeName}</h4>
+                            <h4 style={{ cursor: "pointer" }}>
+                                <FontAwesomeIcon icon={faEdit} className='item-icon' />
+                            </h4>
+                        </div>
+                     :
+                        <></>
+                    }
                     <div className="service-description" style={{marginTop: "30px", marginBottom: "10px"}}>
                         <input
                             style={{width: "95%", borderColor: "#c5c5c5"}}
@@ -329,7 +332,7 @@ const ServiceCard = ({ service, isNew, id }) => {
                         </button>
                     </div>
                 </div>
-        </div>
+            </div>
             <div className={`filter-overlay ${uploadPhotoModal ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
                 <div className="filter-content">
                     <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
@@ -354,9 +357,26 @@ const ServiceCard = ({ service, isNew, id }) => {
                 isOpen={isModalOpen}
                 onRequestClose={() => setIsModalOpen(false)}
                 onSaveAddress={handleSaveAddress}
-                initialPosition={editedAddress.position}
+                initialPosition={editedAddress.position ?? {lat: 53.90215390255788, lng: 27.56189595549677}}
                 canEdit={true}
             />
+            <div className={`filter-overlay ${isFilterButtonVisible ? 'visible' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="filter-content ${theme === 'dark' ? 'dark' : ''}">
+                    <div style={{ display: "flex", justifyContent: "right", width: "95%" }}>
+                        <FontAwesomeIcon icon={faXmark} onClick={() => handleFilterButtonCloseClick(false)} flip="horizontal" style={{ marginRight: "0px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    </div>
+                    {isNew ?
+                        <AllCategories
+                            categories={categories}
+                            isEditServiceCard={true}
+                            userId={id}
+                            onSelectCategory={handleCategorySelect}
+                        />
+                        :
+                        <></>
+                    }
+                </div>
+            </div>
         </div>
     );
 };

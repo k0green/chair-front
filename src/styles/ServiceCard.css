@@ -696,7 +696,7 @@ input[type="text"] {
     }
 
     .card-list {
-        justify-content: flex-start; /* Выравнивание по левому краю */
+        /*justify-content: flex-start; !* Выравнивание по левому краю *!*/
         gap: 10px; /* Более плотное расположение */
     }
 

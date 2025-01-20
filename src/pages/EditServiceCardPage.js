@@ -44,9 +44,7 @@ const EditServiceCardPage = () => {
     }
 
     return (
-        <div className={theme === "dark" ? "main-dark-theme" : "main-light-theme"}>
-            {service && <EditServiceCard service={service} isNew={isNew} id={id}/>}
-        </div>
+        service && <EditServiceCard service={service} isNew={isNew} id={id}/>
     );
 };
 

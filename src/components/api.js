@@ -35,7 +35,14 @@ export const getPopularServiceTypes = async (filterModel) => {
 export const getAllServiceTypes = async (id) => {
     try {
         const response = await axios.get(`${BASE_URL}/service-types/get-all?parentId=` + id, {});
-        return response.data;
+        return response.data.map(type => ({
+            id: type.id,
+            name: type.name,
+            icon: type.icon,
+            parentId: type.parentId,
+            parentName: type.parentName,
+            isFinal: !!id
+        }));
     } catch (error) {
         if (!toast.isActive(error.message)) {
             toast.error(error.message, {
@@ -453,25 +460,68 @@ export const updateServiceCard = async (updatedServiceData, navigate) => {
 export const addServiceCard = async (updatedServiceData, navigate) => {
     try {
         const token = Cookies.get('token');
-        if(!token)
+        if (!token) {
             navigate("/login");
-        else {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            await axios.post(`${BASE_URL}/executor-service/add`, updatedServiceData);
+            return;
+        }
+
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        const response = await axios.post(`${BASE_URL}/executor-service/add`, updatedServiceData);
+        if (response.status >= 200 && response.status < 300) {
             navigate(`/profile`);
+            return response.data;
         }
     } catch (error) {
-        if (!toast.isActive(error.message)) {
-            toast.error(error.message, {
+        if (error.response && error.response.data) {
+            const errorData = error.response.data;
+
+            if (Array.isArray(errorData)) {
+                const messages = errorData.map(err => err.message).join("\n");
+                toast.error(messages, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: 'ServerErrorArray',
+                });
+            }
+            else if (errorData.message) {
+                toast.error(errorData.message, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: 'ServerErrorMessage',
+                });
+            }
+            else {
+                toast.error("Неизвестная ошибка сервера.", {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    toastId: 'UnknownServerError',
+                });
+            }
+        } else {
+            // Если ошибка не связана с ответом сервера
+            toast.error("Сетевая ошибка или проблема с подключением.", {
                 position: "top-center",
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                toastId: error.message,
+                toastId: 'NetworkError',
             });
         }
+
         console.error('Error:', error);
     }
 };

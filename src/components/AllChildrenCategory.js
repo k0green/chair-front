@@ -6,11 +6,11 @@ import {faArrowLeft} from "@fortawesome/free-solid-svg-icons/faArrowLeft";
 import {useNavigate} from "react-router-dom";
 import {ThemeContext} from "./ThemeContext";
 
-const AllChildrenCategory = ({categories, isEditServiceCard, userId}) => {
+const AllChildrenCategory = ({ categories, isEditServiceCard, userId, onSelectCategory }) => {
     const navigate = useNavigate();
     const { theme } = useContext(ThemeContext);
 
-    const handleBackClick = async () => {
+    const handleBackClick = () => {
         navigate('/all-categories');
         window.location.reload();
     };
@@ -21,7 +21,7 @@ const AllChildrenCategory = ({categories, isEditServiceCard, userId}) => {
         <div>
             <div style={{ display: "flex", justifyContent: "flex-start", width: "100%", textAlign: "left" }} onClick={handleBackClick}>
                 <h2 className={`type-name ${theme === 'dark' ? 'dark' : ''}`}>
-                    <FontAwesomeIcon icon={faArrowLeft} style={{ cursor: "pointer", marginRight: "20px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}}/>
+                    <FontAwesomeIcon icon={faArrowLeft} style={{ cursor: "pointer", marginRight: "20px", ...(theme === 'dark' ? { color: "white" } : { color: "#000" })}} />
                     {parentName}
                 </h2>
             </div>
@@ -34,9 +34,8 @@ const AllChildrenCategory = ({categories, isEditServiceCard, userId}) => {
                             name={category.name}
                             icon={category.icon}
                             isEditServiceCard={isEditServiceCard}
-                            userId = {userId}
-                            parentName={category.parentName}
-                            parentId={category.parentId}
+                            userId={userId}
+                            onSelectCategory={onSelectCategory} // Передача обработчика
                         />
                     ))}
                 </div>
@@ -46,4 +45,3 @@ const AllChildrenCategory = ({categories, isEditServiceCard, userId}) => {
 };
 
 export default AllChildrenCategory;
-
